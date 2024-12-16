@@ -146,18 +146,15 @@ function renderChartSmall(data) {
   }
 
 
-  function atualiza_datahota() {
+  function atualiza_datahota(data) {
     const h2Atualizacao = document.getElementById("atualizacao");
-    const h2Atualizacao1 = document.getElementById("atualizacao1");
     // Verifica a última atualização
-    if (UltAtualizacao.length > 0) {
-      const ultimaAtualizacao = UltAtualizacao[0].Atualizacao;
+    if (data.length > 0) {
+      const ultatt = data[0].Atualizacao;
       // Adiciona a data/hora ao conteúdo sem remover o ícone
-      h2Atualizacao.innerHTML += ` ${ultimaAtualizacao}`;
-      h2Atualizacao1.innerHTML += ` ${ultimaAtualizacao}`;
+      h2Atualizacao.innerHTML += ` ${ultatt}`;
     } else {
       h2Atualizacao.innerHTML += " Não disponível";
-      h2Atualizacao1.innerHTML += " Não disponível";
     }
   }
 
