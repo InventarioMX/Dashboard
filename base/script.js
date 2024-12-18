@@ -146,7 +146,7 @@ function renderChartSmall(data) {
   }
 
 
-  function atualiza_datahota(data) {
+  function atualiza_datahota_tables(data) {
     const h2Atualizacao = document.getElementById("atualizacao");
     // Verifica a última atualização
     if (data.length > 0) {
@@ -156,11 +156,21 @@ function renderChartSmall(data) {
     } else {
       h2Atualizacao.innerHTML += " Não disponível";
     }
-  }
+}
+function atualiza_datahota_dash(data) {
+    const h2Atualizacao = document.getElementById("atualizacao");
+    // Verifica a última atualização
+    if (data.length > 0) {
+        const ultatt = data[0].Atualizacao;
+        // Adiciona a data/hora ao conteúdo sem remover o ícone
+        h2Atualizacao.innerHTML += ` ${ultatt}`;
+    } else {
+        h2Atualizacao.innerHTML += " Não disponível";
+    }
+}
 
 function atualizarDados() {
     populateTable(jsonData);
-    atualiza_datahota(UltAtualizacao)
 }
 
 // Executar quando a página carregar

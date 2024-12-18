@@ -37,7 +37,7 @@
 
 <body class="">
   <div class="wrapper">
-    <div class="sidebar">
+    <div class="sidebar" data="blue">
       <!--
         Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red"
     -->
@@ -66,7 +66,7 @@
         </ul>
       </div>
     </div>
-    <div class="main-panel">
+    <div class="main-panel" data="blue">
       <!-- Navbar -->
       <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
         <div class="container-fluid">
@@ -401,7 +401,8 @@
   <script>
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
+        demo.initDashboardPageCharts();
+        atualiza_datahota_tables(UltAtualizacao);
 
     });
   </script>
