@@ -156,12 +156,28 @@ demo = {
       }
     };
 
+    const legendColors = [];
+    for (let i = 0; i < doCreated.length; i++) {
+      if (doCreated[i] > 70) {
+        legendColors.push('red');
+      } else {
+        legendColors.push('rgba(255, 255, 255, 0.8)');
+      }
+    }
+
     gradientChartOptionsConfigurationWithTooltipPurple = {
       maintainAspectRatio: false,
       legend: {
         display: false
       },
-
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 50,
+          right: 50,
+        }
+      },
       tooltips: {
         backgroundColor: '#f5f5f5',
         titleFontColor: '#333',
@@ -173,6 +189,20 @@ demo = {
         position: "nearest"
       },
       responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+        },
+        datalabels: {
+          color: 'rgba(255, 255, 255, 0.8)',
+          anchor: 'end',
+          align: 'top',
+          font: {
+            size: 25,
+          },
+          formatter: (value) => `${value}`, // Formato dos rótulos
+        }
+      },
       scales: {
         yAxes: [{
           barPercentage: 1.6,
@@ -182,10 +212,11 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
-            suggestedMin: 60,
-            suggestedMax: 125,
+            suggestedMin: 50,
+            suggestedMax: Math.max(...doCreated)*1.1,
             padding: 20,
-            fontColor: "#9a9a9a"
+            fontColor: "#9a9a9a",
+            display:false
           }
         }],
 
@@ -257,18 +288,39 @@ demo = {
       legend: {
         display: false
       },
-
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 30,
+          right: 30,
+        }
+      },
       tooltips: {
         backgroundColor: '#f5f5f5',
         titleFontColor: '#333',
         bodyFontColor: '#666',
-        bodySpacing: 4,
+        bodySpacing: 0,
         xPadding: 12,
         mode: "nearest",
         intersect: 0,
         position: "nearest"
       },
       responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+        },
+        datalabels: {
+          color: 'rgba(255, 255, 255, 0.8)',
+          anchor: 'end',
+          align: 'top',
+          font: {
+            size: 25,
+          },
+          formatter: (value) => `${value}`, // Formato dos rótulos
+        }
+      },
       scales: {
         yAxes: [{
           barPercentage: 1.6,
@@ -278,9 +330,10 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
+            display: false,
             suggestedMin: 50,
-            suggestedMax: 125,
-            padding: 20,
+            suggestedMax: 10000,
+            padding: 10,
             fontColor: "#9e9e9e"
           }
         }],
@@ -293,6 +346,7 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
+            fontSize: 19,
             padding: 20,
             fontColor: "#9e9e9e"
           }
@@ -312,24 +366,39 @@ demo = {
         titleFontColor: '#333',
         bodyFontColor: '#666',
         bodySpacing: 4,
-        xPadding: 12,
+        xPadding: 15,
         mode: "nearest",
         intersect: 0,
         position: "nearest"
       },
       responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+        },
+        datalabels: {
+          color: 'rgba(255, 255, 255, 0.8)',
+          anchor: 'end',
+          align: 'top',
+          font: {
+            size: 36,
+          },
+          formatter: (value) => `${value}`, // Formato dos rótulos
+        }
+      },
       scales: {
         yAxes: [{
-
           gridLines: {
             drawBorder: false,
             color: 'rgba(29,140,248,0.1)',
             zeroLineColor: "transparent",
           },
           ticks: {
+            display: false,
+            fontSize: 25,
             suggestedMin: 60,
             suggestedMax: 120,
-            padding: 20,
+            padding: 10,
             fontColor: "#9e9e9e"
           }
         }],
@@ -342,6 +411,8 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
+            
+            fontSize: 25,
             padding: 20,
             fontColor: "#9e9e9e"
           }
@@ -349,43 +420,8 @@ demo = {
       }
     };
 
-    var ctx = document.getElementById("chartLinePurple").getContext("2d");
 
-    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(72,72,176,0.2)');
-    gradientStroke.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
-
-    var data = {
-      labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-      datasets: [{
-        label: "Data",
-        fill: true,
-        backgroundColor: gradientStroke,
-        borderColor: '#d048b6',
-        borderWidth: 2,
-        borderDash: [],
-        borderDashOffset: 0.0,
-        pointBackgroundColor: '#d048b6',
-        pointBorderColor: 'rgba(255,255,255,0)',
-        pointHoverBackgroundColor: '#d048b6',
-        pointBorderWidth: 20,
-        pointHoverRadius: 4,
-        pointHoverBorderWidth: 15,
-        pointRadius: 4,
-        data: [80, 100, 70, 80, 120, 80],
-      }]
-    };
-
-    var myChart = new Chart(ctx, {
-      type: 'line',
-      data: data,
-      options: gradientChartOptionsConfigurationWithTooltipPurple
-    });
-
-
-    var ctxGreen = document.getElementById("chartLineGreen").getContext("2d");
+    var ctx = document.getElementById("chartLineGreen").getContext("2d");
 
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
 
@@ -399,11 +435,11 @@ demo = {
         label: "Itens",
         fill: true,
         backgroundColor: gradientStroke,
-        borderColor: '#00d6b4',
+        borderColor: '#00f2c3',
         borderWidth: 2,
         borderDash: [],
         borderDashOffset: 0.0,
-        pointBackgroundColor: '#00d6b4',
+        pointBackgroundColor: '#00f2c3',
         pointBorderColor: 'rgba(255,255,255,0)',
         pointHoverBackgroundColor: '#00d6b4',
         pointBorderWidth: 20,
@@ -414,72 +450,77 @@ demo = {
       }]
     };
 
-    var myChart = new Chart(ctxGreen, {
+    var myChart = new Chart(ctx, {
       type: 'line',
       data: data,
       options: gradientChartOptionsConfigurationWithTooltipGreen
 
     });
 
-
-
     var chart_labels = ['07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h'];
-    var chart_data = [100, 70, 90, 70, 85, 60, 75, 60];
 
+    var pointColors = [];
+    for (let i = 0; i < doCreated.length; i++) {
+      if (doCreated[i] > 1000) {
+        pointColors.push('red');
+      } else {
+        pointColors.push('#2EC0F9');
+      }
+    }
 
     var ctx = document.getElementById("chartBig1").getContext('2d');
 
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
 
-    gradientStroke.addColorStop(1, 'rgba(72,72,176,0.1)');
-    gradientStroke.addColorStop(0.4, 'rgba(72,72,176,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
     var config = {
       type: 'line',
       data: {
-        labels: chart_labels,
+        labels: chart_labels, 
         datasets: [{
           label: "Itens",
           fill: true,
           backgroundColor: gradientStroke,
-          borderColor: '#d346b1',
+          borderColor: '#2EC0F9',
           borderWidth: 2,
           borderDash: [],
           borderDashOffset: 0.0,
-          pointBackgroundColor: '#d346b1',
+          pointBackgroundColor: pointColors,
           pointBorderColor: 'rgba(255,255,255,0)',
-          pointHoverBackgroundColor: '#d346b1',
+          pointHoverBackgroundColor: '#2EC0F9',
           pointBorderWidth: 20,
           pointHoverRadius: 4,
           pointHoverBorderWidth: 15,
           pointRadius: 4,
-          data: chart_data,
+          data: doCreated,
         }]
       },
       options: gradientChartOptionsConfigurationWithTooltipPurple
     };
     var myChartData = new Chart(ctx, config);
-    $("#0").click(function() {
-      var data = myChartData.config.data;
-      data.datasets[0].data = chart_data;
-      data.labels = chart_labels;
-      myChartData.update();
-    });
-    $("#1").click(function() {
-      var chart_data = [80, 120, 105, 110, 95, 105, 90, 100];
-      var data = myChartData.config.data;
-      data.datasets[0].data = chart_data;
-      data.labels = chart_labels;
-      myChartData.update();
-    });
+    // $("#0").click(function() {
+    //   var data = myChartData.config.data;
+    //   data.datasets[0].data = chart_data;
+    //   data.labels = chart_labels;
+    //   myChartData.update();
+    // });
+    // $("#1").click(function() {
+    //   var chart_data = [80, 120, 105, 110, 95, 105, 90, 100];
+    //   var data = myChartData.config.data;
+    //   data.datasets[0].data = chart_data;
+    //   data.labels = chart_labels;
+    //   myChartData.update();
+    // });
 
-    $("#2").click(function() {
-      var chart_data = [60, 80, 65, 130, 80, 105, 90, 130];
-      var data = myChartData.config.data;
-      data.datasets[0].data = chart_data;
-      data.labels = chart_labels;
-      myChartData.update();
-    });
+    // $("#2").click(function() {
+    //   var chart_data = [60, 80, 65, 130, 80, 105, 90, 130];
+    //   var data = myChartData.config.data;
+    //   data.datasets[0].data = chart_data;
+    //   data.labels = chart_labels;
+    //   myChartData.update();
+    // });
 
 
     var ctx = document.getElementById("CountryChart").getContext("2d");
@@ -511,215 +552,10 @@ demo = {
           data: [53, 20, 10, 80, 100, 45],
         }]
       },
-      options: gradientBarChartConfiguration
+      options: gradientBarChartConfiguration,
+      plugins: [ChartDataLabels],
     });
 
-  },
-
-  initGoogleMaps: function() {
-    var myLatlng = new google.maps.LatLng(40.748817, -73.985428);
-    var mapOptions = {
-      zoom: 13,
-      center: myLatlng,
-      scrollwheel: false, //we disable de scroll over the map, it is a really annoing when you scroll through page
-      styles: [{
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#1d2c4d"
-          }]
-        },
-        {
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#8ec3b9"
-          }]
-        },
-        {
-          "elementType": "labels.text.stroke",
-          "stylers": [{
-            "color": "#1a3646"
-          }]
-        },
-        {
-          "featureType": "administrative.country",
-          "elementType": "geometry.stroke",
-          "stylers": [{
-            "color": "#4b6878"
-          }]
-        },
-        {
-          "featureType": "administrative.land_parcel",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#64779e"
-          }]
-        },
-        {
-          "featureType": "administrative.province",
-          "elementType": "geometry.stroke",
-          "stylers": [{
-            "color": "#4b6878"
-          }]
-        },
-        {
-          "featureType": "landscape.man_made",
-          "elementType": "geometry.stroke",
-          "stylers": [{
-            "color": "#334e87"
-          }]
-        },
-        {
-          "featureType": "landscape.natural",
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#023e58"
-          }]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#283d6a"
-          }]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#6f9ba5"
-          }]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "labels.text.stroke",
-          "stylers": [{
-            "color": "#1d2c4d"
-          }]
-        },
-        {
-          "featureType": "poi.park",
-          "elementType": "geometry.fill",
-          "stylers": [{
-            "color": "#023e58"
-          }]
-        },
-        {
-          "featureType": "poi.park",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#3C7680"
-          }]
-        },
-        {
-          "featureType": "road",
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#304a7d"
-          }]
-        },
-        {
-          "featureType": "road",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#98a5be"
-          }]
-        },
-        {
-          "featureType": "road",
-          "elementType": "labels.text.stroke",
-          "stylers": [{
-            "color": "#1d2c4d"
-          }]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#2c6675"
-          }]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "geometry.fill",
-          "stylers": [{
-            "color": "#9d2a80"
-          }]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "geometry.stroke",
-          "stylers": [{
-            "color": "#9d2a80"
-          }]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#b0d5ce"
-          }]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "labels.text.stroke",
-          "stylers": [{
-            "color": "#023e58"
-          }]
-        },
-        {
-          "featureType": "transit",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#98a5be"
-          }]
-        },
-        {
-          "featureType": "transit",
-          "elementType": "labels.text.stroke",
-          "stylers": [{
-            "color": "#1d2c4d"
-          }]
-        },
-        {
-          "featureType": "transit.line",
-          "elementType": "geometry.fill",
-          "stylers": [{
-            "color": "#283d6a"
-          }]
-        },
-        {
-          "featureType": "transit.station",
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#3a4762"
-          }]
-        },
-        {
-          "featureType": "water",
-          "elementType": "geometry",
-          "stylers": [{
-            "color": "#0e1626"
-          }]
-        },
-        {
-          "featureType": "water",
-          "elementType": "labels.text.fill",
-          "stylers": [{
-            "color": "#4e6d70"
-          }]
-        }
-      ]
-    };
-
-    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-    var marker = new google.maps.Marker({
-      position: myLatlng,
-      title: "Hello World!"
-    });
-
-    // To add the marker to the map, call setMap();
-    marker.setMap(map);
   },
 
   showNotification: function(from, align) {
@@ -727,11 +563,11 @@ demo = {
 
     $.notify({
       icon: "tim-icons icon-bell-55",
-      message: "Welcome to <b>Black Dashboard</b> - a beautiful freebie for every web developer."
+      message: "Dashboar <b>Atualizado com Sucesso</b> - System."
 
     }, {
       type: type[color],
-      timer: 8000,
+      timer: 2000,
       placement: {
         from: from,
         align: align

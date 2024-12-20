@@ -101,52 +101,8 @@ function renderChartLarge(data) {
   });
 }
 
-function renderChartSmall(data) {
-    const groupedData = data.reduce((acc, item) => {
-        if (!acc[item.Status]) {
-            acc[item.Status] = 0;
-        }
-        acc[item.Status] += item.Valor;
-        return acc;
-    }, {});
-  
-    // 2. Preparando os dados para o Chart.js
-    const labels = Object.keys(groupedData); // ['Waiting', 'Close']
-    const valores = Object.values(groupedData); // [430, 259]
-  
-    // 3. Criando o gráfico de pizza
-    const ctx = document.getElementById('smallChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels, // Rótulos (Status)
-            datasets: [{
-                data: valores, // Valores correspondentes
-                backgroundColor: ['#3498db', '#e74c3c'], // Cores para cada status
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top' // Posição da legenda
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (tooltipItem) {
-                            return `${tooltipItem.label}: ${tooltipItem.raw}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-  }
 
-
-  function atualiza_datahota_tables(data) {
+ function atualiza_datahota_tables(data) {
     const h2Atualizacao = document.getElementById("atualizacao");
     // Verifica a última atualização
     if (data.length > 0) {
@@ -168,6 +124,7 @@ function atualiza_datahota_dash(data) {
         h2Atualizacao.innerHTML += " Não disponível";
     }
 }
+
 
 function atualizarDados() {
     populateTable(jsonData);

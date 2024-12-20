@@ -45,6 +45,7 @@ arquivo.WriteLine "];"
 arquivo.WriteLine "const UltAtualizacao = ["
 arquivo.WriteLine vbTab & "{ ""Atualizacao"": """ & Now & """ }"
 arquivo.WriteLine "];"
+arquivo.WriteLine "const doCreated=[8, 12, 34, 2269, 85, 490, 450, 172];"
 
 ' Fechar o arquivo e liberar objetos
 arquivo.Close
