@@ -1,6 +1,8 @@
 ' Definir variáveis
 Dim conn, rs, fso, arquivo, caminhoExcel, caminhoTxt, sqlQuery
 
+WScript.Echo now
+
 ' Caminho para o arquivo Excel e para o arquivo de texto
 caminhoExcel = "C:\Users\luiz.os\source\repos\dashboard-operation\Auxiliar.xlsm"  ' Substitua pelo caminho do arquivo Excel
 caminhoTxt = "C:\Users\luiz.os\source\repos\dashboard-operation\base\dados.js"  ' Substitua pelo caminho do arquivo de saída
@@ -20,26 +22,40 @@ sqlQuery = "SELECT * FROM [Arquivo$]" ' Substitua "Arquivo$" pelo nome da sua pl
 ' Executar a consulta
 rs.Open sqlQuery, conn
 
-' Criar o arquivo de texto
+' Criar o arquivo de texto  
 Set arquivo = fso.CreateTextFile(caminhoTxt, True)
 
 arquivo.WriteLine "const jsonData = ["
 ' Escrever os dados no arquivo de texto
+
 Do Until rs.EOF
+    ' Inicializa a linha com um tabulador
+    vlin = vbTab & "{ "
+    
+    ' Loop por todas as colunas
+    For i = 0 To rs.Fields.Count - 1
+        vlin = vlin & """" & rs.Fields(i).Name & """: """ & rs.Fields(i).Value & """"
+        
+        ' Adiciona uma vírgula entre os pares chave-valor, exceto no último
+        If i < rs.Fields.Count - 1 Then
+            vlin = vlin & ", "
+        End If
+    Next
 
-    vlin = vbTab & "{ """ & rs.Fields(0).Name & """: """ & rs.Fields(0).Value & """, " & _
-              " """ & rs.Fields(1).Name & """: """ & rs.Fields(1).Value & """, " & _
-              " """ & rs.Fields(2).Name & """: """ & rs.Fields(2).Value & """, " & _
-              " """ & rs.Fields(3).Name & """: """ & rs.Fields(3).Value & """ },"
-
+    ' Finaliza a linha JSON
+    vlin = vlin & " },"
+    
     rs.MoveNext
     
+    ' Remove a última vírgula ao atingir o final do Recordset
     If rs.EOF Then
         vlin = Left(vlin, Len(vlin) - 1)
     End If
     
+    ' Escreve a linha no arquivo
     arquivo.WriteLine vlin
 Loop
+
 
 arquivo.WriteLine "];"
 arquivo.WriteLine "const UltAtualizacao = ["
@@ -57,6 +73,8 @@ Set arquivo = Nothing
 Set rs = Nothing
 Set conn = Nothing
 Set fso = Nothing
+
+WScript.Echo now
 
 ' Informar que o arquivo foi criado
 WScript.Echo "Arquivo de texto criado com sucesso!"

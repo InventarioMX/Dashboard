@@ -1,5 +1,12 @@
 type = ['primary', 'info', 'success', 'warning', 'danger'];
 
+data = {
+
+  
+
+
+};
+
 demo = {
   initPickColor: function() {
     $('.pick-class-label').click(function() {
@@ -15,96 +22,96 @@ demo = {
     });
   },
 
-  initDocChart: function() {
-    chartColor = "#FFFFFF";
+  // initDocChart: function() {
+  //   chartColor = "#FFFFFF";
 
-    // General configuration for the charts with Line gradientStroke
-    gradientChartOptionsConfiguration = {
-      maintainAspectRatio: false,
-      legend: {
-        display: false
-      },
-      tooltips: {
-        bodySpacing: 4,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest",
-        xPadding: 10,
-        yPadding: 10,
-        caretPadding: 10
-      },
-      responsive: true,
-      scales: {
-        yAxes: [{
-          display: 0,
-          gridLines: 0,
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            zeroLineColor: "transparent",
-            drawTicks: false,
-            display: false,
-            drawBorder: false
-          }
-        }],
-        xAxes: [{
-          display: 0,
-          gridLines: 0,
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            zeroLineColor: "transparent",
-            drawTicks: false,
-            display: false,
-            drawBorder: false
-          }
-        }]
-      },
-      layout: {
-        padding: {
-          left: 0,
-          right: 0,
-          top: 15,
-          bottom: 15
-        }
-      }
-    };
+  //   // General configuration for the charts with Line gradientStroke
+  //   gradientChartOptionsConfiguration = {
+  //     maintainAspectRatio: false,
+  //     legend: {
+  //       display: false
+  //     },
+  //     tooltips: {
+  //       bodySpacing: 4,
+  //       mode: "nearest",
+  //       intersect: 0,
+  //       position: "nearest",
+  //       xPadding: 10,
+  //       yPadding: 10,
+  //       caretPadding: 10
+  //     },
+  //     responsive: true,
+  //     scales: {
+  //       yAxes: [{
+  //         display: 0,
+  //         gridLines: 0,
+  //         ticks: {
+  //           display: false
+  //         },
+  //         gridLines: {
+  //           zeroLineColor: "transparent",
+  //           drawTicks: false,
+  //           display: false,
+  //           drawBorder: false
+  //         }
+  //       }],
+  //       xAxes: [{
+  //         display: 0,
+  //         gridLines: 0,
+  //         ticks: {
+  //           display: false
+  //         },
+  //         gridLines: {
+  //           zeroLineColor: "transparent",
+  //           drawTicks: false,
+  //           display: false,
+  //           drawBorder: false
+  //         }
+  //       }]
+  //     },
+  //     layout: {
+  //       padding: {
+  //         left: 0,
+  //         right: 0,
+  //         top: 15,
+  //         bottom: 15
+  //       }
+  //     }
+  //   };
 
-    ctx = document.getElementById('lineChartExample').getContext("2d");
+  //   ctx = document.getElementById('lineChartExample').getContext("2d");
 
-    gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
-    gradientStroke.addColorStop(0, '#80b6f4');
-    gradientStroke.addColorStop(1, chartColor);
+  //   gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
+  //   gradientStroke.addColorStop(0, '#80b6f4');
+  //   gradientStroke.addColorStop(1, chartColor);
 
-    gradientFill = ctx.createLinearGradient(0, 170, 0, 50);
-    gradientFill.addColorStop(0, "rgba(128, 182, 244, 0)");
-    gradientFill.addColorStop(1, "rgba(249, 99, 59, 0.40)");
+  //   gradientFill = ctx.createLinearGradient(0, 170, 0, 50);
+  //   gradientFill.addColorStop(0, "rgba(128, 182, 244, 0)");
+  //   gradientFill.addColorStop(1, "rgba(249, 99, 59, 0.40)");
 
-    myChart = new Chart(ctx, {
-      type: 'line',
-      responsive: true,
-      data: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-          label: "Active Users",
-          borderColor: "#f96332",
-          pointBorderColor: "#FFF",
-          pointBackgroundColor: "#f96332",
-          pointBorderWidth: 2,
-          pointHoverRadius: 4,
-          pointHoverBorderWidth: 1,
-          pointRadius: 4,
-          fill: true,
-          backgroundColor: gradientFill,
-          borderWidth: 2,
-          data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]
-        }]
-      },
-      options: gradientChartOptionsConfiguration
-    });
-  },
+  //   myChart = new Chart(ctx, {
+  //     type: 'line',
+  //     responsive: true,
+  //     data: {
+  //       labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  //       datasets: [{
+  //         label: "Active Users",
+  //         borderColor: "#f96332",
+  //         pointBorderColor: "#FFF",
+  //         pointBackgroundColor: "#f96332",
+  //         pointBorderWidth: 2,
+  //         pointHoverRadius: 4,
+  //         pointHoverBorderWidth: 1,
+  //         pointRadius: 4,
+  //         fill: true,
+  //         backgroundColor: gradientFill,
+  //         borderWidth: 2,
+  //         data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]
+  //       }]
+  //     },
+  //     options: gradientChartOptionsConfiguration
+  //   });
+  // },
 
   initDashboardPageCharts: function() {
 
@@ -500,28 +507,6 @@ demo = {
       options: gradientChartOptionsConfigurationWithTooltipPurple
     };
     var myChartData = new Chart(ctx, config);
-    // $("#0").click(function() {
-    //   var data = myChartData.config.data;
-    //   data.datasets[0].data = chart_data;
-    //   data.labels = chart_labels;
-    //   myChartData.update();
-    // });
-    // $("#1").click(function() {
-    //   var chart_data = [80, 120, 105, 110, 95, 105, 90, 100];
-    //   var data = myChartData.config.data;
-    //   data.datasets[0].data = chart_data;
-    //   data.labels = chart_labels;
-    //   myChartData.update();
-    // });
-
-    // $("#2").click(function() {
-    //   var chart_data = [60, 80, 65, 130, 80, 105, 90, 130];
-    //   var data = myChartData.config.data;
-    //   data.datasets[0].data = chart_data;
-    //   data.labels = chart_labels;
-    //   myChartData.update();
-    // });
-
 
     var ctx = document.getElementById("CountryChart").getContext("2d");
 
@@ -556,6 +541,16 @@ demo = {
       plugins: [ChartDataLabels],
     });
 
+  },
+
+  initLastUpdate: function(data) {
+    var txtHtml = document.getElementById("atualizacao");
+    if (data.length > 0) {
+      var ultatt = data[0].Atualizacao;
+      txtHtml.innerHTML += ` ${ultatt}`;
+    } else {
+      txtHtml.innerHTML += " Não disponível";
+    }
   },
 
   showNotification: function(from, align) {

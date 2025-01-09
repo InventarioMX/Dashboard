@@ -38,50 +38,34 @@
 
 <body class="">
     <div class="wrapper">
-        <!--<div class="sidebar" data="blue">-->
-        <!--
-            Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red"
-        -->
-        <!--<div class="sidebar-wrapper">
-                <div class="logo">
-                    <a href="javascript:void(0)" class="simple-text logo-mini">
-                        SDS
-                    </a>
-                    <a href="javascript:void(0)" class="simple-text logo-normal">
-                        SAMSUNG
-                    </a>
-                </div>
-                <ul class="nav">
-                    <li class="active ">
-                        <a href="./dashboard.html">
-                            <i class="tim-icons icon-chart-pie-36"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="./tables.html">
-                            <i class="tim-icons icon-paper"></i>
-                            <p>Tabela de dados</p>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>-->
         <div class="main-panel" data="blue">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
                 <div class="container-fluid">
-                    <a class="navbar-nav" href="javascript:void(0)">
-                        <h3 class="card-title">DASHBOARD OPERAÇÃO MX</h3>
-                    </a>
-                    <ul class="navbar-nav ml-auto">
-                        <li class="dropdown nav-item">
-                            <a href="#" class="nav-link">
-                                <h3 class="card-title" id="atualizacao"><i class="tim-icons icon-refresh-01 text-info"></i> Last Update:</h3>
+                    <div class="navbar-wrapper">
+                        <div class="row">
+                            <a class="navbar-nav" href="javascript:void(0)">
+                                <h3 class="card-title navbar-brand">DASHBOARD OP MX</h3>
                             </a>
-                        </li>
-                        <li class="separator d-lg-none"></li>
-                    </ul>
+
+                        </div>
+
+                    </div>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-bar navbar-kebab"></span>
+                        <span class="navbar-toggler-bar navbar-kebab"></span>
+                        <span class="navbar-toggler-bar navbar-kebab"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navigation">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="dropdown nav-item">
+                                <a href="#" class="nav-link">
+                                    <h3 class="card-title navbar-brand" id="atualizacao"><i class="tim-icons icon-refresh-01 text-info"></i> Last Update:</h3>
+                                </a>
+                            </li>
+                            <li class="separator d-lg-none"></li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
             <!-- End Navbar -->
@@ -170,31 +154,6 @@
                                     <div class="col-sm-6 text-left">
                                         <h3> <i class="tim-icons icon-bag-16" style="color: #2EC0F9;"></i> DO Created</h2>
                                     </div>
-                                    <!-- <div class="col-sm-6">
-                                        <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-                                            <label class="btn btn-sm btn-primary btn-simple active" id="0">
-                                                <input type="radio" name="options" checked>
-                                                <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Picking</span>
-                                                <span class="d-block d-sm-none">
-                                                    <i class="tim-icons icon-single-02"></i>
-                                                </span>
-                                            </label>
-                                            <label class="btn btn-sm btn-primary btn-simple" id="1">
-                                                <input type="radio" class="d-none d-sm-none" name="options">
-                                                <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Checking</span>
-                                                <span class="d-block d-sm-none">
-                                                    <i class="tim-icons icon-gift-2"></i>
-                                                </span>
-                                            </label>
-                                            <label class="btn btn-sm btn-primary btn-simple" id="2">
-                                                <input type="radio" class="d-none" name="options">
-                                                <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Loading</span>
-                                                <span class="d-block d-sm-none">
-                                                    <i class="tim-icons icon-tap-02"></i>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div> -->
                                 </div>
                             </div>
                             <div class="card-body">
@@ -205,7 +164,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
@@ -223,7 +182,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -260,7 +219,7 @@
     <script src="../assets/js/plugins/dataTables.min.js"></script>
 
     <script src="../base/script.js"></script>
-    <script src="../base/dados.js"></script>
+
     <!--   Core JS Files   -->
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap.min.js"></script>
@@ -389,8 +348,6 @@
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
         demo.initDashboardPageCharts();
-        demo.showNotification('top','center')
-        atualiza_datahota_tables(UltAtualizacao);
     });
     </script>
 </body>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos e Tabela Interativos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Consolidação de Quantidades</h1>
+    <canvas id="statusChart" width="400" height="200"></canvas>
+    <canvas id="typeChart" width="400" height="200" style="margin-top: 30px;"></canvas>
+    <h2>Tabela de Dados</h2>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>DO</th>
+                <th>Status</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Linhas da tabela serão adicionadas dinamicamente -->
+        </tbody>
+    </table>
+
+    <script>
+        // const fs = require('fs');
+
+        // // Lendo o arquivo JSON e parseando o conteúdo
+        // fs.readFile('../base/dados.json', 'utf8', (err, data) => {
+        // if (err) {
+        //     console.error('Erro ao ler o arquivo', err);
+        //     return;
+        // }
+
+        // // Convertendo a string JSON para um objeto JavaScript
+        // const baseData = JSON.parse(data);
+
+        // console.log(categorias);
+        // });
+
+        // Base JSON de exemplo com nova coluna "Tipo"
+        const baseData = [
+            { DO: 1, Status: "Sucesso", Tipo: "A",  Quantidade: 10 },
+            { DO: 2, Status: "Erro", Tipo: "B",  Quantidade: 5 },
+            { DO: 3, Status: "Pendente", Tipo: "A",  Quantidade: 8 },
+            { DO: 4, Status: "Sucesso", Tipo: "B",  Quantidade: 7 },
+            { DO: 5, Status: "Erro", Tipo: "A",  Quantidade: 3 },
+            { DO: 6, Status: "Pendente", Tipo: "C",  Quantidade: 6 }
+        ];
+
+        // Variáveis para armazenar os filtros atuais
+        let currentStatusFilter = null;
+        let currentTypeFilter = null;
+
+        // Função para consolidar os dados com base em filtros
+        function consolidateData(data, filterField, groupField) {
+            return data.reduce((acc, row) => {
+                if (!currentStatusFilter || row.Status === currentStatusFilter) {
+                    if (!currentTypeFilter || row.Tipo === currentTypeFilter) {
+                        acc[row[groupField]] = (acc[row[groupField]] || 0) + row.Quantidade;
+                    }
+                }
+                return acc;
+            }, {});
+        }
+
+        // Função para atualizar a tabela com base nos filtros
+        function updateTable(statusFilter = null, typeFilter = null) {
+            const tableBody = document.querySelector("#dataTable tbody");
+            tableBody.innerHTML = ""; // Limpa a tabela
+
+            // Determina os dados a serem exibidos
+            const filteredData = baseData.filter(row => {
+                return (!statusFilter || row.Status === statusFilter) &&
+                       (!typeFilter || row.Tipo === typeFilter);
+            });
+
+            // Adiciona as linhas na tabela
+            filteredData.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td>${row.DO}</td><td>${row.Status}</td><td>${row.Tipo}</td><td>${row.Quantidade}</td>`;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Função para atualizar os gráficos dinamicamente
+        function updateCharts() {
+            const statusConsolidation = consolidateData(baseData, currentTypeFilter, "Status");
+            const typeConsolidation = consolidateData(baseData, currentStatusFilter, "Tipo");
+
+            statusChart.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
+            typeChart.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
+
+            statusChart.update();
+            typeChart.update();
+        }
+
+        // Dados para os gráficos
+        const statusLabels = [...new Set(baseData.map(row => row.Status))];
+        const typeLabels = [...new Set(baseData.map(row => row.Tipo))];
+
+        // Configuração do gráfico de Status
+        const ctxStatus = document.getElementById("statusChart").getContext("2d");
+        const statusChart = new Chart(ctxStatus, {
+            type: "bar",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: "Quantidade por Status",
+                    data: statusLabels.map(label => 0), // Inicialização vazia
+                    backgroundColor: ["#4caf50", "#f44336", "#ff9800"],
+                    borderColor: ["#388e3c", "#d32f2f", "#f57c00"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
+                },
+                onClick: (e) => {
+                    const activePoints = statusChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+                    if (activePoints.length) {
+                        const clickedIndex = activePoints[0].index;
+                        const clickedStatus = statusLabels[clickedIndex];
+
+                        currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
+                        updateTable(currentStatusFilter, currentTypeFilter);
+                        updateCharts();
+                    }
+                }
+            }
+        });
+
+        // Configuração do gráfico de Tipos
+        const ctxType = document.getElementById("typeChart").getContext("2d");
+        const typeChart = new Chart(ctxType, {
+            type: "bar",
+            data: {
+                labels: typeLabels,
+                datasets: [{
+                    label: "Quantidade por Tipo",
+                    data: typeLabels.map(label => 0), // Inicialização vazia
+                    backgroundColor: ["#2196f3", "#ffeb3b", "#9c27b0"],
+                    borderColor: ["#1976d2", "#fbc02d", "#7b1fa2"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
+                },
+                onClick: (e) => {
+                    const activePoints = typeChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+                    if (activePoints.length) {
+                        const clickedIndex = activePoints[0].index;
+                        const clickedType = typeLabels[clickedIndex];
+
+                        currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
+                        updateTable(currentStatusFilter, currentTypeFilter);
+                        updateCharts();
+                    }
+                }
+            }
+        });
+
+        // Inicializa a tabela e gráficos
+        updateTable();
+        updateCharts();
+    </script>
+</body>
+</html>
