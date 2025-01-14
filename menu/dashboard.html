@@ -119,32 +119,81 @@
                             </div>
                         </div>
                     </div>
+                    <!-- <div class="col-lg-2">
+                        <div class="card card-chart">
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="card-header">
+                                        <h4 class="text-muted">Meta</h4>
+                                        <h1>12.680</h1>
+                                    </div>
+                                    
+                                </div>
+                                <div class="col-lg-5">
+                                    
+                                        <div id="orderStatisticsChart"></div> 
+                                        <div class="chart-prod">
+                                            <canvas id="pieProductivity"></canvas>
+                                        </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="card card-chart">
                             <div class="card-header">
-                                <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> Type Delivery</h3>
+                                <h3 class="card-title"><i class="tim-icons icon-molecule-40 text-success"></i> Trans Method.</h3>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="chartLineGreen"></canvas>
+                                    <canvas id="chartLineTransMethod"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-8">
+                    <div class="col-lg-6">
                         <div class="card card-chart">
                             <div class="card-header">
                                 <h3 class="card-title"><i class="tim-icons icon-cart text-info"></i> Step by Step</h3>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="CountryChart"></canvas>
+                                    <canvas id="chartBarStep"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="col-lg-2">
+                        <div class="card card-chart">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> Type D/O</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area">
+                                    <!-- <canvas id="pieProductivity"></canvas> -->
+                                    <div id="orderStatisticsChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="col-lg-4">
+                        <div class="card card-chart">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> Type Delivery</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area">
+                                    <div id="orderStatisticsChart"></div>
+                                    <canvas id="pieProductivity"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
                 </div>
                 <div class="row">
                     <div class="col-12">
@@ -164,7 +213,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="row">
+                <div class="row">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
@@ -182,7 +231,7 @@
                             </div>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
@@ -213,6 +262,7 @@
             </ul>
         </div>
     </div>
+    <script src="../assets/js/plugins/apexcharts.js"></script>
     <script src="../assets/js/plugins/chartjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
     <script src="../assets/js/core/jquery.min.js"></script>

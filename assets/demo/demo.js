@@ -1,9 +1,28 @@
+window.config = {
+  colors: {
+    primary: '#696cff',
+    secondary: '#8592a3',
+    success: '#71dd37',
+    info: '#03c3ec',
+    warning: '#ffab00',
+    danger: '#ff3e1d',
+    dark: '#233446',
+    black: '#22303e',
+    white: '#fff',
+    cardColor: 'rgb(36, 42, 56)',
+    bodyBg: '#f5f5f9',
+    bodyColor: '#fff',
+    headingColor: '#fff',
+    textMuted: '#a7acb2',
+    borderColor: '#e4e6e8'
+  }
+};
+
+
+
 type = ['primary', 'info', 'success', 'warning', 'danger'];
 
 data = {
-
-  
-
 
 };
 
@@ -115,182 +134,93 @@ demo = {
 
   initDashboardPageCharts: function() {
 
-    gradientChartOptionsConfigurationWithTooltipBlue = {
-      maintainAspectRatio: false,
+      let cardColor, headingColor, legendColor, labelColor, shadeColor, borderColor;
+
+  cardColor = config.colors.cardColor;
+  headingColor = config.colors.headingColor;
+  legendColor = config.colors.bodyColor;
+  labelColor = config.colors.textMuted;
+  borderColor = config.colors.borderColor;
+
+    const chartOrderStatistics = document.querySelector('#orderStatisticsChart'),
+    orderChartConfig = {
+      chart: {
+        height: 255,
+        width: 255,
+        type: 'donut'
+      },
+      labels: ['Realizado', 'Pendente'],
+      series: [70, 30],
+      colors: ["#00f2c3",'#1f8ef1'],
+      stroke: {
+        width: 5,
+        colors: [cardColor]
+      },
+      dataLabels: {
+        enabled: false,
+        formatter: function (val, opt) {
+          return parseInt(val) + '%';
+        }
+      },
       legend: {
-        display: false
+        show: false
       },
-
-      tooltips: {
-        backgroundColor: '#f5f5f5',
-        titleFontColor: '#333',
-        bodyFontColor: '#666',
-        bodySpacing: 4,
-        xPadding: 12,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest"
-      },
-      responsive: true,
-      scales: {
-        yAxes: [{
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.0)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            suggestedMin: 60,
-            suggestedMax: 125,
-            padding: 20,
-            fontColor: "#2380f7"
-          }
-        }],
-
-        xAxes: [{
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.1)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            padding: 20,
-            fontColor: "#2380f7"
-          }
-        }]
-      }
-    };
-
-    const legendColors = [];
-    for (let i = 0; i < doCreated.length; i++) {
-      if (doCreated[i] > 70) {
-        legendColors.push('red');
-      } else {
-        legendColors.push('rgba(255, 255, 255, 0.8)');
-      }
-    }
-
-    gradientChartOptionsConfigurationWithTooltipPurple = {
-      maintainAspectRatio: false,
-      legend: {
-        display: false
-      },
-      layout: {
+      grid: {
         padding: {
-          top: 20,
-          bottom: 20,
-          left: 50,
-          right: 50,
+          top: 0,
+          bottom: 0,
+          right: 15
         }
       },
-      tooltips: {
-        backgroundColor: '#f5f5f5',
-        titleFontColor: '#333',
-        bodyFontColor: '#666',
-        bodySpacing: 4,
-        xPadding: 12,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest"
-      },
-      responsive: true,
-      plugins: {
-        legend: {
-          display: true,
+      states: {
+        hover: {
+          filter: { type: 'none' }
         },
-        datalabels: {
-          color: 'rgba(255, 255, 255, 0.8)',
-          anchor: 'end',
-          align: 'top',
-          font: {
-            size: 25,
-          },
-          formatter: (value) => `${value}`, // Formato dos rótulos
+        active: {
+          filter: { type: 'none' }
         }
       },
-      scales: {
-        yAxes: [{
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.0)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            suggestedMin: 50,
-            suggestedMax: Math.max(...doCreated)*1.1,
-            padding: 20,
-            fontColor: "#9a9a9a",
-            display:false
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '75%',
+            labels: {
+              show: true,
+              value: {
+                fontSize: '18px',
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                color: headingColor,
+                offsetY: -17,
+                formatter: function (val) {
+                  return parseInt(val) + '%';
+                }
+              },
+              name: {
+                offsetY: 17,
+                fontFamily: 'Public Sans'
+              },
+              total: {
+                show: true,
+                fontSize: '13px',
+                color: legendColor,
+                label: 'Meta',
+                formatter: function (w) {
+                  return '6.400';
+                }
+              }
+            }
           }
-        }],
-
-        xAxes: [{
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(225,78,202,0.1)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            padding: 20,
-            fontColor: "#9a9a9a"
-          }
-        }]
+        }
       }
     };
+  if (typeof chartOrderStatistics !== undefined && chartOrderStatistics !== null) {
+    const statisticsChart = new ApexCharts(chartOrderStatistics, orderChartConfig);
+    statisticsChart.render();
+  }
 
-    gradientChartOptionsConfigurationWithTooltipOrange = {
-      maintainAspectRatio: false,
-      legend: {
-        display: false
-      },
 
-      tooltips: {
-        backgroundColor: '#f5f5f5',
-        titleFontColor: '#333',
-        bodyFontColor: '#666',
-        bodySpacing: 4,
-        xPadding: 12,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest"
-      },
-      responsive: true,
-      scales: {
-        yAxes: [{
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.0)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            suggestedMin: 50,
-            suggestedMax: 110,
-            padding: 20,
-            fontColor: "#ff8a76"
-          }
-        }],
-
-        xAxes: [{
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(220,53,69,0.1)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            padding: 20,
-            fontColor: "#ff8a76"
-          }
-        }]
-      }
-    };
-
-    gradientChartOptionsConfigurationWithTooltipGreen = {
+    ChartOptionsConfigType = {
       maintainAspectRatio: false,
       legend: {
         display: false
@@ -303,16 +233,6 @@ demo = {
           right: 30,
         }
       },
-      tooltips: {
-        backgroundColor: '#f5f5f5',
-        titleFontColor: '#333',
-        bodyFontColor: '#666',
-        bodySpacing: 0,
-        xPadding: 12,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest"
-      },
       responsive: true,
       plugins: {
         legend: {
@@ -325,7 +245,7 @@ demo = {
           font: {
             size: 25,
           },
-          formatter: (value) => `${value}`, // Formato dos rótulos
+          formatter: (value) => `${value}`, 
         }
       },
       scales: {
@@ -339,9 +259,8 @@ demo = {
           ticks: {
             display: false,
             suggestedMin: 50,
-            suggestedMax: 10000,
+            suggestedMax: 10000, // Math.max(...doCreated)*1.1
             padding: 10,
-            fontColor: "#9e9e9e"
           }
         }],
 
@@ -362,12 +281,46 @@ demo = {
     };
 
 
-    gradientBarChartConfiguration = {
+    var ctx = document.getElementById("chartLineTransMethod").getContext("2d");
+    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, 'rgba(66,134,121,0.15)');
+    gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
+    gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors
+
+    var data = {
+      labels: ['T1', 'M2', 'P4', 'P3'],
+      datasets: [{
+        label: "Itens",
+        fill: true,
+        backgroundColor: gradientStroke,
+        borderColor: '#00f2c3',
+        borderWidth: 2,
+        borderDash: [],
+        borderDashOffset: 0.0,
+        pointBackgroundColor: '#00f2c3',
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointHoverBackgroundColor: '#00d6b4',
+        pointBorderWidth: 20,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 15,
+        pointRadius: 4,
+        data: [2020, 140, 5680, 80],
+      }]
+    };
+
+    var myChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: ChartOptionsConfigType
+    });
+
+
+    ChartOptionsConfigStep = {
       maintainAspectRatio: false,
       legend: {
         display: false
       },
-
       tooltips: {
         backgroundColor: '#f5f5f5',
         titleFontColor: '#333',
@@ -409,17 +362,14 @@ demo = {
             fontColor: "#9e9e9e"
           }
         }],
-
         xAxes: [{
-
           gridLines: {
             drawBorder: false,
             color: 'rgba(29,140,248,0.1)',
             zeroLineColor: "transparent",
           },
           ticks: {
-            
-            fontSize: 25,
+            fontSize: 20,
             padding: 20,
             fontColor: "#9e9e9e"
           }
@@ -427,95 +377,13 @@ demo = {
       }
     };
 
-
-    var ctx = document.getElementById("chartLineGreen").getContext("2d");
-
-    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(66,134,121,0.15)');
-    gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
-    gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors
-
-    var data = {
-      labels: ['T1', 'M2', 'P4', 'P3'],
-      datasets: [{
-        label: "Itens",
-        fill: true,
-        backgroundColor: gradientStroke,
-        borderColor: '#00f2c3',
-        borderWidth: 2,
-        borderDash: [],
-        borderDashOffset: 0.0,
-        pointBackgroundColor: '#00f2c3',
-        pointBorderColor: 'rgba(255,255,255,0)',
-        pointHoverBackgroundColor: '#00d6b4',
-        pointBorderWidth: 20,
-        pointHoverRadius: 4,
-        pointHoverBorderWidth: 15,
-        pointRadius: 4,
-        data: [2020, 140, 5680, 80],
-      }]
-    };
-
-    var myChart = new Chart(ctx, {
-      type: 'line',
-      data: data,
-      options: gradientChartOptionsConfigurationWithTooltipGreen
-
-    });
-
-    var chart_labels = ['07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h'];
-
-    var pointColors = [];
-    for (let i = 0; i < doCreated.length; i++) {
-      if (doCreated[i] > 1000) {
-        pointColors.push('red');
-      } else {
-        pointColors.push('#2EC0F9');
-      }
-    }
-
-    var ctx = document.getElementById("chartBig1").getContext('2d');
+    var ctx = document.getElementById("chartBarStep").getContext("2d");
 
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
 
     gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
     gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
     gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-    var config = {
-      type: 'line',
-      data: {
-        labels: chart_labels, 
-        datasets: [{
-          label: "Itens",
-          fill: true,
-          backgroundColor: gradientStroke,
-          borderColor: '#2EC0F9',
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          pointBackgroundColor: pointColors,
-          pointBorderColor: 'rgba(255,255,255,0)',
-          pointHoverBackgroundColor: '#2EC0F9',
-          pointBorderWidth: 20,
-          pointHoverRadius: 4,
-          pointHoverBorderWidth: 15,
-          pointRadius: 4,
-          data: doCreated,
-        }]
-      },
-      options: gradientChartOptionsConfigurationWithTooltipPurple
-    };
-    var myChartData = new Chart(ctx, config);
-
-    var ctx = document.getElementById("CountryChart").getContext("2d");
-
-    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-
 
     var myChart = new Chart(ctx, {
       type: 'bar',
@@ -537,11 +405,418 @@ demo = {
           data: [53, 20, 10, 80, 100, 45],
         }]
       },
-      options: gradientBarChartConfiguration,
+      options: ChartOptionsConfigStep,
       plugins: [ChartDataLabels],
     });
 
+
+    ChartOptionsConfigProd = {
+      animation: {
+        duration: 2000, // Duração da animação em milissegundos
+        onComplete: function() {
+          // Obtém o contexto do gráfico
+          const chartInstance = this.chart;
+          const ctx = chartInstance.ctx;
+  
+          // Calcula a posição central do canvas
+          const centerX = (chartInstance.chartArea.left + chartInstance.chartArea.right) / 2;
+          const centerY = (chartInstance.chartArea.top + chartInstance.chartArea.bottom) / 2;
+  
+          // Define estilo do texto
+          ctx.save();
+          ctx.font = '22px sans-serif'; // Fonte do texto
+          ctx.fillStyle = 'white'; // Cor do texto
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+  
+          // Obtém o valor total dos dados
+          //const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
+          const value = chartInstance.data.datasets[0].data[0];
+
+          // Desenha o texto no centro
+          ctx.fillText(`${value}`, centerX, centerY);
+          ctx.restore();
+        },
+      },
+      cutoutPercentage: 70,
+      
+     
+      maintainAspectRatio: false,
+      legend: {
+        display: false,
+        position: 'bottom',
+        labels: {
+          fontColor: 'white',
+          padding: 30,
+          family: 'sans-serif',
+        },
+      },
+      tooltips: {
+        bodySpacing:4,
+        mode: "nearest",
+        intersect: 0,
+        position: "nearest",
+        xPadding: 10,
+        yPadding: 10,
+        caretPadding: 10
+      },
+      responsive: true,
+      plugins: {
+        datalabels: {
+          display: false,
+        }
+      },
+      scales: {
+        yAxes: [{
+          display: 0,
+          gridLines: 0,
+          ticks: {
+            display: false
+          },
+          gridLines: {
+            zeroLineColor: "transparent",
+            drawTicks: false,
+            display: false,
+            drawBorder: false
+          }
+        }],
+        xAxes: [{
+          display: 0,
+          gridLines: 0,
+          ticks: {
+            display: false
+          },
+          gridLines: {
+            zeroLineColor: "transparent",
+            drawTicks: false,
+            display: false,
+            drawBorder: false
+          }
+        }]
+      },
+      layout: {
+        padding: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0
+        }
+      }
+    };
+
+    ctx = document.getElementById('pieProductivity').getContext("2d");
+
+    gradientFillBLue = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientFillBLue.addColorStop(0, "rgba(114, 170, 235, 0)");
+    gradientFillBLue.addColorStop(0.7, "rgba(114, 171, 235, 0.1)");
+
+    gradientFillGreen = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientFillGreen.addColorStop(0, "rgba(66, 134, 121, 0.4)");
+    gradientFillGreen.addColorStop(1, "rgba(66,134,121,0)");
+    //"#f96332"
+
+    var data = {
+      labels: ["MONO", "MULT"],
+      datasets: [{
+        label: "Meta",
+        borderColor: ["#00f2c3","#1f8ef1"],
+        pointBorderColor: "#FFF",
+        pointBackgroundColor: "#f96332",
+        pointBorderWidth: 2,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 1,
+        pointRadius: 4,
+        fill: true,
+        backgroundColor: [gradientFillGreen,gradientFillBLue],
+        borderWidth: 3,
+        data: [70, 30]
+      }]
+    }
+
+    myChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: ChartOptionsConfigProd
+    });
+
+
+
   },
+
+
+
+
+
+
+
+  //   gradientChartOptionsConfigurationWithTooltipBlue = {
+  //     maintainAspectRatio: false,
+  //     legend: {
+  //       display: false
+  //     },
+
+  //     tooltips: {
+  //       backgroundColor: '#f5f5f5',
+  //       titleFontColor: '#333',
+  //       bodyFontColor: '#666',
+  //       bodySpacing: 4,
+  //       xPadding: 12,
+  //       mode: "nearest",
+  //       intersect: 0,
+  //       position: "nearest"
+  //     },
+  //     responsive: true,
+  //     scales: {
+  //       yAxes: [{
+  //         barPercentage: 1.6,
+  //         gridLines: {
+  //           drawBorder: false,
+  //           color: 'rgba(29,140,248,0.0)',
+  //           zeroLineColor: "transparent",
+  //         },
+  //         ticks: {
+  //           suggestedMin: 60,
+  //           suggestedMax: 125,
+  //           padding: 20,
+  //           fontColor: "#2380f7"
+  //         }
+  //       }],
+
+  //       xAxes: [{
+  //         barPercentage: 1.6,
+  //         gridLines: {
+  //           drawBorder: false,
+  //           color: 'rgba(29,140,248,0.1)',
+  //           zeroLineColor: "transparent",
+  //         },
+  //         ticks: {
+  //           padding: 20,
+  //           fontColor: "#2380f7"
+  //         }
+  //       }]
+  //     }
+  //   };
+
+
+
+
+
+
+  //   var doCreated = [53, 20, 10, 80, 100, 45, 20, 30]
+
+  //   const legendColors = [];
+  //   for (let i = 0; i < doCreated.length; i++) {
+  //     if (doCreated[i] > 70) {
+  //       legendColors.push('red');
+  //     } else {
+  //       legendColors.push('rgba(255, 255, 255, 0.8)');
+  //     }
+  //   }
+
+  //   gradientChartOptionsConfigurationWithTooltipPurple = {
+  //     maintainAspectRatio: false,
+  //     legend: {
+  //       display: false
+  //     },
+  //     layout: {
+  //       padding: {
+  //         top: 20,
+  //         bottom: 20,
+  //         left: 50,
+  //         right: 50,
+  //       }
+  //     },
+  //     tooltips: {
+  //       backgroundColor: '#f5f5f5',
+  //       titleFontColor: '#333',
+  //       bodyFontColor: '#666',
+  //       bodySpacing: 4,
+  //       xPadding: 12,
+  //       mode: "nearest",
+  //       intersect: 0,
+  //       position: "nearest"
+  //     },
+  //     responsive: true,
+  //     plugins: {
+  //       legend: {
+  //         display: true,
+  //       },
+  //       datalabels: {
+  //         color: 'rgba(255, 255, 255, 0.8)',
+  //         anchor: 'end',
+  //         align: 'top',
+  //         font: {
+  //           size: 25,
+  //         },
+  //         formatter: (value) => `${value}`, // Formato dos rótulos
+  //       }
+  //     },
+  //     scales: {
+  //       yAxes: [{
+  //         barPercentage: 1.6,
+  //         gridLines: {
+  //           drawBorder: false,
+  //           color: 'rgba(29,140,248,0.0)',
+  //           zeroLineColor: "transparent",
+  //         },
+  //         ticks: {
+  //           suggestedMin: 50,
+  //           suggestedMax: Math.max(...doCreated)*1.1,
+  //           padding: 20,
+  //           fontColor: "#9a9a9a",
+  //           display:false
+  //         }
+  //       }],
+
+  //       xAxes: [{
+  //         barPercentage: 1.6,
+  //         gridLines: {
+  //           drawBorder: false,
+  //           color: 'rgba(225,78,202,0.1)',
+  //           zeroLineColor: "transparent",
+  //         },
+  //         ticks: {
+  //           padding: 20,
+  //           fontColor: "#9a9a9a"
+  //         }
+  //       }]
+  //     }
+  //   };
+
+  //   gradientChartOptionsConfigurationWithTooltipOrange = {
+  //     maintainAspectRatio: false,
+  //     legend: {
+  //       display: false
+  //     },
+
+  //     tooltips: {
+  //       backgroundColor: '#f5f5f5',
+  //       titleFontColor: '#333',
+  //       bodyFontColor: '#666',
+  //       bodySpacing: 4,
+  //       xPadding: 12,
+  //       mode: "nearest",
+  //       intersect: 0,
+  //       position: "nearest"
+  //     },
+  //     responsive: true,
+  //     scales: {
+  //       yAxes: [{
+  //         barPercentage: 1.6,
+  //         gridLines: {
+  //           drawBorder: false,
+  //           color: 'rgba(29,140,248,0.0)',
+  //           zeroLineColor: "transparent",
+  //         },
+  //         ticks: {
+  //           suggestedMin: 50,
+  //           suggestedMax: 110,
+  //           padding: 20,
+  //           fontColor: "#ff8a76"
+  //         }
+  //       }],
+
+  //       xAxes: [{
+  //         barPercentage: 1.6,
+  //         gridLines: {
+  //           drawBorder: false,
+  //           color: 'rgba(220,53,69,0.1)',
+  //           zeroLineColor: "transparent",
+  //         },
+  //         ticks: {
+  //           padding: 20,
+  //           fontColor: "#ff8a76"
+  //         }
+  //       }]
+  //     }
+  //   };
+
+ 
+
+
+  
+
+
+
+
+  //   var chart_labels = ['07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h'];
+
+  //   var pointColors = [];
+  //   for (let i = 0; i < doCreated.length; i++) {
+  //     if (doCreated[i] > 1000) {
+  //       pointColors.push('red');
+  //     } else {
+  //       pointColors.push('#2EC0F9');
+  //     }
+  //   }
+
+  //   var ctx = document.getElementById("chartBig1").getContext('2d');
+
+  //   var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+  //   gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+  //   gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+  //   gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+  //   var config = {
+  //     type: 'line',
+  //     data: {
+  //       labels: chart_labels, 
+  //       datasets: [{
+  //         label: "Itens",
+  //         fill: true,
+  //         backgroundColor: gradientStroke,
+  //         borderColor: '#2EC0F9',
+  //         borderWidth: 2,
+  //         borderDash: [],
+  //         borderDashOffset: 0.0,
+  //         pointBackgroundColor: pointColors,
+  //         pointBorderColor: 'rgba(255,255,255,0)',
+  //         pointHoverBackgroundColor: '#2EC0F9',
+  //         pointBorderWidth: 20,
+  //         pointHoverRadius: 4,
+  //         pointHoverBorderWidth: 15,
+  //         pointRadius: 4,
+  //         data: doCreated,
+  //       }]
+  //     },
+  //     options: gradientChartOptionsConfigurationWithTooltipPurple
+  //   };
+  //   var myChartData = new Chart(ctx, config);
+
+  //   var ctx = document.getElementById("CountryChart").getContext("2d");
+
+  //   var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+  //   gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+  //   gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+  //   gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+
+
+  //   var myChart = new Chart(ctx, {
+  //     type: 'bar',
+  //     responsive: true,
+  //     legend: {
+  //       display: false
+  //     },
+  //     data: {
+  //       labels: ['Wainting', 'Alocated', 'Picking', 'N.F.', 'Checking', 'Loading'],
+  //       datasets: [{
+  //         label: "Itens",
+  //         fill: true,
+  //         backgroundColor: gradientStroke,
+  //         hoverBackgroundColor: gradientStroke,
+  //         borderColor: '#1f8ef1',
+  //         borderWidth: 2,
+  //         borderDash: [],
+  //         borderDashOffset: 0.0,
+  //         data: [53, 20, 10, 80, 100, 45],
+  //       }]
+  //     },
+  //     options: gradientBarChartConfiguration,
+  //     plugins: [ChartDataLabels],
+  //   });
+
+  // },
 
   initLastUpdate: function(data) {
     var txtHtml = document.getElementById("atualizacao");

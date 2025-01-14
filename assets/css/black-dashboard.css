@@ -20248,6 +20248,12 @@ Copyright (c) 2015 Daniel Eden
   width: 100%;
 }
 
+.chart-prod {
+  margin-top: 15px;
+  height: 100px;
+  width: 100%;
+}
+
 .card-chart .card-footer {
   margin-top: 15px;
 }

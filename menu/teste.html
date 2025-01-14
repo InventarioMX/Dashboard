@@ -41,153 +41,173 @@
     </table>
 
     <script>
-        // const fs = require('fs');
 
-        // // Lendo o arquivo JSON e parseando o conteúdo
-        // fs.readFile('../base/dados.json', 'utf8', (err, data) => {
-        // if (err) {
-        //     console.error('Erro ao ler o arquivo', err);
-        //     return;
-        // }
+        let baseData;
 
-        // // Convertendo a string JSON para um objeto JavaScript
-        // const baseData = JSON.parse(data);
+        fetch('../base/dados.json') // Caminho relativo ao seu arquivo JSON
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao carregar o arquivo JSON');
+            }
+            return response.json(); // Parseando o JSON
+        })
+        .then(data => {
+            baseData = data.jsonData;
 
-        // console.log(categorias);
-        // });
-
-        // Base JSON de exemplo com nova coluna "Tipo"
-        const baseData = [
-            { DO: 1, Status: "Sucesso", Tipo: "A",  Quantidade: 10 },
-            { DO: 2, Status: "Erro", Tipo: "B",  Quantidade: 5 },
-            { DO: 3, Status: "Pendente", Tipo: "A",  Quantidade: 8 },
-            { DO: 4, Status: "Sucesso", Tipo: "B",  Quantidade: 7 },
-            { DO: 5, Status: "Erro", Tipo: "A",  Quantidade: 3 },
-            { DO: 6, Status: "Pendente", Tipo: "C",  Quantidade: 6 }
-        ];
-
-        // Variáveis para armazenar os filtros atuais
-        let currentStatusFilter = null;
-        let currentTypeFilter = null;
-
-        // Função para consolidar os dados com base em filtros
-        function consolidateData(data, filterField, groupField) {
-            return data.reduce((acc, row) => {
-                if (!currentStatusFilter || row.Status === currentStatusFilter) {
-                    if (!currentTypeFilter || row.Tipo === currentTypeFilter) {
-                        acc[row[groupField]] = (acc[row[groupField]] || 0) + row.Quantidade;
-                    }
-                }
-                return acc;
-            }, {});
-        }
-
-        // Função para atualizar a tabela com base nos filtros
-        function updateTable(statusFilter = null, typeFilter = null) {
-            const tableBody = document.querySelector("#dataTable tbody");
-            tableBody.innerHTML = ""; // Limpa a tabela
-
-            // Determina os dados a serem exibidos
-            const filteredData = baseData.filter(row => {
-                return (!statusFilter || row.Status === statusFilter) &&
-                       (!typeFilter || row.Tipo === typeFilter);
+            // Variáveis para armazenar os filtros atuais
+            let currentStatusFilter = null;
+            let currentTypeFilter = null;
+            var hoje = new Date();
+                hoje.setDate(hoje.getDate() - 2);
+                
+            let dateFilter = hoje.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
             });
 
-            // Adiciona as linhas na tabela
-            filteredData.forEach(row => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `<td>${row.DO}</td><td>${row.Status}</td><td>${row.Tipo}</td><td>${row.Quantidade}</td>`;
-                tableBody.appendChild(tr);
+
+            // Função para consolidar os dados com base em filtros
+            function consolidateData(data, filterField, groupField) {
+                return data.reduce((acc, row) => {
+                    if (!currentStatusFilter || row.Status === currentStatusFilter) {
+                        if (!currentTypeFilter || row["D/O Type"] === currentTypeFilter) {
+                            acc[row[groupField]] = (acc[row[groupField]] || 0) + row["Order Quantity"];
+                        }
+                    }
+                    return acc;
+                }, {});
+            }
+
+            // Função para atualizar a tabela com base nos filtros
+            function updateTable(statusFilter = null, typeFilter = null) {
+                const tableBody = document.querySelector("#dataTable tbody");
+                tableBody.innerHTML = ""; // Limpa a tabela
+                
+
+
+                // Determina os dados a serem exibidos
+                const filteredData = baseData.filter(row => {
+                    return (!statusFilter || row.Status === statusFilter) &&
+                        (!typeFilter || row["D/O Type"] === typeFilter);
+                });
+
+                const limitedData = filteredData.slice(0, 100);
+
+                //Adiciona as linhas na tabela
+                limitedData.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${row["D/O No#"]}</td><td>${row.Status}</td><td>${row["D/O Type"]}</td><td>${row["Order Quantity"]}</td>`;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            // Função para atualizar os gráficos dinamicamente
+            function updateCharts() {
+                const statusConsolidation = consolidateData(baseData, currentTypeFilter, "Status");
+                const typeConsolidation = consolidateData(baseData, currentStatusFilter, "D/O Type");
+
+                statusChart.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
+                typeChart.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
+
+                statusChart.update();
+                typeChart.update();
+            }
+
+            // Dados para os gráficos
+            const statusLabels = [...new Set(baseData.map(row => row.Status))];
+            const typeLabels = [...new Set(baseData.map(row => row["D/O Type"]))];
+
+            statusLabels.sort();
+
+            // Configuração do gráfico de Status
+            const ctxStatus = document.getElementById("statusChart").getContext("2d");
+            const statusChart = new Chart(ctxStatus, {
+                type: "bar",
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        label: "Quantidade por Status",
+                        data: statusLabels.map(label => 0), // Inicialização vazia
+                        backgroundColor: ["#4caf50", "#f44336", "#ff9800"],
+                        borderColor: ["#388e3c", "#d32f2f", "#f57c00"],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
+                    },
+                    onClick: (e) => {
+                        const activePoints = statusChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+                        if (activePoints.length) {
+                            const clickedIndex = activePoints[0].index;
+                            const clickedStatus = statusLabels[clickedIndex];
+
+                            currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
+                            updateTable(currentStatusFilter, currentTypeFilter);
+                            updateCharts();
+                        }
+                    }
+                }
             });
-        }
 
-        // Função para atualizar os gráficos dinamicamente
-        function updateCharts() {
-            const statusConsolidation = consolidateData(baseData, currentTypeFilter, "Status");
-            const typeConsolidation = consolidateData(baseData, currentStatusFilter, "Tipo");
-
-            statusChart.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
-            typeChart.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
-
-            statusChart.update();
-            typeChart.update();
-        }
-
-        // Dados para os gráficos
-        const statusLabels = [...new Set(baseData.map(row => row.Status))];
-        const typeLabels = [...new Set(baseData.map(row => row.Tipo))];
-
-        // Configuração do gráfico de Status
-        const ctxStatus = document.getElementById("statusChart").getContext("2d");
-        const statusChart = new Chart(ctxStatus, {
-            type: "bar",
-            data: {
-                labels: statusLabels,
-                datasets: [{
-                    label: "Quantidade por Status",
-                    data: statusLabels.map(label => 0), // Inicialização vazia
-                    backgroundColor: ["#4caf50", "#f44336", "#ff9800"],
-                    borderColor: ["#388e3c", "#d32f2f", "#f57c00"],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
+            // Configuração do gráfico de Tipos
+            const ctxType = document.getElementById("typeChart").getContext("2d");
+            const typeChart = new Chart(ctxType, {
+                type: "bar",
+                data: {
+                    labels: typeLabels,
+                    datasets: [{
+                        label: "Quantidade por Tipo",
+                        data: typeLabels.map(label => 0), // Inicialização vazia
+                        backgroundColor: ["#2196f3", "#ffeb3b", "#9c27b0"],
+                        borderColor: ["#1976d2", "#fbc02d", "#7b1fa2"],
+                        borderWidth: 1
+                    }]
                 },
-                onClick: (e) => {
-                    const activePoints = statusChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
-                    if (activePoints.length) {
-                        const clickedIndex = activePoints[0].index;
-                        const clickedStatus = statusLabels[clickedIndex];
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
+                    },
+                    onClick: (e) => {
+                        const activePoints = typeChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+                        if (activePoints.length) {
+                            const clickedIndex = activePoints[0].index;
+                            const clickedType = typeLabels[clickedIndex];
 
-                        currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
-                        updateTable(currentStatusFilter, currentTypeFilter);
-                        updateCharts();
+                            currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
+                            updateTable(currentStatusFilter, currentTypeFilter);
+                            updateCharts();
+                        }
                     }
                 }
-            }
+            });
+
+            
+            // Inicializa a tabela e gráficos
+            updateTable();
+            updateCharts();
+            
+        })
+        .catch(err => {
+            console.error('Erro:', err);
         });
 
-        // Configuração do gráfico de Tipos
-        const ctxType = document.getElementById("typeChart").getContext("2d");
-        const typeChart = new Chart(ctxType, {
-            type: "bar",
-            data: {
-                labels: typeLabels,
-                datasets: [{
-                    label: "Quantidade por Tipo",
-                    data: typeLabels.map(label => 0), // Inicialização vazia
-                    backgroundColor: ["#2196f3", "#ffeb3b", "#9c27b0"],
-                    borderColor: ["#1976d2", "#fbc02d", "#7b1fa2"],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
-                },
-                onClick: (e) => {
-                    const activePoints = typeChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
-                    if (activePoints.length) {
-                        const clickedIndex = activePoints[0].index;
-                        const clickedType = typeLabels[clickedIndex];
 
-                        currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
-                        updateTable(currentStatusFilter, currentTypeFilter);
-                        updateCharts();
-                    }
-                }
-            }
-        });
+        // const baseData = [
+        //     { DO: 1, Status: "Sucesso", Tipo: "A",  Quantidade: 10 },
+        //     { DO: 2, Status: "Erro", Tipo: "B",  Quantidade: 5 },
+        //     { DO: 3, Status: "Pendente", Tipo: "A",  Quantidade: 8 },
+        //     { DO: 4, Status: "Sucesso", Tipo: "B",  Quantidade: 7 },
+        //     { DO: 5, Status: "Erro", Tipo: "A",  Quantidade: 3 },
+        //     { DO: 6, Status: "Pendente", Tipo: "C",  Quantidade: 6 }
+        // ];
 
-        // Inicializa a tabela e gráficos
-        updateTable();
-        updateCharts();
     </script>
 </body>
 </html>

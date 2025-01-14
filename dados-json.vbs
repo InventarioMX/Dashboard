@@ -35,8 +35,11 @@ Do Until rs.EOF
     
     ' Loop por todas as colunas
     For i = 0 To rs.Fields.Count - 1
-        vlin = vlin & """" & rs.Fields(i).Name & """: """ & rs.Fields(i).Value & """"
-        
+        if i = 9 Then
+            vlin = vlin & """" & rs.Fields(i).Name & """: " & rs.Fields(i).Value & ""
+        else
+            vlin = vlin & """" & rs.Fields(i).Name & """: """ & rs.Fields(i).Value & """"
+        end if
         ' Adiciona uma vírgula entre os pares chave-valor, exceto no último
         If i < rs.Fields.Count - 1 Then
             vlin = vlin & ", "
