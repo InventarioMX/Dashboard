@@ -52,11 +52,12 @@
             return response.json(); // Parseando o JSON
         })
         .then(data => {
-            baseData = data.jsonData;
+            baseData = data.RelatorioD2C;
 
             // Variáveis para armazenar os filtros atuais
             let currentStatusFilter = null;
             let currentTypeFilter = null;
+
             var hoje = new Date();
                 hoje.setDate(hoje.getDate() - 2);
                 
@@ -83,8 +84,6 @@
             function updateTable(statusFilter = null, typeFilter = null) {
                 const tableBody = document.querySelector("#dataTable tbody");
                 tableBody.innerHTML = ""; // Limpa a tabela
-                
-
 
                 // Determina os dados a serem exibidos
                 const filteredData = baseData.filter(row => {

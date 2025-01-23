@@ -111,7 +111,24 @@ demo = {
   //   });
   // },
 
-  initDashboardPageCharts: function() {
+  initDashboardPageCharts: function(data) {
+    baseData = data.RelatorioD2C;
+
+    let currentTransMethedFilter = null;
+    let currentStatusFilter = null;
+    let currentTypeFilter = null;
+    let currentDOCreatedFilter = null;
+
+    function consolidateData(data, filterField, groupField) {
+      return data.reduce((acc, row) => {
+          if (!currentStatusFilter || row.Status === currentStatusFilter) {
+              if (!currentTypeFilter || row["D/O Type"] === currentTypeFilter) {
+                  acc[row[groupField]] = (acc[row[groupField]] || 0) + row["Order Quantity"];
+              }
+          }
+          return acc;
+      }, {});
+    }
 
     ChartOptionsConfigType = {
       maintainAspectRatio: false,
@@ -295,7 +312,7 @@ demo = {
           borderWidth: 2,
           borderDash: [],
           borderDashOffset: 0.0,
-          data: [53, 20, 10, 80, 100, 45],
+          data: [53, 20, 10, 10, 100, 45],
         }]
       },
       options: ChartOptionsConfigStep,
@@ -303,115 +320,70 @@ demo = {
     });
 
 
-    ChartOptionsConfigProd = {
+    ChartOptionsConfigMonoMult = {
       animation: {
         duration: 2000, // Duração da animação em milissegundos
-        onComplete: function() {
-          // Obtém o contexto do gráfico
-          const chartInstance = this.chart;
-          const ctx = chartInstance.ctx;
-  
-          // Calcula a posição central do canvas
-          const centerX = (chartInstance.chartArea.left + chartInstance.chartArea.right) / 2;
-          const centerY = (chartInstance.chartArea.top + chartInstance.chartArea.bottom) / 2;
-  
-          // Define estilo do texto
-          ctx.save();
-          ctx.font = '22px sans-serif'; // Fonte do texto
-          ctx.fillStyle = 'white'; // Cor do texto
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-  
-          // Obtém o valor total dos dados
-          //const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
-          const value = chartInstance.data.datasets[0].data[0];
-
-          // Desenha o texto no centro
-          ctx.fillText(`${value}`, centerX, centerY);
-          ctx.restore();
-        },
       },
-      cutoutPercentage: 70,
-      
-     
+      cutoutPercentage: 50,
       maintainAspectRatio: false,
       legend: {
-        display: false,
         position: 'bottom',
+        align: 'center',
+        Size: 20,
         labels: {
-          fontColor: 'white',
-          padding: 30,
-          family: 'sans-serif',
+          fontColor: "#9e9e9e",
+          padding: 20,
+          fontSize: 14,
         },
-      },
-      tooltips: {
-        bodySpacing:4,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest",
-        xPadding: 10,
-        yPadding: 10,
-        caretPadding: 10
+        onClick: function(event, legendItem) {
+          
+        },
       },
       responsive: true,
       plugins: {
         datalabels: {
-          display: false,
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value}`,
         }
       },
       scales: {
         yAxes: [{
           display: 0,
-          gridLines: 0,
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            zeroLineColor: "transparent",
-            drawTicks: false,
-            display: false,
-            drawBorder: false
-          }
         }],
         xAxes: [{
           display: 0,
-          gridLines: 0,
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            zeroLineColor: "transparent",
-            drawTicks: false,
-            display: false,
-            drawBorder: false
-          }
         }]
       },
       layout: {
         padding: {
-          left: 0,
-          right: 0,
-          top: 0,
+          left:10,
+          right: 10,
+          top: 20,
           bottom: 0
         }
       }
     };
 
-    ctx = document.getElementById('pieProductivity').getContext("2d");
+    ctx = document.getElementById('pieMonoMult').getContext("2d");
 
     gradientFillBLue = ctx.createLinearGradient(0, 230, 0, 50);
     gradientFillBLue.addColorStop(0, "rgba(114, 170, 235, 0)");
     gradientFillBLue.addColorStop(0.7, "rgba(114, 171, 235, 0.1)");
 
     gradientFillGreen = ctx.createLinearGradient(0, 230, 0, 50);
-    gradientFillGreen.addColorStop(0, "rgba(66, 134, 121, 0.4)");
-    gradientFillGreen.addColorStop(1, "rgba(66,134,121,0)");
+    gradientFillGreen.addColorStop(0, "rgba(66, 134, 121, 0.18)");
+    gradientFillGreen.addColorStop(1, "rgba(66, 134, 121, 0.04)");
     //"#f96332"
 
     var data = {
       labels: ["MONO", "MULT"],
       datasets: [{
-        label: "Meta",
+        label: "Qty.",
         borderColor: ["#00f2c3","#1f8ef1"],
         pointBorderColor: "#FFF",
         pointBackgroundColor: "#f96332",
@@ -422,15 +394,141 @@ demo = {
         fill: true,
         backgroundColor: [gradientFillGreen,gradientFillBLue],
         borderWidth: 3,
-        data: [70, 30]
+        data: [500, 50]
       }]
     }
 
     myChart = new Chart(ctx, {
       type: 'doughnut',
       data: data,
-      options: ChartOptionsConfigProd
+      options: ChartOptionsConfigMonoMult
     });
+
+    var doCreated = [10,30,60,80,50,110,70,120,70,20,10,30,60,80,50,110,70,120,70,20,10,20,100,250]
+
+    const legendColors = [];
+    for (let i = 0; i < doCreated.length; i++) {
+      if (doCreated[i] > 70) {
+        legendColors.push('red');
+      } else {
+        legendColors.push('rgba(255, 255, 255, 0.8)');
+      }
+    }
+
+    ChartOptionsConfigDOCreated = {
+      maintainAspectRatio: false,
+      legend: {
+        display: false
+      },
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 50,
+          right: 50,
+        }
+      },
+      tooltips: {
+        backgroundColor: '#f5f5f5',
+        titleFontColor: '#333',
+        bodyFontColor: '#666',
+        bodySpacing: 4,
+        xPadding: 12,
+        mode: "nearest",
+        intersect: 0,
+        position: "nearest"
+      },
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+        },
+        datalabels: {
+          color: 'rgba(255, 255, 255, 0.8)',
+          anchor: 'end',
+          align: 'top',
+          font: {
+            size: 25,
+          },
+          formatter: (value) => `${value}`, // Formato dos rótulos
+        }
+      },
+      scales: {
+        yAxes: [{
+          barPercentage: 1.6,
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(29,140,248,0.0)',
+            zeroLineColor: "transparent",
+          },
+          ticks: {
+            suggestedMin: 50,
+            suggestedMax: Math.max(...doCreated)*1.1,
+            padding: 20,
+            fontColor: "#9a9a9a",
+            display:false
+          }
+        }],
+
+        xAxes: [{
+          barPercentage: 1.6,
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(225,78,202,0.1)',
+            zeroLineColor: "transparent",
+          },
+          ticks: {
+            padding: 20,
+            fontColor: "#9a9a9a"
+          }
+        }]
+      }
+    };
+
+    var chart_labels = ['00h','01h','02h','03h','04h','05h','06h','07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'];
+
+    var pointColors = [];
+    for (let i = 0; i < doCreated.length; i++) {
+      if (doCreated[i] > 70) {
+        pointColors.push('red');
+      } else {
+        pointColors.push('#2EC0F9');
+      }
+    }
+
+    var ctx = document.getElementById("chartLineDOCreated").getContext('2d');
+
+    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+    var config = {
+      type: 'line',
+      data: {
+        labels: chart_labels, 
+        datasets: [{
+          label: "Itens",
+          fill: true,
+          backgroundColor: gradientStroke,
+          borderColor: '#2EC0F9',
+          borderWidth: 2,
+          borderDash: [],
+          borderDashOffset: 0.0,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: 'rgba(255,255,255,0)',
+          pointHoverBackgroundColor: '#2EC0F9',
+          pointBorderWidth: 20,
+          pointHoverRadius: 4,
+          pointHoverBorderWidth: 15,
+          pointRadius: 4,
+          data: doCreated,
+        }]
+      },
+      options: ChartOptionsConfigDOCreated
+    };
+    var myChartData = new Chart(ctx, config);
+
 
 
 
@@ -495,86 +593,6 @@ demo = {
 
 
 
-  //   var doCreated = [53, 20, 10, 80, 100, 45, 20, 30]
-
-  //   const legendColors = [];
-  //   for (let i = 0; i < doCreated.length; i++) {
-  //     if (doCreated[i] > 70) {
-  //       legendColors.push('red');
-  //     } else {
-  //       legendColors.push('rgba(255, 255, 255, 0.8)');
-  //     }
-  //   }
-
-  //   gradientChartOptionsConfigurationWithTooltipPurple = {
-  //     maintainAspectRatio: false,
-  //     legend: {
-  //       display: false
-  //     },
-  //     layout: {
-  //       padding: {
-  //         top: 20,
-  //         bottom: 20,
-  //         left: 50,
-  //         right: 50,
-  //       }
-  //     },
-  //     tooltips: {
-  //       backgroundColor: '#f5f5f5',
-  //       titleFontColor: '#333',
-  //       bodyFontColor: '#666',
-  //       bodySpacing: 4,
-  //       xPadding: 12,
-  //       mode: "nearest",
-  //       intersect: 0,
-  //       position: "nearest"
-  //     },
-  //     responsive: true,
-  //     plugins: {
-  //       legend: {
-  //         display: true,
-  //       },
-  //       datalabels: {
-  //         color: 'rgba(255, 255, 255, 0.8)',
-  //         anchor: 'end',
-  //         align: 'top',
-  //         font: {
-  //           size: 25,
-  //         },
-  //         formatter: (value) => `${value}`, // Formato dos rótulos
-  //       }
-  //     },
-  //     scales: {
-  //       yAxes: [{
-  //         barPercentage: 1.6,
-  //         gridLines: {
-  //           drawBorder: false,
-  //           color: 'rgba(29,140,248,0.0)',
-  //           zeroLineColor: "transparent",
-  //         },
-  //         ticks: {
-  //           suggestedMin: 50,
-  //           suggestedMax: Math.max(...doCreated)*1.1,
-  //           padding: 20,
-  //           fontColor: "#9a9a9a",
-  //           display:false
-  //         }
-  //       }],
-
-  //       xAxes: [{
-  //         barPercentage: 1.6,
-  //         gridLines: {
-  //           drawBorder: false,
-  //           color: 'rgba(225,78,202,0.1)',
-  //           zeroLineColor: "transparent",
-  //         },
-  //         ticks: {
-  //           padding: 20,
-  //           fontColor: "#9a9a9a"
-  //         }
-  //       }]
-  //     }
-  //   };
 
   //   gradientChartOptionsConfigurationWithTooltipOrange = {
   //     maintainAspectRatio: false,
@@ -632,49 +650,6 @@ demo = {
 
 
 
-  //   var chart_labels = ['07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h'];
-
-  //   var pointColors = [];
-  //   for (let i = 0; i < doCreated.length; i++) {
-  //     if (doCreated[i] > 1000) {
-  //       pointColors.push('red');
-  //     } else {
-  //       pointColors.push('#2EC0F9');
-  //     }
-  //   }
-
-  //   var ctx = document.getElementById("chartBig1").getContext('2d');
-
-  //   var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-  //   gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-  //   gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-  //   gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-  //   var config = {
-  //     type: 'line',
-  //     data: {
-  //       labels: chart_labels, 
-  //       datasets: [{
-  //         label: "Itens",
-  //         fill: true,
-  //         backgroundColor: gradientStroke,
-  //         borderColor: '#2EC0F9',
-  //         borderWidth: 2,
-  //         borderDash: [],
-  //         borderDashOffset: 0.0,
-  //         pointBackgroundColor: pointColors,
-  //         pointBorderColor: 'rgba(255,255,255,0)',
-  //         pointHoverBackgroundColor: '#2EC0F9',
-  //         pointBorderWidth: 20,
-  //         pointHoverRadius: 4,
-  //         pointHoverBorderWidth: 15,
-  //         pointRadius: 4,
-  //         data: doCreated,
-  //       }]
-  //     },
-  //     options: gradientChartOptionsConfigurationWithTooltipPurple
-  //   };
-  //   var myChartData = new Chart(ctx, config);
 
   //   var ctx = document.getElementById("CountryChart").getContext("2d");
 

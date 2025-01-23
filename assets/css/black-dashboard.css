@@ -1272,7 +1272,7 @@ pre code {
   }
 }
 
-@media (min-width: 1250px) {
+@media (min-width: 900px) {
   .col-lg {
     flex-basis: 0;
     flex-grow: 1;
@@ -17996,7 +17996,7 @@ table.tablesorter thead tr .headerSortDown {
   height: 380px;
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 1991px) {
   .sidebar {
     position: fixed;
     display: block;
@@ -18020,7 +18020,7 @@ table.tablesorter thead tr .headerSortDown {
   }
 }
 
-@media screen and (max-width: 991px) and (prefers-reduced-motion: reduce) {
+@media screen and (max-width: 1991px) and (prefers-reduced-motion: reduce) {
   .sidebar {
     transition: none;
   }
@@ -19790,7 +19790,7 @@ Copyright (c) 2015 Daniel Eden
 
 .white-content .card:not(.card-white) {
   background: #ffffff;
-  box-shadow: 0 1px 15px 0 rgba(, , , 0.05);
+  box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.05);
 }
 
 .white-content .card:not(.card-white) .card-header {
@@ -20247,6 +20247,12 @@ Copyright (c) 2015 Daniel Eden
   height: 220px;
   width: 100%;
 }
+
+.card-chart .chart-area-dunut {
+  height: 130px;
+  width: 100%;
+}
+
 
 .chart-prod {
   margin-top: 15px;

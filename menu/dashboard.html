@@ -28,11 +28,9 @@
             <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
                 <div class="container-fluid">
                     <div class="navbar-wrapper">
-                        <div class="row">
-                            <a class="navbar-nav" href="javascript:void(0)">
-                                <h3 class="card-title navbar-brand">DASHBOARD OP MX</h3>
-                            </a>
-                        </div>
+                        <a class="navbar-nav" href="javascript:void(0)">
+                            <h3 class="card-title navbar-brand">DASHBOARD OP MX</h3>
+                        </a>
                     </div>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-bar navbar-kebab"></span>
@@ -54,27 +52,23 @@
             <!-- End Navbar -->
             <div class="content">
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-xxl-5 col-lg-5 col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 <div class="row">
-                                    <div class="col-lg-4 text-center">
-                                        <h4 class="text-muted ">BACKLOG OLD</h4>
+                                    <div class="col-lg-6 text-center">
+                                        <h4 class="text-muted ">BACKLOG D-2</h4>
                                         <h2><i class="tim-icons icon-app text-danger"></i> 243</h2>                                   
                                     </div>
-                                    <div class="col-lg-4 text-center">                                   
+                                    <div class="col-lg-6 text-center">                                   
                                         <h4 class="text-muted">BACKLOG D-1</h4>
                                         <h2><i class="tim-icons  icon-app text-warning"></i> 1.299</h2>                                    
-                                    </div>
-                                    <div class="col-lg-4 text-center">                                    
-                                        <h4 class="text-muted">B.L. CURRENT</h4>
-                                        <h1><i class="tim-icons  icon-app text-success"></i> 8.680</h1>                                    
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-xxl-7 col-lg-7 col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 <div class="row">
@@ -127,8 +121,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="pieProductivity"></canvas>
-                                    <div id="orderStatisticsChart"></div>
+                                    <canvas id="pieMonoMult"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -146,7 +139,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="chartBig1"></canvas>
+                                    <canvas id="chartLineDOCreated"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -336,7 +329,19 @@
     <script>
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
+      fetch('../base/dados.json') // Caminho relativo ao seu arquivo JSON
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao carregar o arquivo JSON');
+            }
+            return response.json(); // Parseando o JSON
+        })
+        .then(data => {
+            demo.initDashboardPageCharts(data);
+        })
+        .catch(err => {
+            console.error('Erro:', err);
+        });
     });
     </script>
 </body>

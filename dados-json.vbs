@@ -26,7 +26,7 @@ rs.Open sqlQuery, conn
 Set arquivo = fso.CreateTextFile(caminhoTxt, True)
 
 arquivo.WriteLine "{"
-arquivo.WriteLine " ""jsonData"": ["
+arquivo.WriteLine " ""RelatorioD2C"": ["
 ' Escrever os dados no arquivo de texto
 
 Do Until rs.EOF
