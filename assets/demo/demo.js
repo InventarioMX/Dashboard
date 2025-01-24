@@ -111,26 +111,106 @@ demo = {
   //   });
   // },
 
-  initDashboardPageCharts: function(data) {
-    baseData = data.RelatorioD2C;
+  initDashboardPageCharts: function(datajson) {
+    const baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
 
     let currentTransMethedFilter = null;
     let currentStatusFilter = null;
     let currentTypeFilter = null;
     let currentDOCreatedFilter = null;
 
-    function consolidateData(data, filterField, groupField) {
+    function consolidateData(data, groupField) {
       return data.reduce((acc, row) => {
-          if (!currentStatusFilter || row.Status === currentStatusFilter) {
+        if (!currentTransMethedFilter || row["Trans Method#"] === currentTransMethedFilter) {
+          if (!currentDOCreatedFilter || row["D/O Date"] === currentDOCreatedFilter) {
+            if (!currentStatusFilter || row["Status"] === currentStatusFilter ) {
               if (!currentTypeFilter || row["D/O Type"] === currentTypeFilter) {
-                  acc[row[groupField]] = (acc[row[groupField]] || 0) + row["Order Quantity"];
+                acc[row[groupField]] = (acc[row[groupField]] || 0) + row["Order Quantity"];
               }
+            }
           }
-          return acc;
+        }
+        return acc;
       }, {});
     }
 
-    ChartOptionsConfigType = {
+    function updateCharts() {
+      var hoje = new Date();
+          hoje.setDate(hoje.getDate() - 15);
+      let dateFilter = hoje.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+      });
+
+      const filteredAndUpdatedData = baseData
+        .filter(item => item["D/O Date"].startsWith(dateFilter))
+        .map(item => ({
+          ...item,
+          ["D/O Date"]: item["D/O Date"].split(" ")[1].split(":")[0] + ":00" 
+        }));
+
+      const transmetodConsolidation = consolidateData(baseData, "Trans Method#");
+      const statusConsolidation = consolidateData(baseData, "Status");
+      const typeConsolidation = consolidateData(baseData, "D/O Type");
+      const DOCreatedConsolidation = consolidateData(filteredAndUpdatedData, "D/O Date");
+
+      myChartTransmetod.data.datasets[0].data = transmetodLabels.map(label => transmetodConsolidation[label] || 0);
+      myChartStep.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
+      myChartType.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
+      myChartDOCreated.data.datasets[0].data = DOCreatedLabels.map(label => DOCreatedConsolidation[label] || 0);
+
+      myChartTransmetod.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartTransmetod.data.datasets[0].data)*1.2;
+      myChartStep.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartStep.data.datasets[0].data)*1.3;
+      
+      myChartTransmetod.update();
+      myChartStep.update();
+      myChartType.update();
+      myChartDOCreated.update();
+    }
+
+    const transmetodLabels = [...new Set(baseData.map(row => row["Trans Method#"]))];
+    const statusLabels = [...new Set(baseData.map(row => row["Status"]))];
+    const typeLabels = [...new Set(baseData.map(row => row["D/O Type"]))];
+    const DOCreatedLabels = ["00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"];
+
+    transmetodLabels.sort();
+
+    var ordem_status = ["00_Waiting Pre-Visit","00_CARR_ID Incorreto","00_Pending Shipmment","W.Booking","W.Allocation","Allocation","Picking","With NF","Print","Checking","Mf.Created","Loading","GI",""]
+    statusLabels.sort((a, b) => {
+      return ordem_status.indexOf(a) - ordem_status.indexOf(b);
+    });
+    
+
+    var ctx = document.getElementById("chartLineTransMethod").getContext("2d");
+    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, 'rgba(66,134,121,0.15)');
+    gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
+    gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors
+
+    var data = {
+      labels: transmetodLabels,
+      datasets: [{
+        label: "Itens",
+        fill: true,
+        backgroundColor: gradientStroke,
+        borderColor: '#00f2c3',
+        borderWidth: 2,
+        borderDash: [],
+        borderDashOffset: 0.0,
+        pointBackgroundColor: '#00f2c3',
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointHoverBackgroundColor: '#00d6b4',
+        pointBorderWidth: 20,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 15,
+        pointRadius: 4,
+        data: transmetodLabels.map(label => 0),
+      }]
+    };
+
+    ChartOptionsConfigTransmetod = {
       maintainAspectRatio: false,
       legend: {
         display: false
@@ -156,7 +236,8 @@ demo = {
             size: 25,
           },
           formatter: (value) => `${value}`, 
-        }
+        },
+        tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
       },
       scales: {
         yAxes: [{
@@ -168,12 +249,9 @@ demo = {
           },
           ticks: {
             display: false,
-            suggestedMin: 50,
-            suggestedMax: 10000, // Math.max(...doCreated)*1.1
             padding: 10,
           }
         }],
-
         xAxes: [{
           barPercentage: 1.6,
           gridLines: {
@@ -187,49 +265,60 @@ demo = {
             fontColor: "#9e9e9e"
           }
         }]
+      },
+      onClick: function(e) {
+        const activePoints = this.getElementAtEvent(e);
+        if (activePoints.length) {
+          const clickedIndex = activePoints[0]._index;
+          const clickedTransmetod = transmetodLabels[clickedIndex];
+
+          currentTransMethedFilter = currentTransMethedFilter === clickedTransmetod ? null : clickedTransmetod;
+          updateCharts();
+        }
       }
     };
 
+    const myChartTransmetod = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: ChartOptionsConfigTransmetod
+    });
 
-    var ctx = document.getElementById("chartLineTransMethod").getContext("2d");
+
+    var ctx = document.getElementById("chartBarStep").getContext("2d");
+
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(66,134,121,0.15)');
-    gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
-    gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
 
     var data = {
-      labels: ['T1', 'M2', 'P4', 'P3'],
+      labels: statusLabels,
       datasets: [{
         label: "Itens",
         fill: true,
         backgroundColor: gradientStroke,
-        borderColor: '#00f2c3',
+        hoverBackgroundColor: gradientStroke,
+        borderColor: '#1f8ef1',
         borderWidth: 2,
         borderDash: [],
         borderDashOffset: 0.0,
-        pointBackgroundColor: '#00f2c3',
-        pointBorderColor: 'rgba(255,255,255,0)',
-        pointHoverBackgroundColor: '#00d6b4',
-        pointBorderWidth: 20,
-        pointHoverRadius: 4,
-        pointHoverBorderWidth: 15,
-        pointRadius: 4,
-        data: [2020, 140, 5680, 80],
+        data: statusLabels.map(label => 0),
       }]
-    };
-
-    var myChart = new Chart(ctx, {
-      type: 'line',
-      data: data,
-      options: ChartOptionsConfigType
-    });
-
+    }
 
     ChartOptionsConfigStep = {
       maintainAspectRatio: false,
       legend: {
         display: false
+      },
+      layout: {
+        padding: {
+          top: 15,
+          bottom: 20,
+          left: 30,
+          right: 30,
+        }
       },
       tooltips: {
         backgroundColor: '#f5f5f5',
@@ -266,8 +355,6 @@ demo = {
           ticks: {
             display: false,
             fontSize: 25,
-            suggestedMin: 60,
-            suggestedMax: 120,
             padding: 10,
             fontColor: "#9e9e9e"
           }
@@ -279,46 +366,55 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
-            fontSize: 20,
+            fontSize: 15,
             padding: 20,
             fontColor: "#9e9e9e"
           }
         }]
+      },
+      onClick: function(e) {
+        const activePoints = this.getElementAtEvent(e);
+        if (activePoints.length) {
+          const clickedIndex = activePoints[0]._index;
+          const clickedStatus = statusLabels[clickedIndex];
+          currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
+          updateCharts();
+        }
       }
     };
 
-    var ctx = document.getElementById("chartBarStep").getContext("2d");
-
-    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-
-    var myChart = new Chart(ctx, {
+    const myChartStep = new Chart(ctx, {
       type: 'bar',
-      responsive: true,
-      legend: {
-        display: false
-      },
-      data: {
-        labels: ['Wainting', 'Alocated', 'Picking', 'N.F.', 'Checking', 'Loading'],
-        datasets: [{
-          label: "Itens",
-          fill: true,
-          backgroundColor: gradientStroke,
-          hoverBackgroundColor: gradientStroke,
-          borderColor: '#1f8ef1',
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          data: [53, 20, 10, 10, 100, 45],
-        }]
-      },
-      options: ChartOptionsConfigStep,
-      plugins: [ChartDataLabels],
+      data: data,
+      options: ChartOptionsConfigStep
     });
 
+
+    ctx = document.getElementById('pieMonoMult').getContext("2d");
+    gradientFillBLue = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientFillBLue.addColorStop(0, "rgba(114, 170, 235, 0)");
+    gradientFillBLue.addColorStop(0.7, "rgba(114, 171, 235, 0.1)");
+    gradientFillGreen = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientFillGreen.addColorStop(0, "rgba(66, 134, 121, 0.18)");
+    gradientFillGreen.addColorStop(1, "rgba(66, 134, 121, 0.04)");
+
+    var data = {
+      labels: typeLabels,
+      datasets: [{
+        label: "Qty.",
+        borderColor: ["#00f2c3","#1f8ef1"],
+        pointBorderColor: "#FFF",
+        pointBackgroundColor: "#f96332",
+        pointBorderWidth: 2,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 1,
+        pointRadius: 4,
+        fill: true,
+        backgroundColor: [gradientFillGreen,gradientFillBLue],
+        borderWidth: 3,
+        data: typeLabels.map(label => 0)
+      }]
+    }
 
     ChartOptionsConfigMonoMult = {
       animation: {
@@ -336,7 +432,10 @@ demo = {
           fontSize: 14,
         },
         onClick: function(event, legendItem) {
+          const clickedType = legendItem.text;;
           
+          currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
+          updateCharts();
         },
       },
       responsive: true,
@@ -351,14 +450,6 @@ demo = {
           formatter: (value) => `${value}`,
         }
       },
-      scales: {
-        yAxes: [{
-          display: 0,
-        }],
-        xAxes: [{
-          display: 0,
-        }]
-      },
       layout: {
         padding: {
           left:10,
@@ -366,46 +457,66 @@ demo = {
           top: 20,
           bottom: 0
         }
+      },
+      onClick: function(e) {
+        const activePoints = this.getElementAtEvent(e);
+        if (activePoints.length) {
+          const clickedIndex = activePoints[0]._index;
+          const clickedType = typeLabels[clickedIndex];
+          console.log(clickedType);
+
+          currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
+          updateCharts();
+        }
       }
     };
 
-    ctx = document.getElementById('pieMonoMult').getContext("2d");
-
-    gradientFillBLue = ctx.createLinearGradient(0, 230, 0, 50);
-    gradientFillBLue.addColorStop(0, "rgba(114, 170, 235, 0)");
-    gradientFillBLue.addColorStop(0.7, "rgba(114, 171, 235, 0.1)");
-
-    gradientFillGreen = ctx.createLinearGradient(0, 230, 0, 50);
-    gradientFillGreen.addColorStop(0, "rgba(66, 134, 121, 0.18)");
-    gradientFillGreen.addColorStop(1, "rgba(66, 134, 121, 0.04)");
-    //"#f96332"
-
-    var data = {
-      labels: ["MONO", "MULT"],
-      datasets: [{
-        label: "Qty.",
-        borderColor: ["#00f2c3","#1f8ef1"],
-        pointBorderColor: "#FFF",
-        pointBackgroundColor: "#f96332",
-        pointBorderWidth: 2,
-        pointHoverRadius: 4,
-        pointHoverBorderWidth: 1,
-        pointRadius: 4,
-        fill: true,
-        backgroundColor: [gradientFillGreen,gradientFillBLue],
-        borderWidth: 3,
-        data: [500, 50]
-      }]
-    }
-
-    myChart = new Chart(ctx, {
+    const myChartType = new Chart(ctx, {
       type: 'doughnut',
       data: data,
       options: ChartOptionsConfigMonoMult
     });
 
-    var doCreated = [10,30,60,80,50,110,70,120,70,20,10,30,60,80,50,110,70,120,70,20,10,20,100,250]
 
+    var ctx = document.getElementById("chartLineDOCreated").getContext('2d');
+    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+  
+    var doCreated = [10,30,60,80,50,110,70,120,70,20,10,30,60,80,50,110,70,120,70,20,10,20,100,250]
+    var chart_labels = ['00:00','01h','02h','03h','04h','05h','06h','07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'];
+
+    var pointColors = [];
+    for (let i = 0; i < doCreated.length; i++) {
+      if (doCreated[i] > 70) {
+        pointColors.push('red');
+      } else {
+        pointColors.push('#2EC0F9');
+      }
+    }
+
+    var data = {
+      labels: DOCreatedLabels, 
+      datasets: [{
+        label: "Itens",
+        fill: true,
+        backgroundColor: gradientStroke,
+        borderColor: '#2EC0F9',
+        borderWidth: 2,
+        borderDash: [],
+        borderDashOffset: 0.0,
+        pointBackgroundColor: pointColors,
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointHoverBackgroundColor: '#2EC0F9',
+        pointBorderWidth: 20,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 15,
+        pointRadius: 4,
+        data: DOCreatedLabels.map(label => 0),
+      }]
+    }
+    
     const legendColors = [];
     for (let i = 0; i < doCreated.length; i++) {
       if (doCreated[i] > 70) {
@@ -485,52 +596,13 @@ demo = {
       }
     };
 
-    var chart_labels = ['00h','01h','02h','03h','04h','05h','06h','07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'];
-
-    var pointColors = [];
-    for (let i = 0; i < doCreated.length; i++) {
-      if (doCreated[i] > 70) {
-        pointColors.push('red');
-      } else {
-        pointColors.push('#2EC0F9');
-      }
-    }
-
-    var ctx = document.getElementById("chartLineDOCreated").getContext('2d');
-
-    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-    var config = {
+    const myChartDOCreated = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: chart_labels, 
-        datasets: [{
-          label: "Itens",
-          fill: true,
-          backgroundColor: gradientStroke,
-          borderColor: '#2EC0F9',
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          pointBackgroundColor: pointColors,
-          pointBorderColor: 'rgba(255,255,255,0)',
-          pointHoverBackgroundColor: '#2EC0F9',
-          pointBorderWidth: 20,
-          pointHoverRadius: 4,
-          pointHoverBorderWidth: 15,
-          pointRadius: 4,
-          data: doCreated,
-        }]
-      },
+      data: data,
       options: ChartOptionsConfigDOCreated
-    };
-    var myChartData = new Chart(ctx, config);
+    });
 
-
-
+    updateCharts();
 
   },
 
