@@ -19,6 +19,9 @@
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="../assets/demo/demo.css" rel="stylesheet" />
     <link href="../assets/css/dataTables.min.css" rel="stylesheet" />
+    <link href="../assets/css/handsontable.min.css" rel="stylesheet" />
+    <link href="../assets/css/ht-theme-main.min.css" rel="stylesheet" />
+
 </head>
 
 <body class="">
@@ -52,37 +55,37 @@
             <!-- End Navbar -->
             <div class="content">
                 <div class="row">
-                    <div class="col-xxl-5 col-lg-5 col-sm-12">
+                    <div class="col-lg-5 col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 <div class="row">
-                                    <div class="col-lg-6 text-center">
+                                    <div class="col-sm-6 text-center">
                                         <h4 class="text-muted ">BACKLOG D-2</h4>
-                                        <h2 id="backlogdmenos2"><i class="tim-icons icon-app text-danger"></i> 243</h2>                                   
+                                        <h2 id="backlogdmenos2"><i class="tim-icons icon-app text-danger"></i></h2>                                   
                                     </div>
-                                    <div class="col-lg-6 text-center">                                   
+                                    <div class="col-sm-6 text-center">                                   
                                         <h4 class="text-muted">BACKLOG D-1</h4>
-                                        <h2 id="backlogdmenos1"><i class="tim-icons  icon-app text-warning"></i> 1.299</h2>                                    
+                                        <h2 id="backlogdmenos1"><i class="tim-icons  icon-app text-warning"></i></h2>                                    
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xxl-7 col-lg-7 col-sm-12">
+                    <div class="col-lg-7 col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 <div class="row">
-                                    <div class="col-lg-4 text-center">
+                                    <div class="col-sm-4 text-center">
                                         <h4 class="text-muted">GI D-2</h4>
-                                        <h2 id="gidmenos2"><i class="tim-icons icon-delivery-fast text-success"></i> 243</h2>
+                                        <h2 id="gidmenos2"><i class="tim-icons icon-delivery-fast text-success"></i></h2>
                                     </div>
-                                    <div class="col-lg-4 text-center">
+                                    <div class="col-sm-4 text-center">
                                         <h4 class="text-muted">GI D-1</h4>
-                                        <h2 id="gidmenos1"><i class="tim-icons  icon-delivery-fast text-success"></i> 1.299</h2>
+                                        <h2 id="gidmenos1"><i class="tim-icons  icon-delivery-fast text-success"></i></h2>
                                     </div>
-                                    <div class="col-lg-4 text-center">
+                                    <div class="col-sm-4 text-center">
                                         <h4 class="text-muted">GI CURRENT</h4>
-                                        <h1 id="gicurrent"><i class="tim-icons  icon-delivery-fast text-success"></i> 8.680</h1>
+                                        <h1 id="gicurrent"><i class="tim-icons  icon-delivery-fast text-success"></i></h1>
                                     </div>
                                 </div>
                             </div>
@@ -138,24 +141,24 @@
                                     <div class="col-sm-6">
                                     <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
                                         <label class="btn btn-sm btn-success btn-simple" id="D-2">
-                                            <input type="radio" class="d-none d-sm-none" name="options">
-                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">D-2</span>
-                                            <span class="d-block d-sm-none">
-                                                <i class="tim-icons icon-gift-2"></i>
-                                            </span>
-                                            </label>
+                                        <input type="radio" class="d-none d-sm-none" name="options">
+                                        <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">D-2</span>
+                                        <span class="d-block d-sm-none">
+                                            D-2
+                                        </span>
+                                        </label>
                                         <label class="btn btn-sm btn-success btn-simple" id="D-1">
                                         <input type="radio" class="d-none d-sm-none" name="options">
                                         <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">D-1</span>
                                         <span class="d-block d-sm-none">
-                                            <i class="tim-icons icon-gift-2"></i>
+                                            D-1
                                         </span>
                                         </label>
                                         <label class="btn btn-sm btn-success btn-simple active" id="Current">
                                         <input type="radio" name="options" checked="">
                                         <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Current</span>
                                         <span class="d-block d-sm-none">
-                                            <i class="tim-icons icon-single-02"></i>
+                                            Current
                                         </span>
                                         </label>
                                     </div>
@@ -177,14 +180,17 @@
                                 <h4 class="card-title"> DO's Detalhado</h4>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive ps">
+                                <!-- <div class="table-responsive ps">
                                     <table class="table tablesorter" id="dataTable">
                                         <thead class="text-primary">
                                             <tr id="tableHeader"></tr>
                                         </thead>
                                         <tbody id="tableBody"></tbody>
+                                        
                                     </table>
-                                </div>
+                                    
+                                </div> -->
+                                <div id="excelTable" class="ht-theme-main-dark"></div>
                             </div>
                         </div>
                     </div>
@@ -192,7 +198,7 @@
             </div>
         </div>
     </div>
-    <div class="fixed-plugin">
+    <!-- <div class="fixed-plugin">
         <div class="dropdown show-dropdown">
             <a href="#" data-toggle="dropdown">
                 <i class="fa fa-cog fa-2x"> </i>
@@ -217,10 +223,11 @@
                 </li>
                 <li class="adjustments-line"></li>
             </ul>
-        </div>
+        </div> -->
     </div>
+    <script src="../assets/js/plugins/handsontable.full.min.js"></script>
     <script src="../assets/js/plugins/chartjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+    <script src="../assets/js/plugins/chartjs-plugin-datalabels.js"></script>
     <script src="../assets/js/core/jquery.min.js"></script>
     <script src="../assets/js/plugins/dataTables.min.js"></script>
 

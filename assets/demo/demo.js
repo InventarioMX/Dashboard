@@ -197,8 +197,6 @@ demo = {
 
       myChartDOCreated.data.datasets[0].pointBackgroundColor = pointColors
 
-
-
       myChartTransmetod.update();
       myChartStep.update();
       myChartType.update();
@@ -277,7 +275,6 @@ demo = {
       },
       scales: {
         yAxes: [{
-          barPercentage: 1.6,
           gridLines: {
             drawBorder: false,
             color: 'rgba(29,140,248,0.0)',
@@ -289,7 +286,6 @@ demo = {
           }
         }],
         xAxes: [{
-          barPercentage: 1.6,
           gridLines: {
             drawBorder: false,
             color: 'rgba(0,242,195,0.1)',
@@ -310,6 +306,7 @@ demo = {
 
           currentTransMethedFilter = currentTransMethedFilter === clickedTransmetod ? null : clickedTransmetod;
           updateCharts();
+          updateTable();
         }
       }
     };
@@ -321,8 +318,8 @@ demo = {
     });
 
     var ctx = document.getElementById("chartBarStep").getContext("2d");
-
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+    
     gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
     gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
     gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
@@ -349,22 +346,13 @@ demo = {
       },
       layout: {
         padding: {
-          top: 15,
+          top: 25,
           bottom: 20,
           left: 30,
-          right: 30,
+          right: 25,
         }
       },
-      tooltips: {
-        backgroundColor: '#f5f5f5',
-        titleFontColor: '#333',
-        bodyFontColor: '#666',
-        bodySpacing: 4,
-        xPadding: 15,
-        mode: "nearest",
-        intersect: 0,
-        position: "nearest"
-      },
+      
       responsive: true,
       plugins: {
         legend: {
@@ -375,10 +363,11 @@ demo = {
           anchor: 'end',
           align: 'top',
           font: {
-            size: 36,
+            size: 25,
           },
           formatter: (value) => `${value}`, // Formato dos rótulos
-        }
+        },
+        tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
       },
       scales: {
         yAxes: [{
@@ -389,9 +378,7 @@ demo = {
           },
           ticks: {
             display: false,
-            fontSize: 25,
             padding: 10,
-            fontColor: "#9e9e9e"
           }
         }],
         xAxes: [{
@@ -401,8 +388,8 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
-            fontSize: 15,
-            padding: 20,
+            fontSize: 19,
+            fontSize: 20,
             fontColor: "#9e9e9e"
           }
         }]
@@ -414,6 +401,7 @@ demo = {
           const clickedStatus = statusLabels[clickedIndex];
           currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
           updateCharts();
+          updateTable();
         }
       }
     };
@@ -471,6 +459,7 @@ demo = {
           
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
           updateCharts();
+          updateTable();
         },
       },
       responsive: true,
@@ -501,6 +490,7 @@ demo = {
 
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
           updateCharts();
+          updateTable();
         }
       }
     };
@@ -625,6 +615,7 @@ demo = {
           currentDOCreatedFilter = currentDOCreatedFilter === clickedDOCreated ? null : clickedDOCreated;
 
           updateCharts();
+          updateTable();
         }
       }
     };
@@ -665,7 +656,134 @@ demo = {
       updateCharts();
     });
 
+    // const tableHeader = document.getElementById("tableHeader");
+
+    // tableHeader.innerHTML = "";
+
+    // const headers = ["D/O No#", "D/O Date", "PGI Date", "Item Code", "Storage Location", "Plant Code", "Trans Method#", "Order Quantity", "D/O Type", "Status"];
+    // headers.forEach(header => {
+    //   const th = document.createElement("th");
+    //   th.textContent = header;
+    //   tableHeader.appendChild(th);
+    // });
+
+    // const tabela = $('#dataTable').DataTable({
+    //   scrollY: '350px',
+    //   paging: true,
+    //   searching: true,
+    //   ordering: true,
+    //   responsive: true,
+    //   language: {
+    //       lengthMenu: "Mostrar _MENU_ registros por página",
+    //       zeroRecords: "Nada encontrado",
+    //       info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+    //       infoEmpty: "Nenhum registro disponível",
+    //       infoFiltered: "(filtrado de _MAX_ registros no total)",
+    //       search: "Buscar:",
+    //       paginate: {
+    //       first: "Primeiro",
+    //       last: "Último",
+    //       next: "Próximo",
+    //       previous: "Anterior"
+    //       },
+    //   },
+    // });
+
+    // function updateTable() {
+
+    //   // Filtrar dados com base nos filtros atuais
+    //   const filteredData = baseData.filter(row => {
+    //     return (
+    //       (!currentTransMethedFilter || row["Trans Method#"] === currentTransMethedFilter) &&
+    //       (!currentDOCreatedFilter || row["D/O Date"].split(":")[0] + ":00" === currentDOCreatedFilter) &&
+    //       (!currentStatusFilter || row["Status"] === currentStatusFilter) &&
+    //       (!currentTypeFilter || row["D/O Type"] === currentTypeFilter)
+    //     );
+    //   });
+
+    //   // Limpar tabela existente
+    //   tabela.clear();
+
+    //   if (filteredData.length === 0) {
+    //     // Adicionar uma linha com mensagem de dados indisponíveis
+    //     tabela.row.add(["Nenhum dado disponível", "", "", "", "", "", "", "", "", ""]);
+    //   } else {
+    //     // Adicionar os dados filtrados
+    //     filteredData.forEach(row => {
+    //       tabela.row.add([
+    //         row["D/O No#"] || "",
+    //         row["D/O Date"] || "",
+    //         row["PGI Date"] || "",
+    //         row["Item Code"] || "",
+    //         row["Storage Location"] || "",
+    //         row["Plant Code"] || "",
+    //         row["Trans Method#"] || "",
+    //         row["Order Quantity"] || "",
+    //         row["D/O Type"] || "",
+    //         row["Status"] || ""
+    //       ]);
+    //     });
+    //   }
+
+    //   // Redesenhar a tabela
+    //   tabela.draw();
+
+    // }
+
+    function updateTable() {
+      const filteredData = baseData.filter(row => {
+        return (
+          (!currentTransMethedFilter || row["Trans Method#"] === currentTransMethedFilter) &&
+          (!currentDOCreatedFilter || row["D/O Date"].split(":")[0] + ":00" === currentDOCreatedFilter) &&
+          (!currentStatusFilter || row["Status"] === currentStatusFilter) &&
+          (!currentTypeFilter || row["D/O Type"] === currentTypeFilter)
+        );
+      })
+      .map(row => [
+        row["D/O No#"] || "",
+        row["D/O Date"] || "",
+        row["PGI Date"] || "",
+        row["Item Code"] || "",
+        row["Storage Location"] || "",
+        row["Plant Code"] || "",
+        row["Trans Method#"] || "",
+        row["Order Quantity"] || "",
+        row["D/O Type"] || "",
+        row["Status"] || ""
+      ]);
+
+      const container = document.getElementById('excelTable');
+
+      const hot = new Handsontable(container, {
+        data: filteredData,
+        height: 450,
+        stretchH: 'all',
+        fixedColumnsStart: 1,
+        colHeaders: [        
+          "D/O No#",
+          "D/O Date",
+          "PGI Date",
+          "Item Code",
+          "Storage Location",
+          "Plant Code",
+          "Trans Method#",
+          "Order Quantity",
+          "D/O Type",
+          "Status"
+        ],
+        contextMenu: true, // Menu com opções de edição
+        manualColumnResize: true, // Redimensionar colunas
+        manualRowResize: true,    // Redimensionar linhas
+        filters: true,            // Habilita filtros
+        dropdownMenu: ['filter_by_condition', 'filter_by_value', 'filter_action_bar'],       // Menu suspenso para filtros
+        licenseKey: 'non-commercial-and-evaluation' // Licença para uso não comercial
+      });
+    }
+
     updateCharts();
+    updateTable();
+
+    
 
   },
 

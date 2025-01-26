@@ -35,6 +35,7 @@ function populateTable(data) {
   
     // Recria o DataTables após um pequeno timeout para garantir que o DOM foi atualizado
     $('#dataTable').DataTable({
+    destroy: true,
     paging: true,
     searching: true,
     ordering: true,
