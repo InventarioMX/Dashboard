@@ -20,96 +20,117 @@ demo = {
     });
   },
 
-  // initDocChart: function() {
-  //   chartColor = "#FFFFFF";
+  initDashboardHeaders: function(datajson) {
 
-  //   // General configuration for the charts with Line gradientStroke
-  //   gradientChartOptionsConfiguration = {
-  //     maintainAspectRatio: false,
-  //     legend: {
-  //       display: false
-  //     },
-  //     tooltips: {
-  //       bodySpacing: 4,
-  //       mode: "nearest",
-  //       intersect: 0,
-  //       position: "nearest",
-  //       xPadding: 10,
-  //       yPadding: 10,
-  //       caretPadding: 10
-  //     },
-  //     responsive: true,
-  //     scales: {
-  //       yAxes: [{
-  //         display: 0,
-  //         gridLines: 0,
-  //         ticks: {
-  //           display: false
-  //         },
-  //         gridLines: {
-  //           zeroLineColor: "transparent",
-  //           drawTicks: false,
-  //           display: false,
-  //           drawBorder: false
-  //         }
-  //       }],
-  //       xAxes: [{
-  //         display: 0,
-  //         gridLines: 0,
-  //         ticks: {
-  //           display: false
-  //         },
-  //         gridLines: {
-  //           zeroLineColor: "transparent",
-  //           drawTicks: false,
-  //           display: false,
-  //           drawBorder: false
-  //         }
-  //       }]
-  //     },
-  //     layout: {
-  //       padding: {
-  //         left: 0,
-  //         right: 0,
-  //         top: 15,
-  //         bottom: 15
-  //       }
-  //     }
-  //   };
+    let hoje = new Date();
+    hoje.setDate(hoje.getDate() - 17);
+    let dateFiltercurrent = hoje.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    hoje.setDate(hoje.getDate() - 1);
+    let dateFilterdmenos1 = hoje.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    hoje.setDate(hoje.getDate() - 1);
+    let dateFilterdmenos2 = hoje.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
 
-  //   ctx = document.getElementById('lineChartExample').getContext("2d");
 
-  //   gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
-  //   gradientStroke.addColorStop(0, '#80b6f4');
-  //   gradientStroke.addColorStop(1, chartColor);
+    const gicurrent = datajson.RelatorioD2C
+    .filter(item => item.Status === "GI" && item["GI Date"].split(" ")[0] === dateFiltercurrent)
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0)
+    .toLocaleString('pt-BR');
 
-  //   gradientFill = ctx.createLinearGradient(0, 170, 0, 50);
-  //   gradientFill.addColorStop(0, "rgba(128, 182, 244, 0)");
-  //   gradientFill.addColorStop(1, "rgba(249, 99, 59, 0.40)");
+    const gidmenos1 = datajson.RelatorioD2C
+    .filter(item => item.Status === "GI" && item["GI Date"].split(" ")[0] === dateFilterdmenos1)
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0)
+    .toLocaleString('pt-BR');
 
-  //   myChart = new Chart(ctx, {
-  //     type: 'line',
-  //     responsive: true,
-  //     data: {
-  //       labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  //       datasets: [{
-  //         label: "Active Users",
-  //         borderColor: "#f96332",
-  //         pointBorderColor: "#FFF",
-  //         pointBackgroundColor: "#f96332",
-  //         pointBorderWidth: 2,
-  //         pointHoverRadius: 4,
-  //         pointHoverBorderWidth: 1,
-  //         pointRadius: 4,
-  //         fill: true,
-  //         backgroundColor: gradientFill,
-  //         borderWidth: 2,
-  //         data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]
-  //       }]
-  //     },
-  //     options: gradientChartOptionsConfiguration
-  //   });
-  // },
+    const gidmenos2 = datajson.RelatorioD2C
+    .filter(item => item.Status === "GI" && item["GI Date"].split(" ")[0] === dateFilterdmenos2)
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0)
+    .toLocaleString('pt-BR');
+
+
+    const Backlogdmenos1 = datajson.RelatorioD2C
+    .filter(item => item.Status !== "GI" && item["D/O Date"].split(" ")[0] === dateFilterdmenos1)
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0)
+    .toLocaleString('pt-BR');
+
+    const Backlogdmenos2 = datajson.RelatorioD2C
+    .filter(item => item.Status !== "GI" && item["D/O Date"].split(" ")[0] === dateFilterdmenos2)
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0)
+    .toLocaleString('pt-BR');
+
+    const lastupdate = datajson.UltAtualizacao[0].Atualizacao;
+
+    const tbgicurrent = document.getElementById("gicurrent");
+
+    if (gicurrent.length === 0) {
+      tbgicurrent.innerHTML = "<h1 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> #N/D</h1>";
+    } else {
+      tbgicurrent.innerHTML = "<h1 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> " + gicurrent + "</h1>";
+    }
+
+    const tbgidmenos1 = document.getElementById("gidmenos1");
+
+    if (gidmenos1.length === 0) {
+      tbgidmenos1.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> #N/D</h2>";
+    }else{
+      tbgidmenos1.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> " + gidmenos1 + "</h2>";
+    }
+
+    const tbgidmenos2 = document.getElementById("gidmenos2");
+
+    if (gidmenos2.length === 0) {
+      tbgidmenos2.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> #N/D</h2>";
+    }else{
+      tbgidmenos2.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> " + gidmenos2 + "</h2>";
+    }
+
+    const tbBacklogdmenos1 = document.getElementById("backlogdmenos1");
+
+    if (Backlogdmenos1.length === 0) {
+      tbBacklogdmenos1.innerHTML = "<h2 id='backlogdmenos1'><i class='tim-icons  icon-app text-warning'></i> #N/D</h2>";
+    }else{
+      tbBacklogdmenos1.innerHTML = "<h2 id='backlogdmenos1'><i class='tim-icons  icon-app text-warning'></i> " + Backlogdmenos1 + "</h2>";
+    }
+
+    const tbBacklogdmenos2 = document.getElementById("backlogdmenos2");
+
+    if (Backlogdmenos2.length === 0) {
+      tbBacklogdmenos2.innerHTML = "<h2 id='backlogdmenos2'><i class='tim-icons icon-app text-danger'></i> #N/D</h2>";
+    }else{
+      tbBacklogdmenos2.innerHTML = "<h2 id='backlogdmenos2'><i class='tim-icons icon-app text-danger'></i> " + Backlogdmenos2 + "</h2>";
+    }
+
+    const tblastupdate = document.getElementById("lastupdate");
+
+    if (lastupdate.length === 0) {
+      tblastupdate.innerHTML = "<h2 id='backlogdmenos2'><i class='tim-icons icon-app text-danger'></i> #N/D</h2>";
+    }else{
+      tblastupdate.innerHTML = "<h3 class='card-title navbar-brand' id='lastupdate'><i class='tim-icons icon-refresh-01 text-info'></i> Last Update: " + lastupdate + "</h3>";
+    }
+
+  },
+
 
   initDashboardPageCharts: function(datajson) {
     const baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
@@ -119,10 +140,18 @@ demo = {
     let currentTypeFilter = null;
     let currentDOCreatedFilter = null;
 
+    let hoje = new Date();
+    hoje.setDate(hoje.getDate() - 17);
+    let dateFilter = hoje.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+
     function consolidateData(data, groupField) {
       return data.reduce((acc, row) => {
         if (!currentTransMethedFilter || row["Trans Method#"] === currentTransMethedFilter) {
-          if (!currentDOCreatedFilter || row["D/O Date"] === currentDOCreatedFilter) {
+          if (!currentDOCreatedFilter || row["D/O Date"].split(":")[0] + ":00" === currentDOCreatedFilter) {
             if (!currentStatusFilter || row["Status"] === currentStatusFilter ) {
               if (!currentTypeFilter || row["D/O Type"] === currentTypeFilter) {
                 acc[row[groupField]] = (acc[row[groupField]] || 0) + row["Order Quantity"];
@@ -135,34 +164,41 @@ demo = {
     }
 
     function updateCharts() {
-      var hoje = new Date();
-          hoje.setDate(hoje.getDate() - 15);
-      let dateFilter = hoje.toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-      });
-
-      const filteredAndUpdatedData = baseData
-        .filter(item => item["D/O Date"].startsWith(dateFilter))
-        .map(item => ({
-          ...item,
-          ["D/O Date"]: item["D/O Date"].split(" ")[1].split(":")[0] + ":00" 
-        }));
 
       const transmetodConsolidation = consolidateData(baseData, "Trans Method#");
       const statusConsolidation = consolidateData(baseData, "Status");
       const typeConsolidation = consolidateData(baseData, "D/O Type");
-      const DOCreatedConsolidation = consolidateData(filteredAndUpdatedData, "D/O Date");
+      let DOCreatedConsolidation = consolidateData(baseData, "D/O Date");
+
+      DOCreatedConsolidation = Object.entries(DOCreatedConsolidation)
+        .filter(([chave, valor]) => chave.startsWith(dateFilter))
+        .reduce((acc, [chave, valor]) => {
+          acc[chave.split(" ")[1].split(":")[0] + ":00"] = (acc[chave.split(" ")[1].split(":")[0] + ":00"] || 0) + valor;
+          return acc;
+        }, {});
 
       myChartTransmetod.data.datasets[0].data = transmetodLabels.map(label => transmetodConsolidation[label] || 0);
       myChartStep.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
       myChartType.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
       myChartDOCreated.data.datasets[0].data = DOCreatedLabels.map(label => DOCreatedConsolidation[label] || 0);
 
-      myChartTransmetod.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartTransmetod.data.datasets[0].data)*1.2;
-      myChartStep.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartStep.data.datasets[0].data)*1.3;
+      myChartTransmetod.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartTransmetod.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartTransmetod.data.datasets[0].data)*1.3;
+      myChartStep.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartStep.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartStep.data.datasets[0].data)*1.3;
+      myChartDOCreated.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartDOCreated.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartDOCreated.data.datasets[0].data)*1.3;
       
+      var pointColors = [];
+      for (let i = 0; i < myChartDOCreated.data.datasets[0].data.length; i++) {
+        if (parseInt(myChartDOCreated.data.datasets[0].data[i]) > 220) {
+          pointColors.push('red');
+        } else {
+          pointColors.push('#2EC0F9');
+        }
+      }
+
+      myChartDOCreated.data.datasets[0].pointBackgroundColor = pointColors
+
+
+
       myChartTransmetod.update();
       myChartStep.update();
       myChartType.update();
@@ -283,7 +319,6 @@ demo = {
       data: data,
       options: ChartOptionsConfigTransmetod
     });
-
 
     var ctx = document.getElementById("chartBarStep").getContext("2d");
 
@@ -463,7 +498,6 @@ demo = {
         if (activePoints.length) {
           const clickedIndex = activePoints[0]._index;
           const clickedType = typeLabels[clickedIndex];
-          console.log(clickedType);
 
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
           updateCharts();
@@ -484,17 +518,7 @@ demo = {
     gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
     gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
   
-    var doCreated = [10,30,60,80,50,110,70,120,70,20,10,30,60,80,50,110,70,120,70,20,10,20,100,250]
-    var chart_labels = ['00:00','01h','02h','03h','04h','05h','06h','07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'];
 
-    var pointColors = [];
-    for (let i = 0; i < doCreated.length; i++) {
-      if (doCreated[i] > 70) {
-        pointColors.push('red');
-      } else {
-        pointColors.push('#2EC0F9');
-      }
-    }
 
     var data = {
       labels: DOCreatedLabels, 
@@ -506,7 +530,7 @@ demo = {
         borderWidth: 2,
         borderDash: [],
         borderDashOffset: 0.0,
-        pointBackgroundColor: pointColors,
+        pointBackgroundColor: "#2EC0F9",
         pointBorderColor: 'rgba(255,255,255,0)',
         pointHoverBackgroundColor: '#2EC0F9',
         pointBorderWidth: 20,
@@ -516,15 +540,15 @@ demo = {
         data: DOCreatedLabels.map(label => 0),
       }]
     }
-    
+
     const legendColors = [];
-    for (let i = 0; i < doCreated.length; i++) {
-      if (doCreated[i] > 70) {
+    DOCreatedLabels.reduce((acc, row) => {
+      if (row > 70) {
         legendColors.push('red');
       } else {
         legendColors.push('rgba(255, 255, 255, 0.8)');
       }
-    }
+    }, {});
 
     ChartOptionsConfigDOCreated = {
       maintainAspectRatio: false,
@@ -573,8 +597,6 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
-            suggestedMin: 50,
-            suggestedMax: Math.max(...doCreated)*1.1,
             padding: 20,
             fontColor: "#9a9a9a",
             display:false
@@ -593,6 +615,17 @@ demo = {
             fontColor: "#9a9a9a"
           }
         }]
+      },
+      onClick: function(e) {
+        const activePoints = this.getElementAtEvent(e);
+        if (activePoints.length) {
+          const clickedIndex = activePoints[0]._index;
+          const clickedDOCreated =  dateFilter + " " + DOCreatedLabels[clickedIndex];
+
+          currentDOCreatedFilter = currentDOCreatedFilter === clickedDOCreated ? null : clickedDOCreated;
+
+          updateCharts();
+        }
       }
     };
 
@@ -602,170 +635,38 @@ demo = {
       options: ChartOptionsConfigDOCreated
     });
 
+    $("#D-2").click(function() {
+      hoje.setDate(hoje.getDate() - 2);
+      dateFilter = hoje.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+      });
+      updateCharts();
+      hoje.setDate(hoje.getDate() + 2);
+    });
+    $("#D-1").click(function() {
+      hoje.setDate(hoje.getDate() - 1);
+      dateFilter = hoje.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+      });
+      updateCharts();
+      hoje.setDate(hoje.getDate() + 1);
+    });
+
+    $("#Current").click(function() {
+      dateFilter = hoje.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      updateCharts();
+    });
+
     updateCharts();
 
-  },
-
-
-
-
-
-
-
-  //   gradientChartOptionsConfigurationWithTooltipBlue = {
-  //     maintainAspectRatio: false,
-  //     legend: {
-  //       display: false
-  //     },
-
-  //     tooltips: {
-  //       backgroundColor: '#f5f5f5',
-  //       titleFontColor: '#333',
-  //       bodyFontColor: '#666',
-  //       bodySpacing: 4,
-  //       xPadding: 12,
-  //       mode: "nearest",
-  //       intersect: 0,
-  //       position: "nearest"
-  //     },
-  //     responsive: true,
-  //     scales: {
-  //       yAxes: [{
-  //         barPercentage: 1.6,
-  //         gridLines: {
-  //           drawBorder: false,
-  //           color: 'rgba(29,140,248,0.0)',
-  //           zeroLineColor: "transparent",
-  //         },
-  //         ticks: {
-  //           suggestedMin: 60,
-  //           suggestedMax: 125,
-  //           padding: 20,
-  //           fontColor: "#2380f7"
-  //         }
-  //       }],
-
-  //       xAxes: [{
-  //         barPercentage: 1.6,
-  //         gridLines: {
-  //           drawBorder: false,
-  //           color: 'rgba(29,140,248,0.1)',
-  //           zeroLineColor: "transparent",
-  //         },
-  //         ticks: {
-  //           padding: 20,
-  //           fontColor: "#2380f7"
-  //         }
-  //       }]
-  //     }
-  //   };
-
-
-
-
-
-
-
-  //   gradientChartOptionsConfigurationWithTooltipOrange = {
-  //     maintainAspectRatio: false,
-  //     legend: {
-  //       display: false
-  //     },
-
-  //     tooltips: {
-  //       backgroundColor: '#f5f5f5',
-  //       titleFontColor: '#333',
-  //       bodyFontColor: '#666',
-  //       bodySpacing: 4,
-  //       xPadding: 12,
-  //       mode: "nearest",
-  //       intersect: 0,
-  //       position: "nearest"
-  //     },
-  //     responsive: true,
-  //     scales: {
-  //       yAxes: [{
-  //         barPercentage: 1.6,
-  //         gridLines: {
-  //           drawBorder: false,
-  //           color: 'rgba(29,140,248,0.0)',
-  //           zeroLineColor: "transparent",
-  //         },
-  //         ticks: {
-  //           suggestedMin: 50,
-  //           suggestedMax: 110,
-  //           padding: 20,
-  //           fontColor: "#ff8a76"
-  //         }
-  //       }],
-
-  //       xAxes: [{
-  //         barPercentage: 1.6,
-  //         gridLines: {
-  //           drawBorder: false,
-  //           color: 'rgba(220,53,69,0.1)',
-  //           zeroLineColor: "transparent",
-  //         },
-  //         ticks: {
-  //           padding: 20,
-  //           fontColor: "#ff8a76"
-  //         }
-  //       }]
-  //     }
-  //   };
-
- 
-
-
-  
-
-
-
-
-
-  //   var ctx = document.getElementById("CountryChart").getContext("2d");
-
-  //   var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-  //   gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-  //   gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-  //   gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-
-
-  //   var myChart = new Chart(ctx, {
-  //     type: 'bar',
-  //     responsive: true,
-  //     legend: {
-  //       display: false
-  //     },
-  //     data: {
-  //       labels: ['Wainting', 'Alocated', 'Picking', 'N.F.', 'Checking', 'Loading'],
-  //       datasets: [{
-  //         label: "Itens",
-  //         fill: true,
-  //         backgroundColor: gradientStroke,
-  //         hoverBackgroundColor: gradientStroke,
-  //         borderColor: '#1f8ef1',
-  //         borderWidth: 2,
-  //         borderDash: [],
-  //         borderDashOffset: 0.0,
-  //         data: [53, 20, 10, 80, 100, 45],
-  //       }]
-  //     },
-  //     options: gradientBarChartConfiguration,
-  //     plugins: [ChartDataLabels],
-  //   });
-
-  // },
-
-  initLastUpdate: function(data) {
-    var txtHtml = document.getElementById("atualizacao");
-    if (data.length > 0) {
-      var ultatt = data[0].Atualizacao;
-      txtHtml.innerHTML += ` ${ultatt}`;
-    } else {
-      txtHtml.innerHTML += " Não disponível";
-    }
   },
 
   showNotification: function(from, align) {

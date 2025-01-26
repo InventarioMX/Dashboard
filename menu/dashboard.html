@@ -41,7 +41,7 @@
                         <ul class="navbar-nav ml-auto">
                             <li class="dropdown nav-item">
                                 <a href="#" class="nav-link">
-                                    <h3 class="card-title navbar-brand" id="atualizacao"><i class="tim-icons icon-refresh-01 text-info"></i> Last Update:</h3>
+                                    <h3 class="card-title navbar-brand" id="lastupdate"><i class="tim-icons icon-refresh-01 text-info"></i> Last Update:</h3>
                                 </a>
                             </li>
                             <li class="separator d-lg-none"></li>
@@ -58,11 +58,11 @@
                                 <div class="row">
                                     <div class="col-lg-6 text-center">
                                         <h4 class="text-muted ">BACKLOG D-2</h4>
-                                        <h2><i class="tim-icons icon-app text-danger"></i> 243</h2>                                   
+                                        <h2 id="backlogdmenos2"><i class="tim-icons icon-app text-danger"></i> 243</h2>                                   
                                     </div>
                                     <div class="col-lg-6 text-center">                                   
                                         <h4 class="text-muted">BACKLOG D-1</h4>
-                                        <h2><i class="tim-icons  icon-app text-warning"></i> 1.299</h2>                                    
+                                        <h2 id="backlogdmenos1"><i class="tim-icons  icon-app text-warning"></i> 1.299</h2>                                    
                                     </div>
                                 </div>
                             </div>
@@ -74,15 +74,15 @@
                                 <div class="row">
                                     <div class="col-lg-4 text-center">
                                         <h4 class="text-muted">GI D-2</h4>
-                                        <h2><i class="tim-icons icon-delivery-fast text-success"></i> 243</h2>
+                                        <h2 id="gidmenos2"><i class="tim-icons icon-delivery-fast text-success"></i> 243</h2>
                                     </div>
                                     <div class="col-lg-4 text-center">
                                         <h4 class="text-muted">GI D-1</h4>
-                                        <h2><i class="tim-icons  icon-delivery-fast text-success"></i> 1.299</h2>
+                                        <h2 id="gidmenos1"><i class="tim-icons  icon-delivery-fast text-success"></i> 1.299</h2>
                                     </div>
                                     <div class="col-lg-4 text-center">
                                         <h4 class="text-muted">GI CURRENT</h4>
-                                        <h1><i class="tim-icons  icon-delivery-fast text-success"></i> 8.680</h1>
+                                        <h1 id="gicurrent"><i class="tim-icons  icon-delivery-fast text-success"></i> 8.680</h1>
                                     </div>
                                 </div>
                             </div>
@@ -134,6 +134,31 @@
                                 <div class="row">
                                     <div class="col-sm-6 text-left">
                                         <h3> <i class="tim-icons icon-bag-16" style="color: #2EC0F9;"></i> DO Created</h2>
+                                    </div>
+                                    <div class="col-sm-6">
+                                    <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                                        <label class="btn btn-sm btn-success btn-simple" id="D-2">
+                                            <input type="radio" class="d-none d-sm-none" name="options">
+                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">D-2</span>
+                                            <span class="d-block d-sm-none">
+                                                <i class="tim-icons icon-gift-2"></i>
+                                            </span>
+                                            </label>
+                                        <label class="btn btn-sm btn-success btn-simple" id="D-1">
+                                        <input type="radio" class="d-none d-sm-none" name="options">
+                                        <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">D-1</span>
+                                        <span class="d-block d-sm-none">
+                                            <i class="tim-icons icon-gift-2"></i>
+                                        </span>
+                                        </label>
+                                        <label class="btn btn-sm btn-success btn-simple active" id="Current">
+                                        <input type="radio" name="options" checked="">
+                                        <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Current</span>
+                                        <span class="d-block d-sm-none">
+                                            <i class="tim-icons icon-single-02"></i>
+                                        </span>
+                                        </label>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -337,6 +362,7 @@
         })
         .then(data => {
             demo.initDashboardPageCharts(data);
+            demo.initDashboardHeaders(data);
         })
         .catch(err => {
             console.error('Erro:', err);
