@@ -1,4 +1,5 @@
 
+
 type = ['primary', 'info', 'success', 'warning', 'danger'];
 
 data = {
@@ -6,6 +7,7 @@ data = {
 };
 
 demo = {
+  
   initPickColor: function() {
     $('.pick-class-label').click(function() {
       var new_class = $(this).attr('new-class');
@@ -133,6 +135,7 @@ demo = {
 
 
   initDashboardPageCharts: function(datajson) {
+    
     const baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
 
     let currentTransMethedFilter = null;
@@ -388,8 +391,7 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
-            fontSize: 19,
-            fontSize: 20,
+            fontSize: 17,
             fontColor: "#9e9e9e"
           }
         }]
@@ -730,6 +732,32 @@ demo = {
 
     // }
 
+    const container = document.getElementById('excelTable');
+
+    const hot = new Handsontable(container, {
+      data: [],
+      height: 450,
+      stretchH: 'all',
+      colHeaders: [        
+        "D/O No#",
+        "D/O Date",
+        "PGI Date",
+        "Item Code",
+        "Storage Location",
+        "Plant Code",
+        "Trans Method#",
+        "Order Quantity",
+        "D/O Type",
+        "Status"
+      ],
+      manualColumnResize: true, // Redimensionar colunas
+      manualRowResize: true,    // Redimensionar linhas
+      filters: true,            // Habilita filtros
+      dropdownMenu: true,       // Menu suspenso para filtros
+      licenseKey: 'non-commercial-and-evaluation' // Licença para uso não comercial
+    });
+
+
     function updateTable() {
       const filteredData = baseData.filter(row => {
         return (
@@ -752,38 +780,12 @@ demo = {
         row["Status"] || ""
       ]);
 
-      const container = document.getElementById('excelTable');
+      hot.loadData(filteredData);
 
-      const hot = new Handsontable(container, {
-        data: filteredData,
-        height: 450,
-        stretchH: 'all',
-        fixedColumnsStart: 1,
-        colHeaders: [        
-          "D/O No#",
-          "D/O Date",
-          "PGI Date",
-          "Item Code",
-          "Storage Location",
-          "Plant Code",
-          "Trans Method#",
-          "Order Quantity",
-          "D/O Type",
-          "Status"
-        ],
-        contextMenu: true, // Menu com opções de edição
-        manualColumnResize: true, // Redimensionar colunas
-        manualRowResize: true,    // Redimensionar linhas
-        filters: true,            // Habilita filtros
-        dropdownMenu: ['filter_by_condition', 'filter_by_value', 'filter_action_bar'],       // Menu suspenso para filtros
-        licenseKey: 'non-commercial-and-evaluation' // Licença para uso não comercial
-      });
     }
 
     updateCharts();
     updateTable();
-
-    
 
   },
 

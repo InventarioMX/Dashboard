@@ -25,8 +25,8 @@ rs.Open sqlQuery, conn
 ' Criar o arquivo de texto  
 Set arquivo = fso.CreateTextFile(caminhoTxt, True)
 
-arquivo.WriteLine "{"
-arquivo.WriteLine " ""RelatorioD2C"": ["
+arquivo.Write "{"
+arquivo.Write " ""RelatorioD2C"": ["
 ' Escrever os dados no arquivo de texto
 
 Do Until rs.EOF
@@ -57,15 +57,15 @@ Do Until rs.EOF
     End If
     
     ' Escreve a linha no arquivo
-    arquivo.WriteLine vlin
+    arquivo.Write vlin
 Loop
 
 
-arquivo.WriteLine "],"
-arquivo.WriteLine """UltAtualizacao"": ["
-arquivo.WriteLine vbTab & "{ ""Atualizacao"": """ & Now & """ }"
-arquivo.WriteLine "]"
-arquivo.WriteLine "}"
+arquivo.Write "],"
+arquivo.Write """UltAtualizacao"": ["
+arquivo.Write vbTab & "{ ""Atualizacao"": """ & Now & """ }"
+arquivo.Write "]"
+arquivo.Write "}"
 ' Fechar o arquivo e liberar objetos
 arquivo.Close
 rs.Close
