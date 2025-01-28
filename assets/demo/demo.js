@@ -1,10 +1,4 @@
-
-
 type = ['primary', 'info', 'success', 'warning', 'danger'];
-
-data = {
-
-};
 
 demo = {
   
@@ -22,10 +16,17 @@ demo = {
     });
   },
 
+  StrToDate: function(str){
+    var date = new Date(str.split('/').reverse().join('/'));
+    return date;
+  },
+
   initDashboardHeaders: function(datajson) {
 
+    let baseData = datajson.RelatorioD2C.filter(item => item.Status !== "00_Pending Shipmment");
+
     let hoje = new Date();
-    hoje.setDate(hoje.getDate() - 17);
+    hoje.setDate(hoje.getDate());
     let dateFiltercurrent = hoje.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -45,98 +46,187 @@ demo = {
     });
 
 
-    const gicurrent = datajson.RelatorioD2C
+    const gicurrent = baseData
     .filter(item => item.Status === "GI" && item["GI Date"].split(" ")[0] === dateFiltercurrent)
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
-    }, 0)
-    .toLocaleString('pt-BR');
+    }, 0);
 
-    const gidmenos1 = datajson.RelatorioD2C
+    const gidmenos1 = baseData
     .filter(item => item.Status === "GI" && item["GI Date"].split(" ")[0] === dateFilterdmenos1)
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
-    }, 0)
-    .toLocaleString('pt-BR');
+    }, 0);
 
-    const gidmenos2 = datajson.RelatorioD2C
+    const gidmenos2 = baseData
     .filter(item => item.Status === "GI" && item["GI Date"].split(" ")[0] === dateFilterdmenos2)
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
-    }, 0)
-    .toLocaleString('pt-BR');
+    }, 0);
 
-
-    const Backlogdmenos1 = datajson.RelatorioD2C
-    .filter(item => item.Status !== "GI" && item["D/O Date"].split(" ")[0] === dateFilterdmenos1)
+    const Backlog = baseData
+    .filter(item => item.Status !== "GI" && item["Trans Method#"] !== "M02" &&  demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFiltercurrent))
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
-    }, 0)
-    .toLocaleString('pt-BR');
+    }, 0);
 
-    const Backlogdmenos2 = datajson.RelatorioD2C
-    .filter(item => item.Status !== "GI" && item["D/O Date"].split(" ")[0] === dateFilterdmenos2)
+    const inprocess = baseData
+    .filter(item => item.Status !== "GI" && item["D/O Date"].split(" ")[0] === dateFiltercurrent)
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
-    }, 0)
-    .toLocaleString('pt-BR');
+    }, 0);
 
     const lastupdate = datajson.UltAtualizacao[0].Atualizacao;
+
+    const tblastupdate = document.getElementById("lastupdate");
+
+    if (lastupdate.length === 0) {
+      tblastupdate.innerHTML = "<i class='tim-icons icon-app text-danger'></i> #N/D";
+    }else{
+      tblastupdate.innerHTML = "<i class='tim-icons icon-refresh-01 text-info'></i> Last Update: " + lastupdate ;
+    }
 
     const tbgicurrent = document.getElementById("gicurrent");
 
     if (gicurrent.length === 0) {
-      tbgicurrent.innerHTML = "<h1 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> #N/D</h1>";
+      tbgicurrent.innerHTML = " #N/D";
     } else {
-      tbgicurrent.innerHTML = "<h1 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> " + gicurrent + "</h1>";
+      tbgicurrent.innerHTML = " " + gicurrent.toLocaleString('pt-BR');
     }
 
     const tbgidmenos1 = document.getElementById("gidmenos1");
 
     if (gidmenos1.length === 0) {
-      tbgidmenos1.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> #N/D</h2>";
+      tbgidmenos1.innerHTML = " #N/D";
     }else{
-      tbgidmenos1.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> " + gidmenos1 + "</h2>";
+      tbgidmenos1.innerHTML = " " + gidmenos1.toLocaleString('pt-BR');
     }
 
     const tbgidmenos2 = document.getElementById("gidmenos2");
 
     if (gidmenos2.length === 0) {
-      tbgidmenos2.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> #N/D</h2>";
+      tbgidmenos2.innerHTML = " #N/D";
     }else{
-      tbgidmenos2.innerHTML = "<h2 id='gicurrent'><i class='tim-icons  icon-delivery-fast text-success'></i> " + gidmenos2 + "</h2>";
+      tbgidmenos2.innerHTML = " " + gidmenos2.toLocaleString('pt-BR');
     }
 
-    const tbBacklogdmenos1 = document.getElementById("backlogdmenos1");
+    const tbBacklog = document.getElementById("Backlog");
 
-    if (Backlogdmenos1.length === 0) {
-      tbBacklogdmenos1.innerHTML = "<h2 id='backlogdmenos1'><i class='tim-icons  icon-app text-warning'></i> #N/D</h2>";
+    if (Backlog.length === 0) {
+      tbBacklog.innerHTML = " #N/D";
     }else{
-      tbBacklogdmenos1.innerHTML = "<h2 id='backlogdmenos1'><i class='tim-icons  icon-app text-warning'></i> " + Backlogdmenos1 + "</h2>";
+      tbBacklog.innerHTML = " " + Backlog.toLocaleString('pt-BR');
     }
 
-    const tbBacklogdmenos2 = document.getElementById("backlogdmenos2");
+    const tbinprocess = document.getElementById("inprocess");
 
-    if (Backlogdmenos2.length === 0) {
-      tbBacklogdmenos2.innerHTML = "<h2 id='backlogdmenos2'><i class='tim-icons icon-app text-danger'></i> #N/D</h2>";
+    if (inprocess.length === 0) {
+      tbinprocess.innerHTML = " #N/D";
     }else{
-      tbBacklogdmenos2.innerHTML = "<h2 id='backlogdmenos2'><i class='tim-icons icon-app text-danger'></i> " + Backlogdmenos2 + "</h2>";
+      tbinprocess.innerHTML = "In process: " + inprocess.toLocaleString('pt-BR');
     }
 
-    const tblastupdate = document.getElementById("lastupdate");
+    var ctx = document.getElementById('gaugeCap').getContext("2d");
 
-    if (lastupdate.length === 0) {
-      tblastupdate.innerHTML = "<h2 id='backlogdmenos2'><i class='tim-icons icon-app text-danger'></i> #N/D</h2>";
-    }else{
-      tblastupdate.innerHTML = "<h3 class='card-title navbar-brand' id='lastupdate'><i class='tim-icons icon-refresh-01 text-info'></i> Last Update: " + lastupdate + "</h3>";
+    gradientFillGreen = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientFillGreen.addColorStop(0, "rgba(66, 134, 121, 0.18)");
+    gradientFillGreen.addColorStop(1, "rgba(66, 134, 121, 0.04)");
+
+    const tbcap = document.getElementById("cap");
+    const tbPending = document.getElementById("Pending");
+    const capacidade = 6000;
+    const Pending = capacidade - gicurrent;
+    tbcap.innerHTML = "" + capacidade.toLocaleString('pt-BR');
+    tbPending.innerHTML = "" + Pending.toLocaleString('pt-BR');
+
+    let currentValue = Math.round(gicurrent / capacidade * 100)
+    console.log(currentValue)
+
+    var data = {
+      labels: ['Atingido', 'Faltante'],
+      datasets: [{
+        borderColor: ["#00f2c3",gradientFillGreen],
+        pointBorderColor: "#FFF",
+        pointBackgroundColor: "#f96332",
+        pointBorderWidth: 2,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 1,
+        pointRadius: 4,
+        backgroundColor: ["#00f2c3", gradientFillGreen], // Cor para o valor e o "restante"
+        borderWidth: 3,
+        data: [currentValue , 100 - currentValue],
+      }],
     }
+
+    ChartOptionsConfigCap = {
+      animation: {
+        duration: 2000, // Duração da animação em milissegundos
+        animateScale: true,
+        animateRotate: true,
+        onComplete: function() {
+          // Obtém o contexto do gráfico
+          const chartInstance = this.chart;
+          const ctx = chartInstance.ctx;
+  
+          // Calcula a posição central do canvas
+          const centerX = (chartInstance.chartArea.left + chartInstance.chartArea.right) / 2;
+          const centerY = (chartInstance.chartArea.top + chartInstance.chartArea.bottom) / 1.35;
+  
+          // Define estilo do texto
+          ctx.save();
+          ctx.font = '2.8625rem Poppins'; // Fonte do texto
+          ctx.fillStyle = 'white'; // Cor do texto
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+  
+          // Obtém o valor total dos dados
+          //const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
+          const value = chartInstance.data.datasets[0].data[0];
+          // Desenha o texto no centro
+          ctx.fillText(`${value}%`, centerX, centerY);
+          ctx.restore();
+        },
+      },
+      hover: {
+        animationDuration: 0, // Remove a animação do hover
+      },
+      aspectRatio: 2.7,
+      maintainAspectRatio: false,
+      responsive: true,
+      rotation: Math.PI, // Inicia a rotação no topo (270 graus)
+      circumference: Math.PI, // Mostra apenas metade do círculo (180 graus)
+      cutoutPercentage: 75, // Controla a espessura do arco (70% da largura do gráfico)
+      legend: { display: false }, // Remove a legenda
+      tooltips: { enabled: false }, 
+      responsive: true,
+      plugins: {
+        datalabels: {
+          display: false,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 30,
+        }
+      },
+      
+    };
+
+    const myChartCap = new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: ChartOptionsConfigCap
+    });
 
   },
 
 
   initDashboardPageCharts: function(datajson) {
     
-    const baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
+    let baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
 
     let currentTransMethedFilter = null;
     let currentStatusFilter = null;
@@ -144,7 +234,7 @@ demo = {
     let currentDOCreatedFilter = null;
 
     let hoje = new Date();
-    hoje.setDate(hoje.getDate() - 17);
+    hoje.setDate(hoje.getDate());
     let dateFilter = hoje.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -166,12 +256,12 @@ demo = {
       }, {});
     }
 
-    function updateCharts() {
+    function updateCharts(data) {
 
-      const transmetodConsolidation = consolidateData(baseData, "Trans Method#");
-      const statusConsolidation = consolidateData(baseData, "Status");
-      const typeConsolidation = consolidateData(baseData, "D/O Type");
-      let DOCreatedConsolidation = consolidateData(baseData, "D/O Date");
+      const transmetodConsolidation = consolidateData(data, "Trans Method#");
+      const statusConsolidation = consolidateData(data, "Status");
+      const typeConsolidation = consolidateData(data, "D/O Type");
+      let DOCreatedConsolidation = consolidateData(data, "D/O Date");
 
       DOCreatedConsolidation = Object.entries(DOCreatedConsolidation)
         .filter(([chave, valor]) => chave.startsWith(dateFilter))
@@ -308,8 +398,8 @@ demo = {
           const clickedTransmetod = transmetodLabels[clickedIndex];
 
           currentTransMethedFilter = currentTransMethedFilter === clickedTransmetod ? null : clickedTransmetod;
-          updateCharts();
-          updateTable();
+          updateCharts(baseData);
+          updateTable(baseData);
         }
       }
     };
@@ -402,8 +492,8 @@ demo = {
           const clickedIndex = activePoints[0]._index;
           const clickedStatus = statusLabels[clickedIndex];
           currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
-          updateCharts();
-          updateTable();
+          updateCharts(baseData);
+          updateTable(baseData);
         }
       }
     };
@@ -460,8 +550,8 @@ demo = {
           const clickedType = legendItem.text;;
           
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
-          updateCharts();
-          updateTable();
+          updateCharts(baseData);
+          updateTable(baseData);
         },
       },
       responsive: true,
@@ -474,7 +564,7 @@ demo = {
             size: 18,
           },
           formatter: (value) => `${value}`,
-        }
+        },
       },
       layout: {
         padding: {
@@ -491,8 +581,8 @@ demo = {
           const clickedType = typeLabels[clickedIndex];
 
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
-          updateCharts();
-          updateTable();
+          updateCharts(baseData);
+          updateTable(baseData);
         }
       }
     };
@@ -524,12 +614,28 @@ demo = {
         borderDashOffset: 0.0,
         pointBackgroundColor: "#2EC0F9",
         pointBorderColor: 'rgba(255,255,255,0)',
-        pointHoverBackgroundColor: '#2EC0F9',
         pointBorderWidth: 20,
         pointHoverRadius: 4,
         pointHoverBorderWidth: 15,
         pointRadius: 4,
         data: DOCreatedLabels.map(label => 0),
+      },
+      {
+        label: "Cap",
+        fill: true,
+        borderColor: 'rgba(199, 33, 33, 0.88)',
+        borderWidth: 2,
+        pointBackgroundColor: 'red',
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointHoverBackgroundColor: '#2EC0F9',
+        pointBorderWidth: 0,
+        pointHoverRadius: 0,
+        pointHoverBorderWidth: 0,
+        pointRadius: 0,
+        data: [220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220],
+        datalabels: {
+          display: false,
+        },
       }]
     }
 
@@ -578,7 +684,7 @@ demo = {
             size: 25,
           },
           formatter: (value) => `${value}`, // Formato dos rótulos
-        }
+        },
       },
       scales: {
         yAxes: [{
@@ -616,8 +722,8 @@ demo = {
 
           currentDOCreatedFilter = currentDOCreatedFilter === clickedDOCreated ? null : clickedDOCreated;
 
-          updateCharts();
-          updateTable();
+          updateCharts(baseData);
+          updateTable(baseData);
         }
       }
     };
@@ -635,7 +741,7 @@ demo = {
           month: '2-digit',
           year: 'numeric'
       });
-      updateCharts();
+      updateCharts(baseData);
       hoje.setDate(hoje.getDate() + 2);
     });
     $("#D-1").click(function() {
@@ -645,7 +751,7 @@ demo = {
           month: '2-digit',
           year: 'numeric'
       });
-      updateCharts();
+      updateCharts(baseData);
       hoje.setDate(hoje.getDate() + 1);
     });
 
@@ -655,7 +761,22 @@ demo = {
         month: '2-digit',
         year: 'numeric'
       });
-      updateCharts();
+      updateCharts(baseData);
+    });
+
+    const Backlog = baseData.filter(item => item.Status !== "GI" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter));
+    let backlog_clic = true
+
+    $("#btn_backlog").click(function() {
+      if (backlog_clic) {
+        backlog_clic = false
+        baseData = Backlog
+      } else {
+        backlog_clic = true
+        baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
+      }
+      updateCharts(baseData);
+      updateTable(baseData);
     });
 
     // const tableHeader = document.getElementById("tableHeader");
@@ -758,8 +879,8 @@ demo = {
     });
 
 
-    function updateTable() {
-      const filteredData = baseData.filter(row => {
+    function updateTable(data) {
+      const filteredData = data.filter(row => {
         return (
           (!currentTransMethedFilter || row["Trans Method#"] === currentTransMethedFilter) &&
           (!currentDOCreatedFilter || row["D/O Date"].split(":")[0] + ":00" === currentDOCreatedFilter) &&
@@ -784,8 +905,10 @@ demo = {
 
     }
 
-    updateCharts();
-    updateTable();
+    
+
+    updateCharts(baseData);
+    updateTable(baseData);
 
   },
 

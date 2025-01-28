@@ -55,38 +55,64 @@
             <!-- End Navbar -->
             <div class="content">
                 <div class="row">
+                    <div class="col-lg-2 col-sm-12">
+                        <div class="card">
+                            <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-danger"></i> Backlog</h2></div>
+                            <div class="card-header btn btn-simple mb-xl-0" id="btn_backlog">
+                                <h4 class="text-muted">Pending</h4>
+                                <h1 id="Backlog"></i></h1>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-5 col-sm-12">
                         <div class="card">
-                            <div class="card-header">
-                                <div class="row">
-                                    <div class="col-sm-6 text-center">
-                                        <h4 class="text-muted ">BACKLOG D-2</h4>
-                                        <h2 id="backlogdmenos2"><i class="tim-icons icon-app text-danger"></i></h2>                                   
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-delivery-fast text-success"></i> GI info</h2></div>
+                                    <div class="card-header">
+                                        <div class="row">
+                                            <div class="col-sm-6 text-center">
+                                                <h4 class="text-muted">D-2</h4>
+                                                <h1 id="gidmenos2"></i></h1>
+                                            </div>
+                                            <div class="col-sm-6 text-center">
+                                                <h4 class="text-muted">D-1</h4>
+                                                <h1 id="gidmenos1"></h1>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6 text-center">                                   
-                                        <h4 class="text-muted">BACKLOG D-1</h4>
-                                        <h2 id="backlogdmenos1"><i class="tim-icons  icon-app text-warning"></i></h2>                                    
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="mb-xl-4"></div>
+                                    <div class="card-header text-center ">
+                                        <h4 class="text-muted">CURRENT</h4>
+                                        <h1 class="bigg" id="gicurrent"></h1>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-7 col-sm-12">
+                    <div class="col-lg-5 col-sm-12">
                         <div class="card">
-                            <div class="card-header">
-                                <div class="row">
-                                    <div class="col-sm-4 text-center">
-                                        <h4 class="text-muted">GI D-2</h4>
-                                        <h2 id="gidmenos2"><i class="tim-icons icon-delivery-fast text-success"></i></h2>
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-info"></i> Procutivity</h2></div>
+                                    <div class="card-header">
+                                        <div class="mb-xl-1"></div>
+                                        <div class="row">
+                                            <div class="col-sm-6 text-center">
+                                                <h4 class="text-muted ">capacity</h4>
+                                                <h1 id="cap"></h2>                                   
+                                            </div>
+                                            <div class="col-sm-6 text-center">
+                                                <h4 class="text-muted ">Pending</h4>
+                                                <h1 id="Pending"></h2>                                   
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-4 text-center">
-                                        <h4 class="text-muted">GI D-1</h4>
-                                        <h2 id="gidmenos1"><i class="tim-icons  icon-delivery-fast text-success"></i></h2>
-                                    </div>
-                                    <div class="col-sm-4 text-center">
-                                        <h4 class="text-muted">GI CURRENT</h4>
-                                        <h1 id="gicurrent"><i class="tim-icons  icon-delivery-fast text-success"></i></h1>
-                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <canvas id="gaugeCap"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +122,7 @@
                     <div class="col-lg-4">
                         <div class="card card-chart">
                             <div class="card-header">
-                                <h3 class="card-title"><i class="tim-icons icon-molecule-40 text-success"></i> Trans Method.</h3>
+                                <h3><i class="tim-icons icon-molecule-40 text-success"></i> Trans Method.</h3>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
@@ -108,7 +134,14 @@
                     <div class="col-lg-6">
                         <div class="card card-chart">
                             <div class="card-header">
-                                <h3 class="card-title"><i class="tim-icons icon-cart text-info"></i> Step by Step</h3>
+                                <div class="row">
+                                    <div class="col-sm-6 text-left">
+                                        <h3><i class="tim-icons icon-cart text-info"></i> Step by Step</h3>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <h3 id="inprocess">In process:</h3>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
@@ -120,7 +153,7 @@
                     <div class="col-lg-2">
                         <div class="card card-chart">
                             <div class="card-header">
-                                <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> Type D/O</h3>
+                                <h3><i class="tim-icons icon-send text-success"></i> Type D/O</h3>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">

@@ -415,6 +415,10 @@ h1,
   font-size: 2.3625rem;
 }
 
+.bigg{
+  font-size: 3.0625rem;
+}
+
 h2,
 .h2 {
   font-size: 1.8875rem;
@@ -11687,7 +11691,7 @@ button.bg-darker:focus {
 
   .mb-xl-4,
   .my-xl-4 {
-    margin-bottom: 1.5rem !important;
+    margin-bottom: 2.8rem !important;
   }
 
   .ml-xl-4,
@@ -17827,7 +17831,7 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .main-panel>.content {
-  padding: 78px 30px 30px 40px;
+  padding: 78px 15px 30px 15px;
   min-height: calc(100vh - 70px);
 }
 
