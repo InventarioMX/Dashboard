@@ -1,9 +1,11 @@
-Dim conn, rs, fso, arquivo, caminhoExcel, caminhoTxt, sqlQuery
+Dim conn, rs, rs1, fso, arquivo, caminhoExcel, caminhoTxt, sqlQuery, sqlQuery1
 
 WScript.Echo now
 
-caminhoExcel = "C:\Users\luiz.os\source\repos\dashboard-operation\Auxiliar.xlsm"  ' Substitua pelo caminho do arquivo Excel
-caminhoTxt = "C:\Users\luiz.os\source\repos\dashboard-operation\base\dados.json"  ' Substitua pelo caminho do arquivo de saída
+diretorio = Left(WScript.ScriptFullName, (Len(WScript.ScriptFullName) - (Len(WScript.ScriptName) + 1)))
+caminhoExcel = diretorio & "\Auxiliar.xlsm"
+caminhoAtualiza =   diretorio & "\base\atualiza.json"
+caminhojson = diretorio & "\base\dados.json"  
 
 Set conn = CreateObject("ADODB.Connection")
 Set rs = CreateObject("ADODB.Recordset")
@@ -12,12 +14,12 @@ Set fso = CreateObject("Scripting.FileSystemObject")
 conn.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & caminhoExcel & ";Extended Properties='Excel 12.0 Xml;HDR=YES';"
 conn.Open
 
-sqlQuery = "SELECT * FROM [Arquivo$]" ' Substitua "Arquivo$" pelo nome da sua planilha (incluindo o sinal de $ no final)
+sqlQuery = "SELECT * FROM [Arquivo$]" 
 
 rs.Open sqlQuery, conn
 
  
-Set arquivo = fso.CreateTextFile(caminhoTxt, True)
+Set arquivo = fso.CreateTextFile(caminhoAtualiza, True)
 
 arquivo.Write "{"
 arquivo.Write """RelatorioD2C"":["
@@ -49,16 +51,34 @@ Do Until rs.EOF
     arquivo.Write vlin
 Loop
 
-
 arquivo.Write "],"
+
+rs.Close
+
+Set rs1 = CreateObject("ADODB.Recordset")
+
+sqlQuery1 = "SELECT * FROM [Inicio$J3:J4]" 
+
+rs1.Open sqlQuery1, conn
+
 arquivo.Write """UltAtualizacao"":["
 arquivo.Write "{""Atualizacao"":""" & Now & """}"
+arquivo.Write "],"
+
+arquivo.Write """Capacidade"":["
+arquivo.Write "{""Cap"":" & rs1.Fields(0).value & "}" 
 arquivo.Write "]"
+
 arquivo.Write "}"
 
+rs1.Close
+
+
 arquivo.Close
-rs.Close
 conn.Close
+
+If fso.FileExists(caminhojson) Then fso.DeleteFile caminhojson, True
+fso.CopyFile caminhoAtualiza, caminhojson
 
 Set arquivo = Nothing
 Set rs = Nothing

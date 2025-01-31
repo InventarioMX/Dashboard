@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="utf-8" />
@@ -43,7 +43,18 @@
                     <div class="collapse navbar-collapse" id="navigation">
                         <ul class="navbar-nav ml-auto">
                             <li class="dropdown nav-item">
-                                <a href="#" class="nav-link">
+                                <div class="form-check ">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" value="" checked="">
+                                        <span class="form-check-sign">
+                                            <span class="check"></span>
+                                        </span>
+                                        <span class="card-title navbar-brand"> Paradigma</span>
+                                    </label>
+                                </div>
+                            </li>
+                            <li class="dropdown nav-item">
+                                <a class="nav-link">
                                     <h3 class="card-title navbar-brand" id="lastupdate"><i class="tim-icons icon-refresh-01 text-info"></i> Last Update:</h3>
                                 </a>
                             </li>
@@ -264,8 +275,6 @@
     <script src="../assets/js/core/jquery.min.js"></script>
     <script src="../assets/js/plugins/dataTables.min.js"></script>
 
-    <script src="../base/script.js"></script>
-
     <!--   Core JS Files   -->
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap.min.js"></script>
@@ -391,22 +400,44 @@
     });
     </script>
     <script>
+        
+        fetch('../base/dados.json') // Caminho relativo ao seu arquivo JSON
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar o arquivo JSON');
+                }
+                return response.json(); // Parseando o JSON
+            })
+            .then(data => {
+                demo.initDashboardPageCharts(data);
+                demo.initDashboardHeaders(data);
+            })
+            .catch(err => {
+                console.error('Erro:', err);
+            });
 
-      // Javascript method's body can be found in assets/js/demos.js
-      fetch('../base/dados.json') // Caminho relativo ao seu arquivo JSON
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao carregar o arquivo JSON');
-            }
-            return response.json(); // Parseando o JSON
-        })
-        .then(data => {
-            demo.initDashboardPageCharts(data);
-            demo.initDashboardHeaders(data);
-        })
-        .catch(err => {
-            console.error('Erro:', err);
-        });
+        
+        const intervalo = 5 * 60 * 1000;
+        let proximaAtualizacao = new Date(Date.now() + intervalo + 1000);
+
+        function update() {
+            // Javascript method's body can be found in assets/js/demos.js
+            location.reload();
+        }
+
+        function mostrarTempoRestante() {
+            const agora = new Date();
+            const tempoRestante = proximaAtualizacao - agora;
+
+            const minutosRestantes = Math.floor((tempoRestante / 1000) / 60);
+            const segundosRestantes = Math.floor((tempoRestante / 1000) % 60);
+
+            console.log(`Próxima atualização em: ${minutosRestantes} minutos e ${segundosRestantes} segundos.`);
+        }
+
+        setInterval(mostrarTempoRestante, 1000);
+        setInterval(update, intervalo);
+        
 
     </script>
 </body>

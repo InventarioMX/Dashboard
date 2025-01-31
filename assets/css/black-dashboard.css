@@ -2226,11 +2226,11 @@ textarea.form-control {
   position: relative;
   display: block;
   padding-left: 1.25rem;
+  padding-top: 1rem;
 }
 
 .form-check-input {
   position: absolute;
-  margin-top: 0.3rem;
   margin-left: -1.25rem;
 }
 
@@ -16855,7 +16855,6 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .form-check {
-  margin-top: .5rem;
   padding-left: 0;
 }
 
@@ -16904,7 +16903,7 @@ table.tablesorter thead tr .headerSortDown {
 .form-check input[type="checkbox"]:checked+.form-check-sign::before,
 .form-check input[type="checkbox"]:checked+.form-check-sign::before {
   border: none;
-  background-color: #e14eca;
+  background-color: rgb(29, 140, 248);
 }
 
 .form-check .form-check-sign::after {

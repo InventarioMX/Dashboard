@@ -23,7 +23,7 @@ demo = {
 
   initDashboardHeaders: function(datajson) {
 
-    let baseData = datajson.RelatorioD2C.filter(item => item.Status !== "00_Pending Shipmment");
+    let baseData = datajson.RelatorioD2C.filter(item => item["Storage Location"] !== "FCBA");
 
     let hoje = new Date();
     hoje.setDate(hoje.getDate());
@@ -65,13 +65,13 @@ demo = {
     }, 0);
 
     const Backlog = baseData
-    .filter(item => item.Status !== "GI" && item["Trans Method#"] !== "M02" &&  demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFiltercurrent))
+    .filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFiltercurrent))
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
     }, 0);
 
     const inprocess = baseData
-    .filter(item => item.Status !== "GI" && item["D/O Date"].split(" ")[0] === dateFiltercurrent)
+    .filter(item => item.Status !== "GI")
     .reduce((acc, item) => {
       return acc + item["Order Quantity"]; 
     }, 0);
@@ -134,13 +134,12 @@ demo = {
 
     const tbcap = document.getElementById("cap");
     const tbPending = document.getElementById("Pending");
-    const capacidade = 6000;
+    const capacidade = datajson.Capacidade[0].Cap;
     const Pending = capacidade - gicurrent;
     tbcap.innerHTML = "" + capacidade.toLocaleString('pt-BR');
     tbPending.innerHTML = "" + Pending.toLocaleString('pt-BR');
 
     let currentValue = Math.round(gicurrent / capacidade * 100)
-    console.log(currentValue)
 
     var data = {
       labels: ['Atingido', 'Faltante'],
@@ -226,7 +225,8 @@ demo = {
 
   initDashboardPageCharts: function(datajson) {
     
-    let baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
+    let baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA");
+    let baseDocreated = datajson.RelatorioD2C.filter(item => item["Storage Location"] !== "FCBA")
 
     let currentTransMethedFilter = null;
     let currentStatusFilter = null;
@@ -261,8 +261,29 @@ demo = {
       const transmetodConsolidation = consolidateData(data, "Trans Method#");
       const statusConsolidation = consolidateData(data, "Status");
       const typeConsolidation = consolidateData(data, "D/O Type");
-      let DOCreatedConsolidation = consolidateData(data, "D/O Date");
 
+      myChartTransmetod.data.datasets[0].data = transmetodLabels.map(label => transmetodConsolidation[label] || 0);
+      myChartStep.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
+      myChartType.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
+
+      myChartTransmetod.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartTransmetod.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartTransmetod.data.datasets[0].data)*1.3;
+      myChartStep.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartStep.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartStep.data.datasets[0].data)*1.3;
+
+      myChartTransmetod.update();
+      myChartStep.update();
+      myChartType.update();
+      
+    }
+
+    function updatedocreated(data) {
+      let base;
+      if (currentTypeFilter === null && currentStatusFilter === null && currentTransMethedFilter === null) {
+        base = data;
+      } else {
+        base = data.filter(item => item.Status !== "GI");
+      }
+
+      let DOCreatedConsolidation = consolidateData(base, "D/O Date");
       DOCreatedConsolidation = Object.entries(DOCreatedConsolidation)
         .filter(([chave, valor]) => chave.startsWith(dateFilter))
         .reduce((acc, [chave, valor]) => {
@@ -270,40 +291,32 @@ demo = {
           return acc;
         }, {});
 
-      myChartTransmetod.data.datasets[0].data = transmetodLabels.map(label => transmetodConsolidation[label] || 0);
-      myChartStep.data.datasets[0].data = statusLabels.map(label => statusConsolidation[label] || 0);
-      myChartType.data.datasets[0].data = typeLabels.map(label => typeConsolidation[label] || 0);
       myChartDOCreated.data.datasets[0].data = DOCreatedLabels.map(label => DOCreatedConsolidation[label] || 0);
-
-      myChartTransmetod.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartTransmetod.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartTransmetod.data.datasets[0].data)*1.3;
-      myChartStep.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartStep.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartStep.data.datasets[0].data)*1.3;
       myChartDOCreated.options.scales.yAxes[0].ticks.suggestedMax =  Math.max(...myChartDOCreated.data.datasets[0].data) === 0 ? 1 : Math.max(...myChartDOCreated.data.datasets[0].data)*1.3;
       
       var pointColors = [];
       for (let i = 0; i < myChartDOCreated.data.datasets[0].data.length; i++) {
-        if (parseInt(myChartDOCreated.data.datasets[0].data[i]) > 220) {
+        if (parseInt(myChartDOCreated.data.datasets[0].data[i]) > caphora) {
           pointColors.push('red');
         } else {
           pointColors.push('#2EC0F9');
         }
       }
-
       myChartDOCreated.data.datasets[0].pointBackgroundColor = pointColors
-
-      myChartTransmetod.update();
-      myChartStep.update();
-      myChartType.update();
       myChartDOCreated.update();
     }
+
+    const caphora = datajson.Capacidade[0].Cap;
 
     const transmetodLabels = [...new Set(baseData.map(row => row["Trans Method#"]))];
     const statusLabels = [...new Set(baseData.map(row => row["Status"]))];
     const typeLabels = [...new Set(baseData.map(row => row["D/O Type"]))];
     const DOCreatedLabels = ["00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"];
+    const caphoralabel = Array(24).fill(caphora/24);
 
     transmetodLabels.sort();
 
-    var ordem_status = ["00_Waiting Pre-Visit","00_CARR_ID Incorreto","00_Pending Shipmment","W.Booking","W.Allocation","Allocation","Picking","With NF","Print","Checking","Mf.Created","Loading","GI",""]
+    var ordem_status = ["00_Waiting Pre-Visit","00_CARR_ID Incorreto","P.Shipmment","W.Booking","W.Allocation","Allocation","Picking","With NF","Print","Checking","Mf.Created","Loading","GI",""]
     statusLabels.sort((a, b) => {
       return ordem_status.indexOf(a) - ordem_status.indexOf(b);
     });
@@ -362,7 +375,7 @@ demo = {
           font: {
             size: 25,
           },
-          formatter: (value) => `${value}`, 
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`, 
         },
         tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
       },
@@ -400,6 +413,7 @@ demo = {
           currentTransMethedFilter = currentTransMethedFilter === clickedTransmetod ? null : clickedTransmetod;
           updateCharts(baseData);
           updateTable(baseData);
+          updatedocreated(baseDocreated);
         }
       }
     };
@@ -439,10 +453,10 @@ demo = {
       },
       layout: {
         padding: {
-          top: 25,
-          bottom: 20,
+          top: 0,
+          bottom: 0,
           left: 30,
-          right: 25,
+          right: 30,
         }
       },
       
@@ -458,7 +472,7 @@ demo = {
           font: {
             size: 25,
           },
-          formatter: (value) => `${value}`, // Formato dos rótulos
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`, // Formato dos rótulos
         },
         tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
       },
@@ -472,6 +486,7 @@ demo = {
           ticks: {
             display: false,
             padding: 10,
+            suggestedMin: 0
           }
         }],
         xAxes: [{
@@ -482,8 +497,17 @@ demo = {
           },
           ticks: {
             fontSize: 17,
+            padding: 20,
             fontColor: "#9e9e9e"
-          }
+          },
+          onClick: function(event, legendItem) {
+            const clickedStatus = legendItem.text;;
+            
+            currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
+            updateCharts(baseData);
+            updateTable(baseData);
+            updatedocreated(baseDocreated);
+          },
         }]
       },
       onClick: function(e) {
@@ -494,6 +518,7 @@ demo = {
           currentStatusFilter = currentStatusFilter === clickedStatus ? null : clickedStatus;
           updateCharts(baseData);
           updateTable(baseData);
+          updatedocreated(baseDocreated);
         }
       }
     };
@@ -552,6 +577,7 @@ demo = {
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
           updateCharts(baseData);
           updateTable(baseData);
+          updatedocreated(baseDocreated);
         },
       },
       responsive: true,
@@ -563,7 +589,7 @@ demo = {
           font: {
             size: 18,
           },
-          formatter: (value) => `${value}`,
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
         },
       },
       layout: {
@@ -583,6 +609,7 @@ demo = {
           currentTypeFilter = currentTypeFilter === clickedType ? null : clickedType;
           updateCharts(baseData);
           updateTable(baseData);
+          updatedocreated(baseDocreated);
         }
       }
     };
@@ -632,7 +659,7 @@ demo = {
         pointHoverRadius: 0,
         pointHoverBorderWidth: 0,
         pointRadius: 0,
-        data: [220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220,220],
+        data: caphoralabel,
         datalabels: {
           display: false,
         },
@@ -683,7 +710,7 @@ demo = {
           font: {
             size: 25,
           },
-          formatter: (value) => `${value}`, // Formato dos rótulos
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`, // Formato dos rótulos
         },
       },
       scales: {
@@ -724,6 +751,7 @@ demo = {
 
           updateCharts(baseData);
           updateTable(baseData);
+          updatedocreated(baseDocreated);
         }
       }
     };
@@ -741,7 +769,7 @@ demo = {
           month: '2-digit',
           year: 'numeric'
       });
-      updateCharts(baseData);
+      updatedocreated(baseDocreated);
       hoje.setDate(hoje.getDate() + 2);
     });
     $("#D-1").click(function() {
@@ -751,7 +779,7 @@ demo = {
           month: '2-digit',
           year: 'numeric'
       });
-      updateCharts(baseData);
+      updatedocreated(baseDocreated);
       hoje.setDate(hoje.getDate() + 1);
     });
 
@@ -761,22 +789,27 @@ demo = {
         month: '2-digit',
         year: 'numeric'
       });
-      updateCharts(baseData);
+      updatedocreated(baseDocreated);
     });
 
-    const Backlog = baseData.filter(item => item.Status !== "GI" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter));
+    const bkbaseData = baseData
+    const bkbaseDocreated = baseDocreated
+    const Backlog = baseData.filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter));
     let backlog_clic = true
 
     $("#btn_backlog").click(function() {
       if (backlog_clic) {
         backlog_clic = false
         baseData = Backlog
+        baseDocreated = Backlog
       } else {
         backlog_clic = true
-        baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item.Status !== "00_Pending Shipmment");
+        baseData = bkbaseData
+        baseDocreated = bkbaseDocreated
       }
       updateCharts(baseData);
       updateTable(baseData);
+      updatedocreated(baseDocreated);
     });
 
     // const tableHeader = document.getElementById("tableHeader");
@@ -905,10 +938,9 @@ demo = {
 
     }
 
-    
-
     updateCharts(baseData);
     updateTable(baseData);
+    updatedocreated(baseDocreated)
 
   },
 
