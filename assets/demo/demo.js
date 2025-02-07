@@ -23,7 +23,7 @@ demo = {
 
   initDashboardHeaders: function(datajson) {
 
-    let baseData = datajson.RelatorioD2C.filter(item => item["Storage Location"] !== "FCBA");
+    let baseData = datajson.RelatorioD2C;
 
     let hoje = new Date();
     hoje.setDate(hoje.getDate());
@@ -64,18 +64,6 @@ demo = {
       return acc + item["Order Quantity"]; 
     }, 0);
 
-    const Backlog = baseData
-    .filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFiltercurrent))
-    .reduce((acc, item) => {
-      return acc + item["Order Quantity"]; 
-    }, 0);
-
-    const inprocess = baseData
-    .filter(item => item.Status !== "GI")
-    .reduce((acc, item) => {
-      return acc + item["Order Quantity"]; 
-    }, 0);
-
     const lastupdate = datajson.UltAtualizacao[0].Atualizacao;
 
     const tblastupdate = document.getElementById("lastupdate");
@@ -110,22 +98,6 @@ demo = {
       tbgidmenos2.innerHTML = " " + gidmenos2.toLocaleString('pt-BR');
     }
 
-    const tbBacklog = document.getElementById("Backlog");
-
-    if (Backlog.length === 0) {
-      tbBacklog.innerHTML = " #N/D";
-    }else{
-      tbBacklog.innerHTML = " " + Backlog.toLocaleString('pt-BR');
-    }
-
-    const tbinprocess = document.getElementById("inprocess");
-
-    if (inprocess.length === 0) {
-      tbinprocess.innerHTML = " #N/D";
-    }else{
-      tbinprocess.innerHTML = "In process: " + inprocess.toLocaleString('pt-BR');
-    }
-
     var ctx = document.getElementById('gaugeCap').getContext("2d");
 
     gradientFillGreen = ctx.createLinearGradient(0, 230, 0, 50);
@@ -135,11 +107,11 @@ demo = {
     const tbcap = document.getElementById("cap");
     const tbPending = document.getElementById("Pending");
     const capacidade = datajson.Capacidade[0].Cap;
-    const Pending = capacidade - gicurrent;
+    const Pending = (capacidade - gicurrent) < 0 ? 0 : capacidade - gicurrent;
     tbcap.innerHTML = "" + capacidade.toLocaleString('pt-BR');
     tbPending.innerHTML = "" + Pending.toLocaleString('pt-BR');
 
-    let currentValue = Math.round(gicurrent / capacidade * 100)
+    let currentValue = Math.round(gicurrent / capacidade * 100) > 100 ? 100 : Math.round(gicurrent / capacidade * 100)
 
     var data = {
       labels: ['Atingido', 'Faltante'],
@@ -180,7 +152,7 @@ demo = {
   
           // Obtém o valor total dos dados
           //const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
-          const value = chartInstance.data.datasets[0].data[0];
+          const value = Math.round(gicurrent / capacidade * 100)
           // Desenha o texto no centro
           ctx.fillText(`${value}%`, centerX, centerY);
           ctx.restore();
@@ -220,13 +192,13 @@ demo = {
       options: ChartOptionsConfigCap
     });
 
-  },
 
+  },
 
   initDashboardPageCharts: function(datajson) {
     
-    let baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA");
-    let baseDocreated = datajson.RelatorioD2C.filter(item => item["Storage Location"] !== "FCBA")
+    baseData = datajson.RelatorioD2C.filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA");
+    baseDocreated = datajson.RelatorioD2C.filter(item => item["Storage Location"] !== "FCBA")
 
     let currentTransMethedFilter = null;
     let currentStatusFilter = null;
@@ -351,6 +323,9 @@ demo = {
     };
 
     ChartOptionsConfigTransmetod = {
+      animation: {
+        duration: 2000, // Duração da animação em milissegundos
+      },
       maintainAspectRatio: false,
       legend: {
         display: false
@@ -359,8 +334,8 @@ demo = {
         padding: {
           top: 20,
           bottom: 20,
-          left: 30,
-          right: 30,
+          left: 50,
+          right: 50,
         }
       },
       responsive: true,
@@ -447,6 +422,9 @@ demo = {
     }
 
     ChartOptionsConfigStep = {
+      animation: {
+        duration: 2000, // Duração da animação em milissegundos
+      },
       maintainAspectRatio: false,
       legend: {
         display: false
@@ -676,6 +654,9 @@ demo = {
     }, {});
 
     ChartOptionsConfigDOCreated = {
+      animation: {
+        duration: 2000, // Duração da animação em milissegundos
+      },
       maintainAspectRatio: false,
       legend: {
         display: false
@@ -792,25 +773,142 @@ demo = {
       updatedocreated(baseDocreated);
     });
 
-    const bkbaseData = baseData
-    const bkbaseDocreated = baseDocreated
-    const Backlog = baseData.filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter));
-    let backlog_clic = true
+    let bkbaseData = baseData;
+    let bkbaseDocreated = baseDocreated;
+
+    const modelos = [
+      "SM-S931B",
+      "SM-S936B",
+      "SM-S938B",
+      "SM-S938B",
+      "EF-GS931",
+      "EF-PS931",
+      "EF-VS931",
+      "EF-QS931",
+      "EF-MS931",
+      "EF-JS931",
+      "EF-RS931",
+      "EF-GS936",
+      "EF-PS936",
+      "EF-VS936",
+      "EF-QS936",
+      "EF-MS936",
+      "EF-JS936",
+      "EF-RS936",
+      "EF-GS938",
+      "EF-PS938",
+      "EF-VS938",
+      "EF-QS938",
+      "EF-MS938",
+      "EF-JS938",
+      "EF-RS938"
+    ];
+    
+
+    function filtra_click() {
+      let filteredData = bkbaseData;
+  
+      if (backlog_clic){
+        filteredData = filteredData.filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter));
+      }
+
+      if(paradigma_clic){
+        filteredData = filteredData.filter(item => !modelos.includes(item['Item Code'].substr(0, 8)));
+      }
+
+      if(pinparadigma_clic){
+        filteredData = filteredData.filter(item => modelos.includes(item['Item Code'].substr(0, 8)));
+      }
+
+      baseData = filteredData;
+
+      if (!backlog_clic && !paradigma_clic && !pinparadigma_clic){
+        baseDocreated = bkbaseDocreated;
+      } else {
+        baseDocreated = filteredData;
+      }
+
+      let Backlog = baseData
+      .filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter))
+      .reduce((acc, item) => {
+        return acc + item["Order Quantity"]; 
+      }, 0);
+      tbBacklog.innerHTML = " " + Backlog.toLocaleString('pt-BR');
+
+      let inprocess = baseData
+      .filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA")
+      .reduce((acc, item) => {
+        return acc + item["Order Quantity"]; 
+      }, 0);
+      tbinprocess.innerHTML = "In process: " + inprocess.toLocaleString('pt-BR');
+
+    }
+
+
+    let backlog_clic = false
 
     $("#btn_backlog").click(function() {
-      if (backlog_clic) {
-        backlog_clic = false
-        baseData = Backlog
-        baseDocreated = Backlog
-      } else {
+      if (!backlog_clic) {
         backlog_clic = true
-        baseData = bkbaseData
-        baseDocreated = bkbaseDocreated
+      } else {
+        backlog_clic = false
       }
+      filtra_click();
       updateCharts(baseData);
       updateTable(baseData);
       updatedocreated(baseDocreated);
     });
+
+    let paradigma_clic = false
+
+    $("#paradigma").click(function() {
+      if (!paradigma_clic) {
+        paradigma_clic = true
+      } else {
+        paradigma_clic = false
+      }
+      filtra_click();
+      updateCharts(baseData);
+      updateTable(baseData);
+      updatedocreated(baseDocreated);
+    });
+
+    let pinparadigma_clic = false
+
+    $("#pinparadigma").click(function() {
+      if (!pinparadigma_clic) {
+        pinparadigma_clic = true
+        $("#pinparadigma i").addClass("text-info")
+        $("#pinparadigma span").addClass("text-info")
+        
+      } else {
+        pinparadigma_clic = false
+        $("#pinparadigma i").removeClass("text-info")
+        $("#pinparadigma span").removeClass("text-info")
+      }
+      filtra_click();
+      updateCharts(baseData);
+      updateTable(baseData);
+      updatedocreated(baseDocreated);
+    });
+
+
+    let Backlog = baseData
+    .filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA" && item["Trans Method#"] !== "T01" && item["Trans Method#"] !== "M02" && demo.StrToDate(item["PGI Date"]) < demo.StrToDate(dateFilter))
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0);
+    const tbBacklog = document.getElementById("Backlog");
+    tbBacklog.innerHTML = " " + Backlog.toLocaleString('pt-BR');
+
+    let inprocess = baseData
+    .filter(item => item.Status !== "GI" && item["Storage Location"] !== "FCBA")
+    .reduce((acc, item) => {
+      return acc + item["Order Quantity"]; 
+    }, 0);
+    const tbinprocess = document.getElementById("inprocess");
+    tbinprocess.innerHTML = "In process: " + inprocess.toLocaleString('pt-BR');
+
 
     // const tableHeader = document.getElementById("tableHeader");
 
@@ -940,7 +1038,7 @@ demo = {
 
     updateCharts(baseData);
     updateTable(baseData);
-    updatedocreated(baseDocreated)
+    updatedocreated(baseDocreated);
 
   },
 

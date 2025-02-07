@@ -7452,6 +7452,10 @@ button.bg-darker:focus {
   border-color: #ffffff !important;
 }
 
+.border-transparent {
+  border-color: transparent !important;
+}
+
 .rounded-sm {
   border-radius: 0.2857rem !important;
 }
@@ -14559,7 +14563,7 @@ fieldset[disabled] .btn-link.active {
   border-radius: 0.4285rem;
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 2991px) {
   .dropdown-toggle:after {
     display: inline-block;
     width: 0;
@@ -20247,7 +20251,7 @@ Copyright (c) 2015 Daniel Eden
 }
 
 .card-chart .chart-area {
-  height: 220px;
+  height: 255px;
   width: 100%;
 }
 
