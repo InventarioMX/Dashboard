@@ -20260,6 +20260,11 @@ Copyright (c) 2015 Daniel Eden
   width: 100%;
 }
 
+.card-chart .chart-area-division {
+  height: 647px;
+  width: 100%;
+}
+
 
 .chart-prod {
   margin-top: 15px;

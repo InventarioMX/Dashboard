@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos com ChartManager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div>
+        <canvas id="chart1" width="400" height="200"></canvas>
+    </div>
+    <div>
+        <canvas id="chart2" width="400" height="200"></canvas>
+    </div>
+    
+    
+    <button onclick="resetFilter()">Resetar Filtros</button>
+
+    <script>
+        class ChartManager {
+            static globalFilters = null;
+            static instances = [];
+
+            constructor(chartId, type, data = {}, options = {}) {
+                this.chartId = chartId;
+                this.ctx = document.getElementById(chartId).getContext("2d");
+
+                this.chart = new Chart(this.ctx, {
+                    type: type,
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        onClick: (event, elements) => this.handleClick(elements),
+                        ...options
+                    }
+                });
+
+                ChartManager.instances.push(this);
+            }
+
+            updateData(newLabels, newData) {
+                this.chart.data.labels = newLabels;
+                this.chart.data.datasets.forEach((dataset, i) => {
+                    dataset.data = newData[i];
+                });
+                this.chart.update();
+            }
+
+            handleClick(elements) {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    console.log(`Índice clicado: ${index}`);
+
+                    if (ChartManager.globalFilters === index) {
+                        ChartManager.globalFilters = null;
+                    } else {
+                        ChartManager.globalFilters = index;
+                    }
+
+                    ChartManager.updateAllCharts();
+                }
+            }
+
+            static updateAllCharts() {
+                ChartManager.instances.forEach(instance => {
+                    const { labels, datasets } = instance.chart.data;
+
+                    if (ChartManager.globalFilters === null) {
+                        instance.chart.data.labels = instance.originalLabels;
+                        instance.chart.data.datasets.forEach((dataset, i) => {
+                            dataset.data = instance.originalData[i];
+                        });
+                    } else {
+                        const filteredLabel = [instance.originalLabels[ChartManager.globalFilters]];
+                        const filteredData = instance.originalData.map(data => [data[ChartManager.globalFilters]]);
+                        
+                        instance.chart.data.labels = filteredLabel;
+                        instance.chart.data.datasets.forEach((dataset, i) => {
+                            dataset.data = filteredData[i];
+                        });
+                    }
+
+                    instance.chart.update();
+                });
+            }
+        }
+
+        function resetFilter() {
+            ChartManager.globalFilters = null;
+            ChartManager.updateAllCharts();
+        }
+
+        // Dados iniciais
+        const labels = ["Janeiro", "Fevereiro", "Março", "Abril"];
+        const data1 = [10, 20, 30, 40];
+        const data2 = [5, 15, 25, 35];
+
+        const dataset1 = [
+            { label: "Vendas", data: data1, backgroundColor: "blue" }
+        ];
+
+        const dataset2 = [
+            { label: "Lucros", data: data2, borderColor: "green", fill: false }
+        ];
+
+        // Criar gráficos
+        const chart1 = new ChartManager("chart1", "bar", { labels, datasets: dataset1 });
+        const chart2 = new ChartManager("chart2", "line", { labels, datasets: dataset2 });
+
+        // Armazena os dados originais para resetar
+        ChartManager.instances.forEach(instance => {
+            instance.originalLabels = [...instance.chart.data.labels];
+            instance.originalData = instance.chart.data.datasets.map(dataset => [...dataset.data]);
+        });
+    </script>
+</body>
+</html>

@@ -55,25 +55,38 @@ arquivo.Write "],"
 
 rs.Close
 
-Set rs1 = CreateObject("ADODB.Recordset")
-
-sqlQuery1 = "SELECT * FROM [Inicio$J3:J4]" 
-
-rs1.Open sqlQuery1, conn
-
 arquivo.Write """UltAtualizacao"":["
 arquivo.Write "{""Atualizacao"":""" & Now & """}"
 arquivo.Write "],"
 
-arquivo.Write """Capacidade"":["
-arquivo.Write "{""Cap"":" & rs1.Fields(0).value & "}" 
-arquivo.Write "]"
+Set rs1 = CreateObject("ADODB.Recordset")
+sqlQuery1 = "SELECT * FROM [Inicio$H3:J5]" 
+rs1.Open sqlQuery1, conn
 
+arquivo.Write """Capacidade"":["
+Do Until rs1.EOF
+
+    vlin = "{"
+
+    vlin = vlin & """" & rs1.Fields(0).Name & """: """ & rs1.Fields(0).Value & ""","
+    vlin = vlin & """" & rs1.Fields(2).Name & """: " & rs1.Fields(2).Value & ""
+
+    vlin = vlin & "},"
+
+    rs1.MoveNext
+    
+    If rs1.EOF Then
+        vlin = Left(vlin, Len(vlin) - 1)
+    End If
+
+    arquivo.Write vlin
+
+Loop
+
+arquivo.Write "]"
 arquivo.Write "}"
 
 rs1.Close
-
-
 arquivo.Close
 conn.Close
 

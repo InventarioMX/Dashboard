@@ -40,7 +40,7 @@
                         <span class="navbar-toggler-bar navbar-kebab"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navigation">
-                        <!-- <ul class="navbar-nav">
+                        <ul class="navbar-nav">
                             <li class="dropdown nav-item ml-5"></li>
                             <li class="dropdown nav-item card-title mb-0">
                                 <a href="javascript:void(0)" class="dropdown-toggle h3 navbar-brand ml-0" data-toggle="dropdown">
@@ -50,7 +50,7 @@
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="" id="">
+                                                <input class="form-check-input" type="checkbox" value="" checked="" id="C820_L">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
                                                 </span>
@@ -62,7 +62,7 @@
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="" id="">
+                                                <input class="form-check-input" type="checkbox" value="" checked="" id="C820_J">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
                                                 </span>
@@ -74,17 +74,18 @@
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="" id="">
+                                                <input class="form-check-input" type="checkbox" value="" checked="" id="C820_R">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
                                                 </span>
-                                                <span class="card-title navbar-brand">C820_R - Recife</span>
+                                                <span class="card-title navbar-brand">C820_R - RECIFE</span>
                                             </label>
                                         </div>
-                                    </a></li>
+                                    </a>
+                                    </li>
                                 </ul>
                             </li>
-                        </ul> -->
+                        </ul>
                         <ul class="navbar-nav ml-auto">
                             <li class="dropdown nav-item card-title mb-0">
                                 <a href="javascript:void(0)" class="dropdown-toggle navbar-brand h3 ml-0" data-toggle="dropdown">
@@ -168,46 +169,46 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-sm-12">
+                    <div class="col-lg-5 col-sm-1x2">
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
-                                    <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-info"></i> Productivity</h2></div>
+                                    <div class="card-header"><h2 class="mb-xl-0" id="cap"><i class="tim-icons  icon-app text-info"></i> Capacity:  </h2></div>
                                     <div class="card-header">
                                         <div class="mb-xl-1"></div>
                                         <div class="row">
                                             <div class="col-sm-6 text-center">
-                                                <h4 class="text-muted ">capacity</h4>
-                                                <h1 id="cap"></h2>                                   
+                                                <h4 class="text-muted ">Pending</h4>
+                                                <h1 id="Pending"></h>                                   
                                             </div>
                                             <div class="col-sm-6 text-center">
-                                                <h4 class="text-muted ">Pending</h4>
-                                                <h1 id="Pending"></h2>                                   
+                                                <h4 class="text-muted">GI Exp.</h4>
+                                                <h1 id="giexpected"></h1>    
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-5">
-                                    <canvas id="gaugeCap"></canvas>
+                                        <canvas id="gaugeCap"></canvas> 
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="card card-chart">
                             <div class="card-header">
-                                <h3><i class="tim-icons icon-molecule-40 text-success"></i> Trans Method.</h3>
+                                <h3><i class="tim-icons icon-molecule-40 text-success"></i> Shipping Type</h3>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="chartLineTransMethod"></canvas>
+                                    <canvas id="Trans Method."></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-7">
                         <div class="card card-chart">
                             <div class="card-header">
                                 <div class="row">
@@ -221,26 +222,32 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="chartBarStep"></canvas>
+                                    <canvas id="Status"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2">
-                        <div class="card card-chart">
-                            <div class="card-header">
-                                <h3><i class="tim-icons icon-send text-success"></i> Type D/O</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-area">
-                                    <canvas id="pieMonoMult"></canvas>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card card-chart">
+                                    <div class="card-header">
+                                        <div class="text-left">
+                                            <h3><i class="tim-icons icon-components text-info"></i> Division</h3>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-area">
+                                            <canvas id="chartBarDivision"></canvas>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-lg-10">
                         <div class="card card-chart">
                             <div class="card-header ">
                                 <div class="row">
@@ -281,6 +288,18 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-2">
+                        <div class="card card-chart">
+                            <div class="card-header">
+                                <h3><i class="tim-icons icon-send text-success"></i> Type DO</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area">
+                                    <canvas id="pieMonoMult"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
@@ -289,16 +308,6 @@
                                 <h4 class="card-title"> DO's Detalhado</h4>
                             </div>
                             <div class="card-body">
-                                <!-- <div class="table-responsive ps">
-                                    <table class="table tablesorter" id="dataTable">
-                                        <thead class="text-primary">
-                                            <tr id="tableHeader"></tr>
-                                        </thead>
-                                        <tbody id="tableBody"></tbody>
-                                        
-                                    </table>
-                                    
-                                </div> -->
                                 <div id="excelTable" class="ht-theme-main-dark"></div>
                             </div>
                         </div>
@@ -306,33 +315,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- <div class="fixed-plugin">
-        <div class="dropdown show-dropdown">
-            <a href="#" data-toggle="dropdown">
-                <i class="fa fa-cog fa-2x"> </i>
-            </a>
-            <ul class="dropdown-menu">
-                <li class="header-title"> Sidebar Background</li>
-                <li class="adjustments-line">
-                    <a href="javascript:void(0)" class="switch-trigger background-color">
-                        <div class="badge-colors text-center">
-                            <span class="badge filter badge-primary active" data-color="primary"></span>
-                            <span class="badge filter badge-info" data-color="blue"></span>
-                            <span class="badge filter badge-success" data-color="green"></span>
-                        </div>
-                        <div class="clearfix"></div>
-                    </a>
-                </li>
-                <li class="adjustments-line text-center color-change">
-                    <span class="color-label">LIGHT MODE</span>
-                    <span class="badge light-badge mr-2"></span>
-                    <span class="badge dark-badge ml-2"></span>
-                    <span class="color-label">DARK MODE</span>
-                </li>
-                <li class="adjustments-line"></li>
-            </ul>
-        </div> -->
     </div>
     <script src="../assets/js/plugins/handsontable.full.min.js"></script>
     <script src="../assets/js/plugins/chartjs.min.js"></script>
@@ -358,10 +340,9 @@
       $().ready(function() {
 
         $('.dropdown-menu a').click(function(event) {
-            event.stopPropagation();  // Impede que o clique se propague para o dropdown
+            event.stopPropagation();
         });
         
-        // Alterna o valor de aria-expanded e impede o fechamento ao clicar no toggle
         $('.dropdown-toggle').click(function(event) {
             var isExpanded = $(this).attr('aria-expanded') === 'true';
             $(this).attr('aria-expanded', !isExpanded);
@@ -380,8 +361,6 @@
         window_width = $(window).width();
 
         fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
-
-
 
         $('.fixed-plugin a').click(function(event) {
           if ($(this).hasClass('switch-trigger')) {
@@ -429,12 +408,10 @@
             blackDashboard.showSidebarMessage('Sidebar mini activated...');
           }
 
-          // we simulate the window Resize so the charts will get updated in realtime.
           var simulateWindowResize = setInterval(function() {
             window.dispatchEvent(new Event('resize'));
           }, 180);
 
-          // we stop the simulation of Window Resize after the animations are completed
           setTimeout(function() {
             clearInterval(simulateWindowResize);
           }, 1000);
@@ -476,43 +453,57 @@
     });
     </script>
     <script>
+
+        // Dashboard.initialize();
         
-        fetch('../base/dados.json') // Caminho relativo ao seu arquivo JSON
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar o arquivo JSON');
-                }
-                return response.json(); // Parseando o JSON
-            })
-            .then(data => {
-                demo.initDashboardPageCharts(data);
-                demo.initDashboardHeaders(data);
-            })
-            .catch(err => {
-                console.error('Erro:', err);
-            });
+        fetch('../base/dados.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao carregar o arquivo JSON');
+            }
+            return response.json();
+        })
+        .then(data => {
+            
+            demo.initDashboardPageCharts(data);
+        })
+        .catch(err => {
+            console.error('Erro:', err);
+        });
 
         
-        const intervalo = 5 * 60 * 1000;
-        let proximaAtualizacao = new Date(Date.now() + intervalo + 1000);
+        // const intervalo = 1 * 60 * 1000;
+        // let proximaAtualizacao = new Date(Date.now() + intervalo + 1000);
 
-        function update() {
-            // Javascript method's body can be found in assets/js/demos.js
-            location.reload();
-        }
+        // function update() {
+        //     proximaAtualizacao = new Date(Date.now() + intervalo + 1000);
+        //     fetch('../base/dados.json')
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Erro ao carregar o arquivo JSON');
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         demo.initDashboardPageCharts(data);
+        //     })
+        //     .catch(err => {
+        //         console.error('Erro:', err);
+        //     });
+        // }
 
-        function mostrarTempoRestante() {
-            const agora = new Date();
-            const tempoRestante = proximaAtualizacao - agora;
+        // function mostrarTempoRestante() {
+        //     const agora = new Date();
+        //     const tempoRestante = proximaAtualizacao - agora;
 
-            const minutosRestantes = Math.floor((tempoRestante / 1000) / 60);
-            const segundosRestantes = Math.floor((tempoRestante / 1000) % 60);
+        //     const minutosRestantes = Math.floor((tempoRestante / 1000) / 60);
+        //     const segundosRestantes = Math.floor((tempoRestante / 1000) % 60);
 
-            console.log(`Próxima atualização em: ${minutosRestantes} minutos e ${segundosRestantes} segundos.`);
-        }
+        //     console.log(`Próxima atualização em: ${minutosRestantes} minutos e ${segundosRestantes} segundos.`);
+        // }
 
-        setInterval(mostrarTempoRestante, 1000);
-        setInterval(update, intervalo);
+        // setInterval(mostrarTempoRestante, 1000);
+        // setInterval(update, intervalo);
         
 
     </script>
