@@ -1,7 +1,30 @@
 class ChartManager {
-  constructor(chartId, type, data = {}, options = {}) {
+  constructor(chartId, type, data = {}, options = {},gradientcolor) {
     this.chartId = chartId;
     this.ctx = document.getElementById(chartId).getContext("2d");
+    if (gradientcolor){
+      switch (gradientcolor) {
+        case "Azul":
+          console.log(data)
+          var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
+              gradientStroke.addColorStop(1,   'rgba(29,140,248,0.2)');
+              gradientStroke.addColorStop(0.1, 'rgba(29,140,248,0.0)');
+              gradientStroke.addColorStop(0,   'rgba(29,140,248,0)');
+              data.datasets[0].backgroundColor = gradientStroke
+              console.log(data)
+          break;
+
+        case "Verde":
+          console.log(data)
+          var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
+              gradientStroke.addColorStop(1, 'rgba(66,134,121,0.2)');
+              gradientStroke.addColorStop(0.2, 'rgba(66,134,121,0.0)');
+              gradientStroke.addColorStop(0, 'rgba(66,134,121,0)');
+              data.datasets[0].backgroundColor = gradientStroke
+              console.log(data)
+          break;
+      }
+    }
     this.chart = new Chart(this.ctx,{
       type: type,
       data: data,
@@ -18,7 +41,6 @@ class ChartManager {
           mode: "nearest",
           intersect: 0,
           position: "nearest",
-          callbacks: {label: function(tooltipItem, data) {var valor = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]; return valor.toLocaleString("pt-BR"); }}
         },
         animation: {
           duration: 2000,
@@ -35,12 +57,12 @@ class ChartManager {
     if (elements.length > 0) {
       const index = elements[0]._index;
       const label = this.chart.data.labels[index]
-      if (Dashboard.globalFilters[this.chartId] === label) {
-        delete Dashboard.globalFilters[this.chartId]
+      if (Dashboard.chartFilters[this.chartId] === label) {
+        delete Dashboard.chartFilters[this.chartId]
       } else {
-        Dashboard.globalFilters[this.chartId] = label;
+        Dashboard.chartFilters[this.chartId] = label;
       }
-      console.log(Dashboard.globalFilters);
+      console.log(Dashboard.chartFilters);
     }
   }
 }
@@ -49,23 +71,96 @@ const Dashboard = {
 
   dataCharts: null,
   globalFilters: {},
+  chartFilters: {},
   instances: [],
 
-  initialize(){
+  initialize_charts(){
+
+    var DataCap = {
+      labels: ['Atingido', 'Faltante'],
+      datasets: [{
+        borderColor: ["#00f2c3","rgba(0, 242, 194, 0.04)"],
+        pointBorderColor: "#FFF",
+        pointBackgroundColor: "#f96332",
+        pointBorderWidth: 2,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 1,
+        pointRadius: 4,
+        backgroundColor: ["#00f2c3","rgba(0, 242, 194, 0.05)"],
+        borderWidth: 3,
+        data: [78 , 22],
+      }],
+    }
+    var OptionsCap = {
+      animation: {
+        duration: 0, 
+        animateScale: true,
+        animateRotate: true,
+        onComplete: function() {
+          const chartInstance = this.chart;
+          const ctx = chartInstance.ctx;
+          const centerX = (chartInstance.chartArea.left + chartInstance.chartArea.right) / 2;
+          const centerY = (chartInstance.chartArea.top + chartInstance.chartArea.bottom) / 1.35;
+
+          ctx.save();
+          ctx.font = '2.6625rem Poppins'; 
+          ctx.fillStyle = 'white'; 
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          const value = 78
+
+          ctx.fillText(`${value}%`, centerX, centerY);
+          ctx.restore();
+        },
+      },
+      hover: {
+        animationDuration: 0,
+      },
+      aspectRatio: 2.7,
+      maintainAspectRatio: false,
+      responsive: true,
+      rotation: Math.PI, 
+      circumference: Math.PI, 
+      cutoutPercentage: 75,
+      legend: { display: false },
+      tooltips: { enabled: false }, 
+      responsive: true,
+      plugins: {
+        datalabels: {
+          display: false,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 10,
+          bottom: 10,
+        }
+      },
+      
+    };
 
     var DataTransmetod = {
-      labels: [1,2,3,4,5],
+      labels: ["P4","P3","M2","T1"],
       datasets: [{
         label: "Itens",
         fill: true,
-        backgroundColor: "transparent",
+        backgroundColor: 'rgba(66,134,121,0.2)',
         borderColor: '#00f2c3',
-        borderWidth: 4,
+        borderWidth: 2,
+        borderDash: [],
+        borderDashOffset: 0.0,
         pointBackgroundColor: '#00f2c3',
         pointBorderColor: 'rgba(255,255,255,0)',
-        pointRadius: 5,
-        data: [],
-      }]
+        pointHoverBackgroundColor: '#00d6b4',
+        pointBorderWidth: 20,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 15,
+        pointRadius: 4,
+        data: [300,0,5080,2000],
+      }],
     };
     var OptionsTransmetod = {
       plugins: {
@@ -81,6 +176,7 @@ const Dashboard = {
       },
       scales: {
         yAxes: [{
+          beginAtZero: true,
           display: false,
         }],
         xAxes: [{
@@ -98,21 +194,23 @@ const Dashboard = {
       },
       layout: {
         padding: {
-          top: 40,
-          bottom: 20,
-          left: 50,
-          right: 50,
+          top: 20,
+          bottom: 0,
+          left: 40,
+          right: 40,
         }
       },
     };
 
     var DataStatus = {
-      labels: [],
+      labels: ["W.Allocation","Picking","Cheking","W.NF","Loading"],
       datasets: [{
+        label:"Itens",
         fill: true,
+        backgroundColor:"rgba(31, 143, 241, 0.05)",
         borderColor: '#1f8ef1',
         borderWidth: 2,
-        data: [],
+        data: [300,0,500,200,900],
       }]
     };
     var OptionsStatus = {
@@ -129,6 +227,11 @@ const Dashboard = {
       },
       scales: {
         yAxes: [{
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(29,140,248,0.1)',
+            zeroLineColor: "transparent",
+          },
           display:false,
         }],
         xAxes: [{
@@ -146,18 +249,198 @@ const Dashboard = {
       },
       layout: {
         padding: {
-          top: 20,
-          bottom: 20,
-          left: 50,
-          right: 50,
+          top: 40,
+          bottom: 0,
+          left: 0,
+          right: 0,
         }
       },
     };
 
-    this.myChartTransmetod = new ChartManager("Trans Method.","line",DataTransmetod,OptionsTransmetod);
-    this.myChartStatus = new ChartManager("Status","bar",DataStatus,OptionsStatus);
+    var DataDivision = {
+      labels: ["SVC","DVD","TBT","ZUX","PPP"],
+      datasets: [{
+        label: "Itens",
+        fill: true,
+        backgroundColor: "rgba(0, 242, 194, 0.02)",
+        borderColor: '#1f8ef1',
+        borderWidth: 2,
+        data:[5,4,3,2,1],
+      }]
+    }
+    var OptionsDivision = {
+      plugins: {
+        legend: {
+          display: true,
+        },
+        datalabels: {
+          color: 'rgba(255, 255, 255, 0.8)',
+          anchor: "end",  // Alinha ao final da barra
+          align: "right",  // Posiciona o texto à direita da barra
+          offset: 10,
+          padding: 10,
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`, // Formato dos rótulos
+        },
+        tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
+      },
+      scales: {
+        yAxes: [{
+          gridLines: {
+            color: 'rgba(29,140,248,0.1)',
+            zeroLineColor: 'rgba(29,140,248,0.1)',
+          },
+          ticks: {
+            fontSize: 17,
+            fontColor: "#9e9e9e"
+          }
+        }],
+        xAxes: [{
+          display: false,
+        }]
+      },
+      layout: {
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 55,
+        }
+      },
+    };
 
-    this.update([300,0,500,200,900])
+    var DataDOCreated = {
+      labels: ["00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"], 
+      datasets: [{
+        label: "Itens",
+        fill: true,
+        backgroundColor:"rgba(46, 191, 249, 0.02)",
+        borderColor: '#2EC0F9',
+        borderWidth: 2,
+        pointBackgroundColor: "#2EC0F9",
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointRadius: 5,
+        data: [2,0,4,2,6,4,8,6,10,8,12,10,14,10,9,8,7,6,5,4,3,2,1,0],
+      },
+      {
+        label: "Cap",
+        fill: true,
+        backgroundColor: "transparent",
+        borderColor: 'rgba(199, 33, 33, 0.88)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(199, 33, 33, 0.88)',
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointHoverRadius: 0,
+        pointRadius: 0,
+        data: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],
+        datalabels: {
+          display: false,
+        },
+      }]
+    }
+    var OptionsDOCreated = {
+      plugins: {
+        datalabels: {
+          color: 'rgba(255, 255, 255, 0.8)',
+          anchor: 'end',
+          align: 'top',
+          font: {
+            size: 25,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`, // Formato dos rótulos
+        },
+      },
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(29,140,248,0.0)',
+            zeroLineColor: "transparent",
+          },
+          ticks: {
+            padding: 20,
+            fontColor: "#9a9a9a",
+            display:false
+          }
+        }],
+        xAxes: [{
+          barPercentage: 1.6,
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(225,78,202,0.1)',
+            zeroLineColor: "transparent",
+          },
+          ticks: {
+            padding: 20,
+            fontColor: "#9a9a9a"
+          }
+        }]
+      },
+      layout: {
+        padding: {
+          top: 40,
+          bottom: 0,
+          left: 25,
+          right: 25,
+        }
+      },
+    };
+
+    var DataType = {
+      labels: ["Mono","Mult"],
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#00f2c3","#1f8ef1"],
+        fill: true,
+        backgroundColor: ["rgba(0, 242, 194, 0.05)","rgba(31, 143, 241, 0.05)"],
+        borderWidth: 3,
+        data: [2000,5000]
+      }]
+    }
+    var OptionsType = {
+      cutoutPercentage: 50,
+      maintainAspectRatio: false,
+      legend: {
+        position: 'bottom',
+        align: 'center',
+        Size: 20,
+        labels: {
+          fontColor: "#9e9e9e",
+          padding: 20,
+          fontSize: 14,
+        },
+      },
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+    };
+
+    this.myChartCap = new ChartManager("Cap","doughnut",DataCap,OptionsCap);
+    this.myChartTransmetod = new ChartManager("Trans Method.","line",DataTransmetod,OptionsTransmetod,"Verde");
+    this.myChartStatus = new ChartManager("Status","bar",DataStatus,OptionsStatus,"Azul");
+    this.myChartDivision = new ChartManager("Division","horizontalBar",DataDivision,OptionsDivision,"Azul");
+    this.myChartDOCreated = new ChartManager("D/O Date","line",DataDOCreated,OptionsDOCreated,"Azul");
+    this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType)
+
+    // this.update([300,0,500,200,900])
   },
   update(newData){
     this.instances.forEach(instance => {
@@ -168,7 +451,7 @@ const Dashboard = {
   },
   filterdata(data){
     const filteredData = data.filter(item =>
-      Object.entries(this.globalFilters).every(([key, value]) => item[key] === value)
+      Object.entries(this.chartFilters).every(([key, value]) => item[key] === value)
     );
   }
 }

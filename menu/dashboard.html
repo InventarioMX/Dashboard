@@ -189,7 +189,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-5">
-                                        <canvas id="gaugeCap"></canvas> 
+                                        <canvas id="Cap"></canvas> 
                                 </div>
                             </div>
                         </div>
@@ -238,7 +238,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="chart-area">
-                                            <canvas id="chartBarDivision"></canvas>
+                                            <canvas id="Division"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -283,7 +283,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="chartLineDOCreated"></canvas>
+                                    <canvas id="D/O Date"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -295,7 +295,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="pieMonoMult"></canvas>
+                                    <canvas id="D/O Type"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -454,7 +454,7 @@
     </script>
     <script>
 
-        // Dashboard.initialize();
+        Dashboard.initialize_charts();
         
         fetch('../base/dados.json')
         .then(response => {
@@ -465,7 +465,7 @@
         })
         .then(data => {
             
-            demo.initDashboardPageCharts(data);
+            // demo.initDashboardPageCharts(data);
         })
         .catch(err => {
             console.error('Erro:', err);
