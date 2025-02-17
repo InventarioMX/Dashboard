@@ -5,23 +5,18 @@ class ChartManager {
     if (gradientcolor){
       switch (gradientcolor) {
         case "Azul":
-          console.log(data)
           var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
               gradientStroke.addColorStop(1,   'rgba(29,140,248,0.2)');
               gradientStroke.addColorStop(0.1, 'rgba(29,140,248,0.0)');
               gradientStroke.addColorStop(0,   'rgba(29,140,248,0)');
               data.datasets[0].backgroundColor = gradientStroke
-              console.log(data)
           break;
-
         case "Verde":
-          console.log(data)
           var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
               gradientStroke.addColorStop(1, 'rgba(66,134,121,0.2)');
               gradientStroke.addColorStop(0.2, 'rgba(66,134,121,0.0)');
               gradientStroke.addColorStop(0, 'rgba(66,134,121,0)');
               data.datasets[0].backgroundColor = gradientStroke
-              console.log(data)
           break;
       }
     }
@@ -51,7 +46,7 @@ class ChartManager {
         ...options
       }
     });
-    Dashboard.instances.push(this);
+    Dashboard.instances_chart.push(this);
   }
   handleClick(event,elements) {
     if (elements.length > 0) {
@@ -67,14 +62,28 @@ class ChartManager {
   }
 }
 
+class HeadManager{
+  constructor(id,value){
+    this.ctx = document.getElementById(id)
+    this.ctx.innerHTML = value.toLocaleString('pt-BR');
+    Dashboard.instances_head.push(this);
+  }
+  update(value){
+    this.ctx.innerHTML = value.toLocaleString('pt-BR');
+  }
+}
+
 const Dashboard = {
 
-  dataCharts: null,
+  data: {},
   globalFilters: {},
   chartFilters: {},
-  instances: [],
+  instances_chart: [],
+  instances_head: [],
 
-  initialize_charts(){
+  initialize_charts(data){
+
+    this.data = data
 
     var DataCap = {
       labels: ['Atingido', 'Faltante'],
@@ -93,7 +102,7 @@ const Dashboard = {
     }
     var OptionsCap = {
       animation: {
-        duration: 0, 
+        duration: 1000, 
         animateScale: true,
         animateRotate: true,
         onComplete: function() {
@@ -142,8 +151,10 @@ const Dashboard = {
       
     };
 
+    const TransmetodLabels = [...new Set(data.RelatorioD2C.map(row => row["Trans Method."]))];
+
     var DataTransmetod = {
-      labels: ["P4","P3","M2","T1"],
+      labels: TransmetodLabels,
       datasets: [{
         label: "Itens",
         fill: true,
@@ -159,7 +170,7 @@ const Dashboard = {
         pointHoverRadius: 4,
         pointHoverBorderWidth: 15,
         pointRadius: 4,
-        data: [300,0,5080,2000],
+        data: TransmetodLabels.map(label => 0),
       }],
     };
     var OptionsTransmetod = {
@@ -202,15 +213,17 @@ const Dashboard = {
       },
     };
 
+    const StatusLabels = [...new Set(data.RelatorioD2C.map(row => row["Status"]))];
+
     var DataStatus = {
-      labels: ["W.Allocation","Picking","Cheking","W.NF","Loading"],
+      labels: StatusLabels,
       datasets: [{
         label:"Itens",
         fill: true,
         backgroundColor:"rgba(31, 143, 241, 0.05)",
         borderColor: '#1f8ef1',
         borderWidth: 2,
-        data: [300,0,500,200,900],
+        data: StatusLabels.map(label => 0),
       }]
     };
     var OptionsStatus = {
@@ -257,15 +270,17 @@ const Dashboard = {
       },
     };
 
+    let DivisionLabels = [...new Set(data.RelatorioD2C.map(row => row["Division"]))];
+
     var DataDivision = {
-      labels: ["SVC","DVD","TBT","ZUX","PPP"],
+      labels: DivisionLabels,
       datasets: [{
         label: "Itens",
         fill: true,
         backgroundColor: "rgba(0, 242, 194, 0.02)",
         borderColor: '#1f8ef1',
         borderWidth: 2,
-        data:[5,4,3,2,1],
+        data: DivisionLabels.map(label => 0),
       }]
     }
     var OptionsDivision = {
@@ -311,6 +326,8 @@ const Dashboard = {
       },
     };
 
+    let caphoralabel = Array(24).fill(Math.round(data.Capacidade.reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
+
     var DataDOCreated = {
       labels: ["00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"], 
       datasets: [{
@@ -334,7 +351,7 @@ const Dashboard = {
         pointBorderColor: 'rgba(255,255,255,0)',
         pointHoverRadius: 0,
         pointRadius: 0,
-        data: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],
+        data: caphoralabel,
         datalabels: {
           display: false,
         },
@@ -388,15 +405,17 @@ const Dashboard = {
       },
     };
 
+    const TypeLabels = [...new Set(data.RelatorioD2C.map(row => row["D/O Type"]))];
+
     var DataType = {
-      labels: ["Mono","Mult"],
+      labels: TypeLabels,
       datasets: [{
         label: "Itens",
         borderColor: ["#00f2c3","#1f8ef1"],
         fill: true,
         backgroundColor: ["rgba(0, 242, 194, 0.05)","rgba(31, 143, 241, 0.05)"],
         borderWidth: 3,
-        data: [2000,5000]
+        data: TypeLabels.map(label => 0)
       }]
     }
     var OptionsType = {
@@ -440,10 +459,12 @@ const Dashboard = {
     this.myChartDOCreated = new ChartManager("D/O Date","line",DataDOCreated,OptionsDOCreated,"Azul");
     this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType)
 
-    // this.update([300,0,500,200,900])
+  },
+  initialize_head(){
+    
   },
   update(newData){
-    this.instances.forEach(instance => {
+    this.instances_chart.forEach(instance => {
       instance.chart.data.labels = newData;
       instance.chart.data.datasets[0].data = newData;
       instance.chart.update();
