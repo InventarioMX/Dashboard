@@ -137,7 +137,7 @@
                             <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-danger"></i> Backlog</h2></div>
                             <div class="card-header btn btn-simple mb-xl-0" id="btn_backlog">
                                 <h4 class="text-muted">Pending</h4>
-                                <h1 id="Backlog"></i></h1>
+                                <h1 id="backlog"></i></h1>
                             </div>
                         </div>
                     </div>
@@ -150,11 +150,11 @@
                                         <div class="row">
                                             <div class="col-sm-6 text-center">
                                                 <h4 class="text-muted">D-2</h4>
-                                                <h1 id="gidmenos2"></i></h1>
+                                                <h1 id="GID2"></i></h1>
                                             </div>
                                             <div class="col-sm-6 text-center">
                                                 <h4 class="text-muted">D-1</h4>
-                                                <h1 id="gidmenos1"></h1>
+                                                <h1 id="GID1"></h1>
                                             </div>
                                         </div>
                                     </div>
@@ -163,7 +163,7 @@
                                     <div class="mb-xl-4"></div>
                                     <div class="card-header text-center ">
                                         <h4 class="text-muted">CURRENT</h4>
-                                        <h1 class="bigg" id="gicurrent"></h1>
+                                        <h1 class="bigg" id="GICurrent"></h1>
                                     </div>
                                 </div>
                             </div>
@@ -173,23 +173,23 @@
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
-                                    <div class="card-header"><h2 class="mb-xl-0" id="cap"><i class="tim-icons  icon-app text-info"></i> Capacity:  </h2></div>
+                                    <div class="card-header"><h2 class="mb-xl-0" id="Cap"><i class="tim-icons  icon-app text-info"></i> Capacity:  </h2></div>
                                     <div class="card-header">
                                         <div class="mb-xl-1"></div>
                                         <div class="row">
                                             <div class="col-sm-6 text-center">
                                                 <h4 class="text-muted ">Pending</h4>
-                                                <h1 id="Pending"></h>                                   
+                                                <h1 id="PendingCap"></h>                                   
                                             </div>
                                             <div class="col-sm-6 text-center">
                                                 <h4 class="text-muted">GI Exp.</h4>
-                                                <h1 id="giexpected"></h1>    
+                                                <h1 id="GIExpected"></h1>    
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-5">
-                                        <canvas id="Cap"></canvas> 
+                                    <canvas id="CapPorcent"></canvas> 
                                 </div>
                             </div>
                         </div>
@@ -336,176 +336,121 @@
     <script src="./assets/js/black-dashboard.min.js"></script><!-- Black Dashboard DEMO methods, don't include it in your project! -->
     <script src="./assets/js/dashboard-page.js"></script>
     <script>
-    $(document).ready(function() {
-      $().ready(function() {
+        $(document).ready(function() {
+        $().ready(function() {
 
-        $('.dropdown-menu a').click(function(event) {
-            event.stopPropagation();
-        });
-        
-        $('.dropdown-toggle').click(function(event) {
-            var isExpanded = $(this).attr('aria-expanded') === 'true';
-            $(this).attr('aria-expanded', !isExpanded);
-        });
-
-        $sidebar = $('.sidebar');
-        $navbar = $('.navbar');
-        $main_panel = $('.main-panel');
-
-        $full_page = $('.full-page');
-
-        $sidebar_responsive = $('body > .navbar-collapse');
-        sidebar_mini_active = true;
-        white_color = false;
-
-        window_width = $(window).width();
-
-        fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
-
-        $('.fixed-plugin a').click(function(event) {
-          if ($(this).hasClass('switch-trigger')) {
-            if (event.stopPropagation) {
-              event.stopPropagation();
-            } else if (window.event) {
-              window.event.cancelBubble = true;
-            }
-          }
-        });
-
-        $('.fixed-plugin .background-color span').click(function() {
-          $(this).siblings().removeClass('active');
-          $(this).addClass('active');
-
-          var new_color = $(this).data('color');
-
-          if ($sidebar.length != 0) {
-            $sidebar.attr('data', new_color);
-          }
-
-          if ($main_panel.length != 0) {
-            $main_panel.attr('data', new_color);
-          }
-
-          if ($full_page.length != 0) {
-            $full_page.attr('filter-color', new_color);
-          }
-
-          if ($sidebar_responsive.length != 0) {
-            $sidebar_responsive.attr('data', new_color);
-          }
-        });
-
-        $('.switch-sidebar-mini input').on("switchChange.bootstrapSwitch", function() {
-          var $btn = $(this);
-
-          if (sidebar_mini_active == true) {
-            $('body').removeClass('sidebar-mini');
-            sidebar_mini_active = false;
-            blackDashboard.showSidebarMessage('Sidebar mini deactivated...');
-          } else {
-            $('body').addClass('sidebar-mini');
-            sidebar_mini_active = true;
-            blackDashboard.showSidebarMessage('Sidebar mini activated...');
-          }
-
-          var simulateWindowResize = setInterval(function() {
-            window.dispatchEvent(new Event('resize'));
-          }, 180);
-
-          setTimeout(function() {
-            clearInterval(simulateWindowResize);
-          }, 1000);
-        });
-
-        $('.switch-change-color input').on("switchChange.bootstrapSwitch", function() {
-          var $btn = $(this);
-
-          if (white_color == true) {
-
-            $('body').addClass('change-background');
-            setTimeout(function() {
-              $('body').removeClass('change-background');
-              $('body').removeClass('white-content');
-            }, 900);
-            white_color = false;
-          } else {
-
-            $('body').addClass('change-background');
-            setTimeout(function() {
-              $('body').removeClass('change-background');
-              $('body').addClass('white-content');
-            }, 900);
-
-            white_color = true;
-          }
-
-
-        });
-
-        $('.light-badge').click(function() {
-          $('body').addClass('white-content');
-        });
-
-        $('.dark-badge').click(function() {
-          $('body').removeClass('white-content');
-        });
-      });
-    });
-    </script>
-    <script>
-
-        // Dashboard.initialize_charts();
-        
-        // fetch('../base/dados.json')
-        // .then(response => {
-        //     if (!response.ok) {
-        //         throw new Error('Erro ao carregar o arquivo JSON');
-        //     }
-        //     return response.json();
-        // })
-        // .then(data => {
+            $('.dropdown-menu a').click(function(event) {
+                event.stopPropagation();
+            });
             
-        //     // demo.initDashboardPageCharts(data);
-        // })
-        // .catch(err => {
-        //     console.error('Erro:', err);
-        // });
+            $('.dropdown-toggle').click(function(event) {
+                var isExpanded = $(this).attr('aria-expanded') === 'true';
+                $(this).attr('aria-expanded', !isExpanded);
+            });
 
-        
-        // const intervalo = 1 * 60 * 1000;
-        // let proximaAtualizacao = new Date(Date.now() + intervalo + 1000);
+            $sidebar = $('.sidebar');
+            $navbar = $('.navbar');
+            $main_panel = $('.main-panel');
 
-        // function update() {
-        //     proximaAtualizacao = new Date(Date.now() + intervalo + 1000);
-        //     fetch('../base/dados.json')
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('Erro ao carregar o arquivo JSON');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         demo.initDashboardPageCharts(data);
-        //     })
-        //     .catch(err => {
-        //         console.error('Erro:', err);
-        //     });
-        // }
+            $full_page = $('.full-page');
 
-        // function mostrarTempoRestante() {
-        //     const agora = new Date();
-        //     const tempoRestante = proximaAtualizacao - agora;
+            $sidebar_responsive = $('body > .navbar-collapse');
+            sidebar_mini_active = true;
+            white_color = false;
 
-        //     const minutosRestantes = Math.floor((tempoRestante / 1000) / 60);
-        //     const segundosRestantes = Math.floor((tempoRestante / 1000) % 60);
+            window_width = $(window).width();
 
-        //     console.log(`Próxima atualização em: ${minutosRestantes} minutos e ${segundosRestantes} segundos.`);
-        // }
+            fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
 
-        // setInterval(mostrarTempoRestante, 1000);
-        // setInterval(update, intervalo);
-        
+            $('.fixed-plugin a').click(function(event) {
+            if ($(this).hasClass('switch-trigger')) {
+                if (event.stopPropagation) {
+                event.stopPropagation();
+                } else if (window.event) {
+                window.event.cancelBubble = true;
+                }
+            }
+            });
 
+            $('.fixed-plugin .background-color span').click(function() {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+
+            var new_color = $(this).data('color');
+
+            if ($sidebar.length != 0) {
+                $sidebar.attr('data', new_color);
+            }
+
+            if ($main_panel.length != 0) {
+                $main_panel.attr('data', new_color);
+            }
+
+            if ($full_page.length != 0) {
+                $full_page.attr('filter-color', new_color);
+            }
+
+            if ($sidebar_responsive.length != 0) {
+                $sidebar_responsive.attr('data', new_color);
+            }
+            });
+
+            $('.switch-sidebar-mini input').on("switchChange.bootstrapSwitch", function() {
+            var $btn = $(this);
+
+            if (sidebar_mini_active == true) {
+                $('body').removeClass('sidebar-mini');
+                sidebar_mini_active = false;
+                blackDashboard.showSidebarMessage('Sidebar mini deactivated...');
+            } else {
+                $('body').addClass('sidebar-mini');
+                sidebar_mini_active = true;
+                blackDashboard.showSidebarMessage('Sidebar mini activated...');
+            }
+
+            var simulateWindowResize = setInterval(function() {
+                window.dispatchEvent(new Event('resize'));
+            }, 180);
+
+            setTimeout(function() {
+                clearInterval(simulateWindowResize);
+            }, 1000);
+            });
+
+            $('.switch-change-color input').on("switchChange.bootstrapSwitch", function() {
+            var $btn = $(this);
+
+            if (white_color == true) {
+
+                $('body').addClass('change-background');
+                setTimeout(function() {
+                $('body').removeClass('change-background');
+                $('body').removeClass('white-content');
+                }, 900);
+                white_color = false;
+            } else {
+
+                $('body').addClass('change-background');
+                setTimeout(function() {
+                $('body').removeClass('change-background');
+                $('body').addClass('white-content');
+                }, 900);
+
+                white_color = true;
+            }
+
+
+            });
+
+            $('.light-badge').click(function() {
+            $('body').addClass('white-content');
+            });
+
+            $('.dark-badge').click(function() {
+            $('body').removeClass('white-content');
+            });
+        });
+        });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -518,7 +463,11 @@
                 const response = await fetch('/api/dados');
                 const dados = await response.json();
                 
-                Dashboard.initialize_charts(dados);
+                Dashboard.data = dados;
+                console.log(dados)
+
+                Dashboard.initialize_charts();
+                Dashboard.initialize_heads();
             } catch (error) {
                 console.error('Erro ao buscar dados iniciais:', error);
             }
@@ -558,5 +507,4 @@
         }
     </script>
 </body>
-
 </html>

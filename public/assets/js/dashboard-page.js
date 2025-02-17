@@ -63,27 +63,32 @@ class ChartManager {
 }
 
 class HeadManager{
-  constructor(id,value){
-    this.ctx = document.getElementById(id)
-    this.ctx.innerHTML = value.toLocaleString('pt-BR');
+  constructor(id,icon,description){
+    this.ctx = document.getElementById(id);
+    this.icon = icon;
+    this.description = description;
+
+    console.log(id,icon,description)
+    this.ctx.innerHTML = (icon?icon:"") + (description?description:"");
+
     Dashboard.instances_head.push(this);
   }
   update(value){
-    this.ctx.innerHTML = value.toLocaleString('pt-BR');
+    this.ctx.innerHTML = (this.icon?this.icon:"") + (this.description?this.description:"") + value.toLocaleString('pt-BR');
   }
 }
 
 const Dashboard = {
 
   data: {},
+  data_charts:{},
+  data_head:{},
   globalFilters: {},
   chartFilters: {},
   instances_chart: [],
   instances_head: [],
 
-  initialize_charts(data){
-
-    this.data = data
+  initialize_charts(){
 
     var DataCap = {
       labels: ['Atingido', 'Faltante'],
@@ -151,7 +156,7 @@ const Dashboard = {
       
     };
 
-    const TransmetodLabels = [...new Set(data.RelatorioD2C.map(row => row["Trans Method."]))];
+    const TransmetodLabels = [...new Set(this.data.RelatorioD2C.map(row => row["Trans Method."]))];
 
     var DataTransmetod = {
       labels: TransmetodLabels,
@@ -213,7 +218,7 @@ const Dashboard = {
       },
     };
 
-    const StatusLabels = [...new Set(data.RelatorioD2C.map(row => row["Status"]))];
+    const StatusLabels = [...new Set(this.data.RelatorioD2C.map(row => row["Status"]))];
 
     var DataStatus = {
       labels: StatusLabels,
@@ -270,7 +275,7 @@ const Dashboard = {
       },
     };
 
-    let DivisionLabels = [...new Set(data.RelatorioD2C.map(row => row["Division"]))];
+    let DivisionLabels = [...new Set(this.data.RelatorioD2C.map(row => row["Division"]))];
 
     var DataDivision = {
       labels: DivisionLabels,
@@ -326,7 +331,7 @@ const Dashboard = {
       },
     };
 
-    let caphoralabel = Array(24).fill(Math.round(data.Capacidade.reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
+    let caphoralabel = Array(24).fill(Math.round(this.data.Capacidade.reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
 
     var DataDOCreated = {
       labels: ["00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"], 
@@ -405,7 +410,7 @@ const Dashboard = {
       },
     };
 
-    const TypeLabels = [...new Set(data.RelatorioD2C.map(row => row["D/O Type"]))];
+    const TypeLabels = [...new Set(this.data.RelatorioD2C.map(row => row["D/O Type"]))];
 
     var DataType = {
       labels: TypeLabels,
@@ -452,7 +457,7 @@ const Dashboard = {
       },
     };
 
-    this.myChartCap = new ChartManager("Cap","doughnut",DataCap,OptionsCap);
+    this.myChartCap = new ChartManager("CapPorcent","doughnut",DataCap,OptionsCap);
     this.myChartTransmetod = new ChartManager("Trans Method.","line",DataTransmetod,OptionsTransmetod,"Verde");
     this.myChartStatus = new ChartManager("Status","bar",DataStatus,OptionsStatus,"Azul");
     this.myChartDivision = new ChartManager("Division","horizontalBar",DataDivision,OptionsDivision,"Azul");
@@ -460,14 +465,74 @@ const Dashboard = {
     this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType)
 
   },
-  initialize_head(){
-    
+  initialize_heads(){
+
+    var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>"
+    var lastupdateDescription = " Last Update: "
+
+    var capIcon = "<i class='tim-icons  icon-app text-info'></i>"
+    var capDescription = " Capacity: "
+
+    this.headLastUpdate = new HeadManager("lastupdate",lastupdateIcon,lastupdateDescription)
+    this.headBacklog = new HeadManager("backlog")
+    this.headGID2 = new HeadManager("GID2")
+    this.headGID1 = new HeadManager("GID1")
+    this.headGICurrent = new HeadManager("GICurrent")
+    this.headCapacity = new HeadManager("Cap",capIcon,capDescription)
+    this.headPendingCap = new HeadManager("PendingCap")
+    this.headGIExpected = new HeadManager("GIExpected")
+
   },
   update(newData){
+
+    const processarDados = (tabela) => {
+      const dadosAgrupados = {};
+    
+      tabela.forEach(row => {
+        Object.keys(row).forEach(coluna => {
+          if (coluna !== "Order Quantity") { // Ignora a coluna de soma diretamente
+            const chave = coluna + "Chart"; // Define o nome do gráfico dinamicamente
+    
+            if (!dadosAgrupados[chave]) {
+              dadosAgrupados[chave] = {};
+            }
+    
+            const categoria = row[coluna]; // Exemplo: "Waiting" ou "P04"
+            const quantidade = row["Order Quantity"];
+    
+            if (!dadosAgrupados[chave][categoria]) {
+              dadosAgrupados[chave][categoria] = 0;
+            }
+            dadosAgrupados[chave][categoria] += quantidade;
+          }
+        });
+      });
+    
+      // Converter para o formato de gráfico
+      const newData = {};
+      Object.entries(dadosAgrupados).forEach(([chartId, data]) => {
+        newData[chartId] = {
+          labels: Object.keys(data),
+          dados: Object.values(data)
+        };
+      });
+    
+      return newData;
+    };
+    
+    const teste = processarDados(newData.RelatorioD2C);
+    console.log(teste);
+    
+  
     this.instances_chart.forEach(instance => {
+      const chartId = instance.id;
+
       instance.chart.data.labels = newData;
       instance.chart.data.datasets[0].data = newData;
       instance.chart.update();
+    });
+    this.instances_head.forEach(instance => {
+      instance.update(newData[0]);
     });
   },
   filterdata(data){
