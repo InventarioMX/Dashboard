@@ -36,7 +36,7 @@ export_data["UltAtualizacao"] = [
 ]
 
 # Exportar para JSON
-with open(r"base\dados.json", "w", encoding="utf-8") as json_file:
+with open(r"data\dados.json", "w", encoding="utf-8") as json_file:
     json.dump(export_data, json_file, indent=4, ensure_ascii=False)
 
 print("✅ Exportação de múltiplas tabelas concluída!")

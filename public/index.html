@@ -463,11 +463,8 @@
                 const response = await fetch('/api/dados');
                 const dados = await response.json();
                 
-                Dashboard.data = dados;
-                console.log(dados)
+                Dashboard.Dashboard_start(dados);
 
-                Dashboard.initialize_charts();
-                Dashboard.initialize_heads();
             } catch (error) {
                 console.error('Erro ao buscar dados iniciais:', error);
             }
@@ -485,7 +482,7 @@
 
                 console.log("Atualizando dados...");
                 
-                Dashboard.update(dados); // Agora usa os dados recebidos da API
+                Dashboard.update(dados);
             } catch (error) {
                 console.error('Erro ao buscar dados na atualização:', error);
             }

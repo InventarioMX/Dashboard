@@ -51,16 +51,16 @@ class ChartManager {
   handleClick(event,elements) {
     if (elements.length > 0) {
       const index = elements[0]._index;
-      const label = this.chart.data.labels[index]
+      const label =  this.chartId == "D/O Date"? Dashboard.DOCreatedFilter + " " + this.chart.data.labels[index]: this.chart.data.labels[index]
       if (Dashboard.chartFilters[this.chartId] === label) {
         delete Dashboard.chartFilters[this.chartId]
       } else {
         Dashboard.chartFilters[this.chartId] = label;
       }
-      console.log(Dashboard.chartFilters);
+      Dashboard.update(Dashboard.data)
     }
   }
-}
+};
 
 class HeadManager{
   constructor(id,icon,description){
@@ -68,7 +68,6 @@ class HeadManager{
     this.icon = icon;
     this.description = description;
 
-    console.log(id,icon,description)
     this.ctx.innerHTML = (icon?icon:"") + (description?description:"");
 
     Dashboard.instances_head.push(this);
@@ -76,7 +75,13 @@ class HeadManager{
   update(value){
     this.ctx.innerHTML = (this.icon?this.icon:"") + (this.description?this.description:"") + value.toLocaleString('pt-BR');
   }
-}
+};
+
+const formatarData = (diasAtras = 0) => {
+  let data = new Date();
+  data.setDate(data.getDate() - diasAtras);
+  return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
 
 const Dashboard = {
 
@@ -85,8 +90,31 @@ const Dashboard = {
   data_head:{},
   globalFilters: {},
   chartFilters: {},
+  DOCreatedFilter: formatarData(),
   instances_chart: [],
   instances_head: [],
+
+  Dashboard_start(data){
+    
+    this.data = data;
+
+    this.initialize_charts();
+    this.initialize_heads();
+    this.update(data);
+
+    $("#Current").click(function() {
+      Dashboard.DOCreatedFilter = formatarData();
+      Dashboard.update(Dashboard.data);
+    });
+    $("#D-1").click(function() {
+      Dashboard.DOCreatedFilter = formatarData(1);
+      Dashboard.update(Dashboard.data);
+    });
+    $("#D-2").click(function() {
+      Dashboard.DOCreatedFilter = formatarData(2);
+      Dashboard.update(this.data);
+    });
+  },
 
   initialize_charts(){
 
@@ -210,7 +238,7 @@ const Dashboard = {
       },
       layout: {
         padding: {
-          top: 20,
+          top: 40,
           bottom: 0,
           left: 40,
           right: 40,
@@ -218,7 +246,11 @@ const Dashboard = {
       },
     };
 
-    const StatusLabels = [...new Set(this.data.RelatorioD2C.map(row => row["Status"]))];
+    var ordem_status = ["00_Waiting Pre-Visit","00_CARR_ID Incorreto","P.Shipmment","W.Booking","W.Allocation","Allocation","Picking","With NF","Print","Checking","Mf.Created","Loading","GI"]
+    const StatusLabels = [...new Set(this.data.RelatorioD2C
+      .filter(item => item["Status"] !== "GI" )
+      .map(row => row["Status"]))]
+      .sort((a, b) => { return ordem_status.indexOf(a) - ordem_status.indexOf(b); });
 
     var DataStatus = {
       labels: StatusLabels,
@@ -344,7 +376,7 @@ const Dashboard = {
         pointBackgroundColor: "#2EC0F9",
         pointBorderColor: 'rgba(255,255,255,0)',
         pointRadius: 5,
-        data: [2,0,4,2,6,4,8,6,10,8,12,10,14,10,9,8,7,6,5,4,3,2,1,0],
+        data: [],
       },
       {
         label: "Cap",
@@ -483,64 +515,99 @@ const Dashboard = {
     this.headGIExpected = new HeadManager("GIExpected")
 
   },
-  update(newData){
+  update(data){
+    this.data = data || this.data ;
+    const newData = this.data;
 
-    const processarDados = (tabela) => {
-      const dadosAgrupados = {};
-    
-      tabela.forEach(row => {
-        Object.keys(row).forEach(coluna => {
-          if (coluna !== "Order Quantity") { // Ignora a coluna de soma diretamente
-            const chave = coluna + "Chart"; // Define o nome do gráfico dinamicamente
-    
-            if (!dadosAgrupados[chave]) {
-              dadosAgrupados[chave] = {};
-            }
-    
-            const categoria = row[coluna]; // Exemplo: "Waiting" ou "P04"
-            const quantidade = row["Order Quantity"];
-    
-            if (!dadosAgrupados[chave][categoria]) {
-              dadosAgrupados[chave][categoria] = 0;
-            }
-            dadosAgrupados[chave][categoria] += quantidade;
-          }
-        });
-      });
-    
-      // Converter para o formato de gráfico
-      const newData = {};
-      Object.entries(dadosAgrupados).forEach(([chartId, data]) => {
-        newData[chartId] = {
-          labels: Object.keys(data),
-          dados: Object.values(data)
-        };
-      });
-    
-      return newData;
-    };
-    
-    const teste = processarDados(newData.RelatorioD2C);
-    console.log(teste);
-    
-  
+    const newDataGlobalFiltered = this.globalfilterdata(newData.RelatorioD2C);
+
+    const newDataChartFiltered = this.filterdata(newDataGlobalFiltered);
+    const DataChartProcessed = this.ChartDataProcess(newDataChartFiltered.filter(item => item["Status"] !== "GI" ));
+    const DataChartProcessedDOCreated = this.ChartDataProcess(newDataChartFiltered);
+
     this.instances_chart.forEach(instance => {
-      const chartId = instance.id;
+      const chartId = instance.chartId;
 
-      instance.chart.data.labels = newData;
-      instance.chart.data.datasets[0].data = newData;
-      instance.chart.update();
+      if (DataChartProcessed[chartId]) {
+
+        if(chartId == "Division"){
+          instance.chart.data.labels = DataChartProcessed[chartId].labels;
+          instance.chart.data.datasets[0].data = DataChartProcessed[chartId].dados
+        }else if(chartId == "D/O Date"){
+          instance.chart.data.datasets[0].data = instance.chart.data.labels.map(label => 
+            (DataChartProcessedDOCreated[chartId] && DataChartProcessedDOCreated[chartId].dados[DataChartProcessedDOCreated[chartId].labels.indexOf(this.DOCreatedFilter+" "+label)] !== undefined) 
+              ? DataChartProcessedDOCreated[chartId].dados[DataChartProcessedDOCreated[chartId].labels.indexOf(this.DOCreatedFilter+" "+label)] 
+              : 0
+          );
+        }else{
+          instance.chart.data.datasets[0].data = instance.chart.data.labels.map(label => 
+            (DataChartProcessed[chartId] && DataChartProcessed[chartId].dados[DataChartProcessed[chartId].labels.indexOf(label)] !== undefined) 
+              ? DataChartProcessed[chartId].dados[DataChartProcessed[chartId].labels.indexOf(label)] 
+              : 0
+          );
+        }
+        
+        instance.chart.update();
+      }
+
     });
+
+    
     this.instances_head.forEach(instance => {
       instance.update(newData[0]);
     });
   },
   filterdata(data){
     const filteredData = data.filter(item =>
-      Object.entries(this.chartFilters).every(([key, value]) => item[key] === value)
+      Object.entries(this.chartFilters).every(([key, value]) => key == "D/O Date"? item[key].split(":")[0]+":00" === value: item[key] === value)
     );
+    return filteredData;
+  },
+  globalfilterdata(data){
+    const filteredData = data.filter(item =>
+      Object.entries(this.globalFilters).every(([key, value]) => item[key] === value)
+    );
+    return filteredData;
+  },
+  ChartDataProcess(tabela) {
+    const dadosAgrupados = {};
+  
+    tabela.forEach(row => {
+      Object.keys(row).forEach(coluna => {
+        if (coluna !== "Order Quantity") { // Ignora a coluna de soma diretamente
+          const chave = coluna; // Define o nome do gráfico dinamicamente
+
+          if (!dadosAgrupados[chave]) {
+            dadosAgrupados[chave] = {};
+          }
+
+          let categoria = row[chave]; // Exemplo: "Waiting" ou "P04"
+          const quantidade = row["Order Quantity"];
+
+          if (chave == "D/O Date"){
+            categoria = row[chave].split(":")[0] + ":00"
+          }
+  
+          if (!dadosAgrupados[chave][categoria]) {
+            dadosAgrupados[chave][categoria] = 0;
+          }
+          dadosAgrupados[chave][categoria] += quantidade;
+        }
+      });
+    });
+
+    // Converter para o formato de gráfico
+    const Data = {};
+    Object.entries(dadosAgrupados).forEach(([chartId, data]) => {
+      Data[chartId] = {
+        labels: Object.keys(data),
+        dados: Object.values(data)
+      };
+    });
+  
+    return Data;
   }
-}
+};
 
 
 demo = {

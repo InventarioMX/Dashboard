@@ -28,14 +28,14 @@ const formatarData = (diasAtras = 0) => {
   return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
-const datas = [formatarData(),formatarData(1),formatarData(2), ""];
+const datas = [formatarData(),formatarData(1),formatarData(2)];
 console.log(datas)
 
 const carregarDados = async () => {
   try {
     const data = await fs.readFile(path.join(__dirname, 'data', 'dados.json'), 'utf-8');
     let DOs = JSON.parse(data);
-    DOs.RelatorioD2C = DOs.RelatorioD2C.filter(item => datas.includes(item['GI Date'].split(" ")[0].trim()));
+    // DOs.RelatorioD2C = DOs.RelatorioD2C.filter(item => datas.includes(item['GI Date'].split(" ")[0]));
 
     return DOs;
   } catch (error) {
