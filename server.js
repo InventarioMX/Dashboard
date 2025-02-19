@@ -50,10 +50,20 @@ fastify.get('/api/dados', async (request, reply) => {
   return reply.send(dados);
 });
 
+fastify.get('/MX', async (request, reply) => {
+  reply.redirect('/?wh=C820_L');
+});
+fastify.get('/CE', async (request, reply) => {
+  reply.redirect('/?wh=C820_J');
+});
+fastify.get('/REC', async (request, reply) => {
+  reply.redirect('/?wh=C820_R');
+});
+
 // Inicializando o servidor
 const start = async () => {
   try {
-    await fastify.listen({ port: 9000, host: '105.112.157.146' });
+    await fastify.listen({ port: 9000}); // , host: '105.112.157.146' 
     console.log('Servidor rodando em http://105.112.157.146:8000');
   } catch (err) {
     fastify.log.error(err);

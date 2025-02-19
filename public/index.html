@@ -196,7 +196,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <div class="card card-chart">
                             <div class="card-header">
                                 <h3><i class="tim-icons icon-molecule-40 text-success"></i> Shipping Type</h3>
@@ -208,7 +208,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-7">
+                    <div class="col-lg-8">
                         <div class="card card-chart">
                             <div class="card-header">
                                 <div class="row">
@@ -454,6 +454,19 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("wh")) {
+                Dashboard.globalFilters["Warehouse Cd."] = []
+                Dashboard.globalFilters["Warehouse Cd."].push(params.get("wh"));
+
+                document.getElementById('C820_L').checked = false;
+                document.getElementById('C820_J').checked = false;
+                document.getElementById('C820_R').checked = false;
+
+                document.getElementById(params.get("wh")).checked = true;
+            
+                window.history.pushState({}, "", "/"); // Volta a URL para "/mx"
+            }
             await carregarDadosIniciais();
             iniciarAtualizacaoAutomatica();
         });

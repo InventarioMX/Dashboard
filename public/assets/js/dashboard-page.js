@@ -57,6 +57,7 @@ class ChartManager {
       } else {
         Dashboard.chartFilters[this.chartId] = label;
       }
+      console.log(Dashboard.chartFilters)
       Dashboard.update(Dashboard.data)
     }
   }
@@ -88,7 +89,7 @@ const Dashboard = {
   data: {},
   data_charts:{},
   data_head:{},
-  globalFilters: {},
+  globalFilters: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
   chartFilters: {},
   DOCreatedFilter: formatarData(),
   instances_chart: [],
@@ -113,6 +114,39 @@ const Dashboard = {
     $("#D-2").click(function() {
       Dashboard.DOCreatedFilter = formatarData(2);
       Dashboard.update(this.data);
+    });
+    $("#C820_L").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_L";
+      const index = Dashboard.globalFilters[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters[key].push(value);
+      }
+      Dashboard.update(Dashboard.data);
+    });
+    $("#C820_J").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_J";
+      const index = Dashboard.globalFilters[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters[key].push(value);
+      }
+      Dashboard.update(Dashboard.data);
+    });
+    $("#C820_R").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_R";
+      const index = Dashboard.globalFilters[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters[key].push(value);
+      }
+      Dashboard.update(Dashboard.data);
     });
   },
 
@@ -334,7 +368,7 @@ const Dashboard = {
           font: {
             size: 18,
           },
-          formatter: (value) => `${value.toLocaleString('pt-BR')}`, // Formato dos rótulos
+          formatter: (value) => `${value?value.toLocaleString('pt-BR'):value}`, // Formato dos rótulos
         },
         tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
       },
@@ -551,11 +585,10 @@ const Dashboard = {
       }
 
     });
-
     
-    this.instances_head.forEach(instance => {
-      instance.update(newData[0]);
-    });
+    // this.instances_head.forEach(instance => {
+    //   instance.update(newData[0]);
+    // });
   },
   filterdata(data){
     const filteredData = data.filter(item =>
@@ -565,7 +598,9 @@ const Dashboard = {
   },
   globalfilterdata(data){
     const filteredData = data.filter(item =>
-      Object.entries(this.globalFilters).every(([key, value]) => item[key] === value)
+      Object.entries(this.globalFilters).every(([key, values]) =>
+        Array.isArray(values) ? values.includes(item[key]) : item[key] === values
+      )
     );
     return filteredData;
   },
