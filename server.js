@@ -35,8 +35,6 @@ const carregarDados = async () => {
   try {
     const data = await fs.readFile(path.join(__dirname, 'data', 'dados.json'), 'utf-8');
     let DOs = JSON.parse(data);
-    // DOs.RelatorioD2C = DOs.RelatorioD2C.filter(item => datas.includes(item['GI Date'].split(" ")[0]));
-
     return DOs;
   } catch (error) {
     console.error('Erro ao carregar os dados:', error);
@@ -63,8 +61,8 @@ fastify.get('/REC', async (request, reply) => {
 // Inicializando o servidor
 const start = async () => {
   try {
-    await fastify.listen({ port: 9000}); // , host: '105.112.157.146' 
-    console.log('Servidor rodando em http://105.112.157.146:8000');
+    await fastify.listen({ port: 9000, host: '105.112.157.146' }); // , host: '105.112.157.146' 
+    console.log('Servidor rodando em http://105.112.157.146:9000');
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

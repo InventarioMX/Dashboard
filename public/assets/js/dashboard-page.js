@@ -1,24 +1,15 @@
 class ChartManager {
-  constructor(chartId, type, data = {}, options = {},gradientcolor) {
+  constructor(chartId, type, data = {}, options = {},gradientColor) {
     this.chartId = chartId;
     this.ctx = document.getElementById(chartId).getContext("2d");
-    if (gradientcolor){
-      switch (gradientcolor) {
-        case "Azul":
-          var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
-              gradientStroke.addColorStop(1,   'rgba(29,140,248,0.2)');
-              gradientStroke.addColorStop(0.1, 'rgba(29,140,248,0.0)');
-              gradientStroke.addColorStop(0,   'rgba(29,140,248,0)');
-              data.datasets[0].backgroundColor = gradientStroke
-          break;
-        case "Verde":
-          var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
-              gradientStroke.addColorStop(1, 'rgba(66,134,121,0.2)');
-              gradientStroke.addColorStop(0.2, 'rgba(66,134,121,0.0)');
-              gradientStroke.addColorStop(0, 'rgba(66,134,121,0)');
-              data.datasets[0].backgroundColor = gradientStroke
-          break;
-      }
+    if (gradientColor) {
+      const gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
+      const colors = {
+        Azul: ['rgba(29,140,248,0)', 'rgba(29,140,248,0.0)', 'rgba(29,140,248,0.2)'],
+        Verde: ['rgba(66,134,121,0)', 'rgba(66,134,121,0.0)', 'rgba(66,134,121,0.2)']
+      };
+      colors[gradientColor]?.forEach((color, i) => gradientStroke.addColorStop(i / 2, color));
+      data.datasets[0].backgroundColor = gradientStroke;
     }
     this.chart = new Chart(this.ctx,{
       type: type,
@@ -27,16 +18,6 @@ class ChartManager {
         onClick: (event,elements) => this.handleClick(event,elements),
         maintainAspectRatio: false,
         responsive: true,
-        tooltips: {
-          backgroundColor: '#f5f5f5',
-          titleFontColor: '#333',
-          bodyFontColor: '#666',
-          bodySpacing: 4,
-          xPadding: 12,
-          mode: "nearest",
-          intersect: 0,
-          position: "nearest",
-        },
         animation: {
           duration: 2000,
         },
@@ -57,8 +38,7 @@ class ChartManager {
       } else {
         Dashboard.chartFilters[this.chartId] = label;
       }
-      console.log(Dashboard.chartFilters)
-      Dashboard.update(Dashboard.data)
+      Dashboard.update()
     }
   }
 };
@@ -89,7 +69,8 @@ const Dashboard = {
   data: {},
   data_charts:{},
   data_head:{},
-  globalFilters: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
+  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
+  globalFilters_out: {},
   chartFilters: {},
   DOCreatedFilter: formatarData(),
   instances_chart: [],
@@ -99,59 +80,31 @@ const Dashboard = {
     
     this.data = data;
 
-    this.initialize_charts();
     this.initialize_heads();
+    this.initialize_charts();
+    this.initialize_table();
+    this.initialize_buttons();
+
     this.update(data);
 
-    $("#Current").click(function() {
-      Dashboard.DOCreatedFilter = formatarData();
-      Dashboard.update(Dashboard.data);
-    });
-    $("#D-1").click(function() {
-      Dashboard.DOCreatedFilter = formatarData(1);
-      Dashboard.update(Dashboard.data);
-    });
-    $("#D-2").click(function() {
-      Dashboard.DOCreatedFilter = formatarData(2);
-      Dashboard.update(this.data);
-    });
-    $("#C820_L").click(function() {
-      const key = "Warehouse Cd.";
-      const value = "C820_L";
-      const index = Dashboard.globalFilters[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters[key].push(value);
-      }
-      Dashboard.update(Dashboard.data);
-    });
-    $("#C820_J").click(function() {
-      const key = "Warehouse Cd.";
-      const value = "C820_J";
-      const index = Dashboard.globalFilters[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters[key].push(value);
-      }
-      Dashboard.update(Dashboard.data);
-    });
-    $("#C820_R").click(function() {
-      const key = "Warehouse Cd.";
-      const value = "C820_R";
-      const index = Dashboard.globalFilters[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters[key].push(value);
-      }
-      Dashboard.update(Dashboard.data);
-    });
   },
+  initialize_heads(){
+    var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>"
+    var lastupdateDescription = " Last Update: "
 
+    var capIcon = "<i class='tim-icons  icon-app text-info'></i>"
+    var capDescription = " Capacity: "
+
+    this.headLastUpdate = new HeadManager("lastupdate",lastupdateIcon,lastupdateDescription)
+    this.headBacklog = new HeadManager("backlog")
+    this.headGID2 = new HeadManager("GID2")
+    this.headGID1 = new HeadManager("GID1")
+    this.headGICurrent = new HeadManager("GICurrent")
+    this.headCapacity = new HeadManager("Cap",capIcon,capDescription)
+    this.headPendingCap = new HeadManager("PendingCap")
+    this.headGIExpected = new HeadManager("GIExpected")
+  },
   initialize_charts(){
-
     var DataCap = {
       labels: ['Atingido', 'Faltante'],
       datasets: [{
@@ -531,39 +484,114 @@ const Dashboard = {
     this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType)
 
   },
-  initialize_heads(){
-
-    var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>"
-    var lastupdateDescription = " Last Update: "
-
-    var capIcon = "<i class='tim-icons  icon-app text-info'></i>"
-    var capDescription = " Capacity: "
-
-    this.headLastUpdate = new HeadManager("lastupdate",lastupdateIcon,lastupdateDescription)
-    this.headBacklog = new HeadManager("backlog")
-    this.headGID2 = new HeadManager("GID2")
-    this.headGID1 = new HeadManager("GID1")
-    this.headGICurrent = new HeadManager("GICurrent")
-    this.headCapacity = new HeadManager("Cap",capIcon,capDescription)
-    this.headPendingCap = new HeadManager("PendingCap")
-    this.headGIExpected = new HeadManager("GIExpected")
-
+  initialize_table(){
+    const container = document.getElementById('excelTable');
+    this.table = new Handsontable(container, {
+      data: [],
+      height: 450,
+      stretchH: 'all',
+      colHeaders: [        
+        "Warehouse Cd.",
+        "D/O No.",
+        "D/O Date",
+        "PGI Date",
+        "Item Code",
+        "Storage Location",
+        "Plant Code",
+        "Trans Method.",
+        "Order Quantity",
+        "D/O Type",
+        "Division",
+        "Status"
+      ],
+      manualColumnResize: true, // Redimensionar colunas
+      manualRowResize: true,    // Redimensionar linhas
+      filters: true,            // Habilita filtros
+      dropdownMenu: true,       // Menu suspenso para filtros
+      licenseKey: 'non-commercial-and-evaluation'
+    });
+  },
+  initialize_buttons(){
+    $("#Current").click(function() {
+      Dashboard.DOCreatedFilter = formatarData();
+      Dashboard.update();
+    });
+    $("#D-1").click(function() {
+      Dashboard.DOCreatedFilter = formatarData(1);
+      Dashboard.update();
+    });
+    $("#D-2").click(function() {
+      Dashboard.DOCreatedFilter = formatarData(2);
+      Dashboard.update();
+    });
+    $("#C820_L").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_L";
+      const index = Dashboard.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters_in[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters_in[key].push(value);
+      }
+      Dashboard.update();
+    });
+    $("#C820_J").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_J";
+      const index = Dashboard.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters_in[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters_in[key].push(value);
+      }
+      Dashboard.update();
+    });
+    $("#C820_R").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_R";
+      const index = Dashboard.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters_in[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters_in[key].push(value);
+      }
+      Dashboard.update();
+    });
+    $("#filtrarparadigma").click(function() {
+      const key = "Item Code";
+      const modelos = ["SM-S931B","SM-S936B","SM-S938B","SM-S938B","EF-GS931","EF-PS931","EF-VS931","EF-QS931","EF-MS931","EF-JS931","EF-RS931","EF-GS936","EF-PS936","EF-VS936","EF-QS936","EF-MS936","EF-JS936","EF-RS936","EF-GS938","EF-PS938","EF-VS938","EF-QS938","EF-MS938","EF-JS938","EF-RS938"];
+      if (Dashboard.globalFilters_in[key]) {
+        delete Dashboard.globalFilters_in[key];
+        $("#filtrarparadigma i").removeClass("text-info")
+        $("#filtrarparadigma span").removeClass("text-info")
+      } else {
+        Dashboard.globalFilters_in[key] = (modelos);
+        $("#filtrarparadigma i").addClass("text-info")
+        $("#filtrarparadigma span").addClass("text-info")
+      }
+      Dashboard.update();
+    });
+    $("#exibirparadigma").click(function() {
+      const key = "Item Code";
+      const modelos = ["SM-S931B","SM-S936B","SM-S938B","SM-S938B","EF-GS931","EF-PS931","EF-VS931","EF-QS931","EF-MS931","EF-JS931","EF-RS931","EF-GS936","EF-PS936","EF-VS936","EF-QS936","EF-MS936","EF-JS936","EF-RS936","EF-GS938","EF-PS938","EF-VS938","EF-QS938","EF-MS938","EF-JS938","EF-RS938"];
+      if (Dashboard.globalFilters_out[key]) {
+        delete Dashboard.globalFilters_out[key];
+      } else {
+        Dashboard.globalFilters_out[key] = (modelos);
+      }
+      Dashboard.update();
+    });
   },
   update(data){
     this.data = data || this.data ;
-    const newData = this.data;
-
-    const newDataGlobalFiltered = this.globalfilterdata(newData.RelatorioD2C);
-
+    const newDataGlobalFiltered = this.globalfilterdata(this.data.RelatorioD2C);
     const newDataChartFiltered = this.filterdata(newDataGlobalFiltered);
     const DataChartProcessed = this.ChartDataProcess(newDataChartFiltered.filter(item => item["Status"] !== "GI" ));
     const DataChartProcessedDOCreated = this.ChartDataProcess(newDataChartFiltered);
 
     this.instances_chart.forEach(instance => {
       const chartId = instance.chartId;
-
       if (DataChartProcessed[chartId]) {
-
         if(chartId == "Division"){
           instance.chart.data.labels = DataChartProcessed[chartId].labels;
           instance.chart.data.datasets[0].data = DataChartProcessed[chartId].dados
@@ -580,12 +608,34 @@ const Dashboard = {
               : 0
           );
         }
-        
         instance.chart.update();
       }
-
     });
-    
+
+    const DataTableProcessed = newDataChartFiltered.map(row => [
+      row["Warehouse Cd."] || "",
+      row["D/O No."] || "",
+      row["D/O Date"] || "",
+      row["PGI Date"] || "",
+      row["Item Code"] || "",
+      row["Storage Location"] || "",
+      row["Plant Code"] || "",
+      row["Trans Method."] || "",
+      row["Order Quantity"] || "",
+      row["D/O Type"] || "",
+      row["Division"] || "",
+      row["Status"] || ""
+    ]);
+
+    // this.table.loadData(DataTableProcessed);
+
+    // setTimeout(() => {this.table.loadData(DataTableProcessed);}, 3000);
+
+    // const Backlog = newDataGlobalFiltered
+    // .filter(row => row["PGI Date"].split(":")[0] < formatarData())
+    // .reduce((acc, item) => {return acc + item["Order Quantity"];}, 0);
+    // console.log(Backlog)
+
     // this.instances_head.forEach(instance => {
     //   instance.update(newData[0]);
     // });
@@ -597,12 +647,21 @@ const Dashboard = {
     return filteredData;
   },
   globalfilterdata(data){
-    const filteredData = data.filter(item =>
-      Object.entries(this.globalFilters).every(([key, values]) =>
+    const filter_out = data.filter(item =>
+      Object.entries(this.globalFilters_out).every(([key, values]) =>
+        key === "Item Code" ?
+        !values.includes(item[key].substr(0, 8)):
+        Array.isArray(values) ? !values.includes(item[key]) : item[key] !== values
+      )
+    );
+    const filter_in = filter_out.filter(item =>
+      Object.entries(this.globalFilters_in).every(([key, values]) =>
+        key === "Item Code" ?
+        values.includes(item[key].substr(0, 8)):
         Array.isArray(values) ? values.includes(item[key]) : item[key] === values
       )
     );
-    return filteredData;
+    return filter_in;
   },
   ChartDataProcess(tabela) {
     const dadosAgrupados = {};
