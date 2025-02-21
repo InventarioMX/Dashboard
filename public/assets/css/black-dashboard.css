@@ -1276,7 +1276,24 @@ pre code {
   }
 }
 
-@media (min-width: 1080px) {
+@media (min-width: 1310px) {
+
+  #divShipType {
+    order: 1;
+  }
+  #divStep {
+    order: 4;
+  }
+  #divDivision {
+    order: 3;
+  }
+  #divDOCreated {
+    order: 5;
+  }
+  #divTypeDO {
+    order: 2;
+  }
+
   .col-lg {
     flex-basis: 0;
     flex-grow: 1;
@@ -1458,7 +1475,24 @@ pre code {
   }
 }
 
-@media (min-width: 1300px) {
+@media (min-width: 1550px) {
+  
+  #divShipType {
+    order: 0;
+  }
+  #divStep {
+    order: 0;
+  }
+  #divDivision {
+    order: 0;
+  }
+  #divDOCreated {
+    order: 0;
+  }
+  #divTypeDO {
+    order: 0;
+  }
+
   .col-xl {
     flex-basis: 0;
     flex-grow: 1;

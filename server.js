@@ -21,16 +21,6 @@ fastify.register(fastifyStatic, {
   root: path.join(__dirname, 'public'),
 });
 
-// Função para ler e processar o JSON
-const formatarData = (diasAtras = 0) => {
-  let data = new Date();
-  data.setDate(data.getDate() - diasAtras);
-  return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
-
-const datas = [formatarData(),formatarData(1),formatarData(2)];
-console.log(datas)
-
 const carregarDados = async () => {
   try {
     const data = await fs.readFile(path.join(__dirname, 'data', 'dados.json'), 'utf-8');
@@ -61,8 +51,7 @@ fastify.get('/REC', async (request, reply) => {
 // Inicializando o servidor
 const start = async () => {
   try {
-    await fastify.listen({ port: 9000, host: '105.112.157.146' }); // , host: '105.112.157.146' 
-    console.log('Servidor rodando em http://105.112.157.146:9000');
+    await fastify.listen({ port: 9000, host: '0.0.0.0' });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
