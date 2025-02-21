@@ -21,25 +21,60 @@ class ChartManager {
         animation: {
           duration: 2000,
         },
-        legend: {
-          display: false
+        tooltips: {
+          backgroundColor: '#f5f5f5',
+          titleFontColor: '#333',
+          bodyFontColor: '#666',
+          bodySpacing: 4,
+          xPadding: 12,
+          mode: "nearest",
+          intersect: 0,
+          position: "nearest",
         },
+        legend: chartId == "D/O Type"
+          ? 
+            {
+              position: 'bottom',
+              align: 'center',
+              Size: 20,
+              labels: {
+                fontColor: "#9e9e9e",
+                padding: 20,
+                fontSize: 14,
+              },
+              onClick: (event, legendItem) => this.legendClick(event, legendItem),
+            }
+          :
+            {
+              display: false,
+            }
+        ,
         ...options
       }
     });
     Dashboard.instances_chart.push(this);
   }
+  legendClick(event, legendItem){
+    const label = legendItem.text;
+    if (Dashboard.chartFilters_in[this.chartId] === label) {
+      delete Dashboard.chartFilters_in[this.chartId]
+    } else {
+      Dashboard.chartFilters_in[this.chartId] = label;
+    }
+    Dashboard.update_charts();
+    Dashboard.update_tables();
+  }
   handleClick(event,elements) {
     if (elements.length > 0) {
       const index = elements[0]._index;
       const label =  this.chartId == "D/O Date"? Dashboard.DOCreatedFilter + " " + this.chart.data.labels[index]: this.chart.data.labels[index]
-      if (Dashboard.chartFilters[this.chartId] === label) {
-        delete Dashboard.chartFilters[this.chartId]
+      if (Dashboard.chartFilters_in[this.chartId] === label) {
+        delete Dashboard.chartFilters_in[this.chartId]
       } else {
-        Dashboard.chartFilters[this.chartId] = label;
+        Dashboard.chartFilters_in[this.chartId] = label;
       }
-      Dashboard.update_charts()
-      Dashboard.update_tables()
+      Dashboard.update_charts();
+      Dashboard.update_tables();
     }
   }
 };
@@ -66,17 +101,20 @@ const formatarData = (diasAtras = 0) => {
   return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
+const StrToDate = (str) => {
+  var date = new Date(str.split('/').reverse().join('/'));
+  return date;
+}
+
 let fulldata = null;
 let d2cdata = null;
 
 const Dashboard = {
 
-  data: {},
-  data_charts:{},
-  data_head:{},
   globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
   globalFilters_out: {},
-  chartFilters: {},
+  chartFilters_in: {},
+  chartFilters_out: {},
   DOCreatedFilter: formatarData(),
   instances_chart: [],
   instances_head: [],
@@ -170,15 +208,9 @@ const Dashboard = {
         backgroundColor: 'rgba(66,134,121,0.2)',
         borderColor: '#00f2c3',
         borderWidth: 2,
-        borderDash: [],
-        borderDashOffset: 0.0,
         pointBackgroundColor: '#00f2c3',
         pointBorderColor: 'rgba(255,255,255,0)',
-        pointHoverBackgroundColor: '#00d6b4',
-        pointBorderWidth: 20,
-        pointHoverRadius: 4,
-        pointHoverBorderWidth: 15,
-        pointRadius: 4,
+        pointRadius: 5,
         data: TransmetodLabels.map(label => 0),
       }],
     };
@@ -303,14 +335,14 @@ const Dashboard = {
         },
         datalabels: {
           color: 'rgba(255, 255, 255, 0.8)',
-          anchor: "end",  // Alinha ao final da barra
-          align: "right",  // Posiciona o texto à direita da barra
+          anchor: "end",  
+          align: "right", 
           offset: 10,
           padding: 10,
           font: {
             size: 18,
           },
-          formatter: (value) => `${value?value.toLocaleString('pt-BR'):value}`, // Formato dos rótulos
+          formatter: (value) => `${value?value.toLocaleString('pt-BR'):value}`,
         },
         tooltip: { callbacks: { label: (context) => `Quantidade: ${context.raw}` } }
       },
@@ -377,7 +409,7 @@ const Dashboard = {
           font: {
             size: 25,
           },
-          formatter: (value) => `${value.toLocaleString('pt-BR')}`, // Formato dos rótulos
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
         },
       },
       scales: {
@@ -432,16 +464,6 @@ const Dashboard = {
     var OptionsType = {
       cutoutPercentage: 50,
       maintainAspectRatio: false,
-      legend: {
-        position: 'bottom',
-        align: 'center',
-        Size: 20,
-        labels: {
-          fontColor: "#9e9e9e",
-          padding: 20,
-          fontSize: 14,
-        },
-      },
       plugins: {
         datalabels: {
           color: 'rgb(255, 255, 255)',
@@ -491,10 +513,10 @@ const Dashboard = {
         "Division",
         "Status"
       ],
-      manualColumnResize: true, // Redimensionar colunas
-      manualRowResize: true,    // Redimensionar linhas
-      filters: true,            // Habilita filtros
-      dropdownMenu: true,       // Menu suspenso para filtros
+      manualColumnResize: true, 
+      manualRowResize: true,    
+      filters: true,            
+      dropdownMenu: true,       
       licenseKey: 'non-commercial-and-evaluation'
     });
   },
@@ -569,15 +591,21 @@ const Dashboard = {
       Dashboard.update();
     });
     $("#btn_backlog").click(function() {
-      const key = "Warehouse Cd.";
-      const value = "C820_R";
-      const index = Dashboard.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters_in[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters_in[key].push(value);
-      }
-      Dashboard.update();
+      const filtros = {
+        "Status": ["GI"],
+        "Storage Location": ["FCBA"],
+        "Trans Method.": ["T01", "M02"],
+        "PGI Date": formatarData()
+      };
+      Object.entries(filtros).forEach(([key, value]) => {
+        if (Dashboard.chartFilters_out[key]) {
+          delete Dashboard.chartFilters_out[key];
+        } else {
+          Dashboard.chartFilters_out[key] = value;
+        }
+      });
+      Dashboard.update_charts();
+      Dashboard.update_tables();
     });
   },
   update(data){
@@ -596,21 +624,20 @@ const Dashboard = {
 
     const lastupdate = fulldata.UltAtualizacao[0].Atualizacao;
 
-    // Pré-calcula as datas necessárias
     const dataAtual = formatarData();
     const dataMenos1 = formatarData(1);
     const dataMenos2 = formatarData(2);
 
-    // Processa os valores de GI e Backlog de forma otimizada
-    let Backlog = 0, GI_DMenos2 = 0, GI_DMenos1 = 0, GI_Current = 0, GI_Exp = 0;
-    let expected = ["Checking","Mf.Created","Loading"]
+    let Backlog = 0, GI_DMenos2 = 0, GI_DMenos1 = 0, GI_Current = 0, GI_Exp = 0, inprocess = 0;
+    let expected = ["Checking","Mf.Created","Loading"];
+    let trsMethod = ["T01","M02"];
 
     datadfiltered.forEach(row => {
         const pgiDate = row["PGI Date"].split(" ")[0];
         const giDate = row["GI Date"].split(" ")[0];
         const orderQty = row["Order Quantity"];
 
-        if (row["Status"] !== "GI" && pgiDate < dataAtual) {
+        if (row["Storage Location"] !== "FCBA" && row["Status"] !== "GI" && StrToDate(pgiDate) < StrToDate(dataAtual) && !trsMethod.includes(row["Trans Method."])) {
           Backlog += orderQty;
         }
         if (giDate === dataMenos2) {
@@ -625,7 +652,12 @@ const Dashboard = {
         if (expected.includes(row["Status"])){
           GI_Exp += orderQty;
         }
+        if (row["Status"] !== "GI"){
+          inprocess += orderQty;
+        }
     });
+
+    GI_Exp = GI_Exp + GI_Current
 
     const Capacidade = fulldata.Capacidade
     .filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."]))
@@ -637,7 +669,9 @@ const Dashboard = {
     var lastupdateDescription = " Last Update: ";
 
     var capIcon = "<i class='tim-icons  icon-app text-info'></i>";
-    var capDescription = " Capacity:";
+    var capDescription = " Target: ";
+
+    var inprocessDescription = "In process: "
 
     document.getElementById("lastupdate").innerHTML = lastupdateIcon + lastupdateDescription + (lastupdate.toLocaleString('pt-BR'));
     document.getElementById("backlog").innerHTML = Backlog.toLocaleString('pt-BR');
@@ -647,6 +681,7 @@ const Dashboard = {
     document.getElementById("Cap").innerHTML = (capIcon + capDescription + Capacidade.toLocaleString('pt-BR'));
     document.getElementById("PendingCap").innerHTML = PendingCap.toLocaleString('pt-BR');
     document.getElementById("GIExpected").innerHTML = GI_Exp.toLocaleString('pt-BR');
+    document.getElementById("inprocess").innerHTML = inprocessDescription + inprocess.toLocaleString('pt-BR');
     
     const currentValue = Math.round(GI_Current / Capacidade * 100) > 100 ? 100 : Math.round(GI_Current / Capacidade * 100);
     this.myChartCap.chart.data.datasets[0].data = [currentValue, 100-currentValue];
@@ -667,7 +702,6 @@ const Dashboard = {
       ["Trans Method.","Status","Division","D/O Type"]
     );
 
-    // Atualiza gráficos sem criar cópias desnecessárias
     this.instances_chart.forEach(instance => {
         const { chartId, chart } = instance;
         const isDODate = chartId === "D/O Date";
@@ -677,21 +711,24 @@ const Dashboard = {
           const { labels, dados } = chartData[chartId];
 
           if (chartId === "Division") {
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = dados;
+            const sortedData = labels
+            .map((label, index) => ({ label, value: dados[index] }))
+            .sort((a, b) => b.value - a.value); 
+            chart.data.labels = sortedData.map(item => item.label);
+            chart.data.datasets[0].data = sortedData.map(item => item.value);
           } else if(chartId === "D/O Date") {
-            chart.data.datasets[0].data = chart.data.labels.map(label => {
-              const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
-              const index = labels.indexOf(searchLabel);
-              return index >= 0 ? dados[index] : 0;
-            });
-            chart.data.datasets[1].data = Array(24).fill(Math.round(fulldata.Capacidade.reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
+              chart.data.datasets[0].data = chart.data.labels.map(label => {
+                const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
+                const index = labels.indexOf(searchLabel);
+                return index >= 0 ? dados[index] : 0;
+              });
+              chart.data.datasets[1].data = Array(24).fill(Math.round(fulldata.Capacidade.reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
           } else {
-            chart.data.datasets[0].data = chart.data.labels.map(label => {
-              const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
-              const index = labels.indexOf(searchLabel);
-              return index >= 0 ? dados[index] : 0;
-            });
+              chart.data.datasets[0].data = chart.data.labels.map(label => {
+                const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
+                const index = labels.indexOf(searchLabel);
+                return index >= 0 ? dados[index] : 0;
+              });
           }
           chart.update();
         }
@@ -718,17 +755,28 @@ const Dashboard = {
     );
   },
   filterdata(data){
-    const filteredData = data.filter(item =>
-      Object.entries(this.chartFilters).every(([key, value]) => key == "D/O Date"? item[key].split(":")[0]+":00" === value: item[key] === value)
+    const filter_out = data.filter(item =>
+      Object.entries(this.chartFilters_out).every(([key, values]) =>
+        key === "PGI Date" ?
+          StrToDate(item[key]) < StrToDate(values):
+          Array.isArray(values) ?
+            !values.includes(item[key]) : item[key] !== values
+      )
     );
-    return filteredData;
+    const filter_in = filter_out.filter(item =>
+      Object.entries(this.chartFilters_in).every(([key, value]) => key == "D/O Date"? item[key].split(":")[0]+":00" === value: item[key] === value)
+    );
+    return filter_in;
   },
   globalfilterdata(data){
     const filter_out = data.filter(item =>
       Object.entries(this.globalFilters_out).every(([key, values]) =>
         key === "Item Code" ?
-        !values.includes(item[key].substr(0, 8)):
-        Array.isArray(values) ? !values.includes(item[key]) : item[key] !== values
+          !values.includes(item[key].substr(0, 8)):
+          key === "PGI Date" ?
+            StrToDate(item[key]) < StrToDate(values):
+            Array.isArray(values) ?
+              !values.includes(item[key]) : item[key] !== values
       )
     );
     const filter_in = filter_out.filter(item =>
@@ -745,8 +793,8 @@ const Dashboard = {
   
     tabela.forEach(row => {
       Object.keys(row).forEach(coluna => {
-        if (coluna !== "Order Quantity") { // Ignora a coluna de soma diretamente
-          const chave = coluna; // Define o nome do gráfico dinamicamente
+        if (coluna !== "Order Quantity") { 
+          const chave = coluna; 
 
           dadosAgrupados[chave] ??= {};
           let categoria = chave=="D/O Date" ? row[chave].split(":")[0] + ":00" : row[chave];
@@ -757,7 +805,6 @@ const Dashboard = {
       });
     });
 
-    // Converter para o formato de gráfico
     const Data = {};
     Object.entries(dadosAgrupados).forEach(([chartId, data]) => {
       if(chartIds.includes(chartId)){
