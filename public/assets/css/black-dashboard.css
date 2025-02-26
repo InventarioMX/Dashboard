@@ -4975,7 +4975,7 @@ input[type="button"].btn-block {
   }
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 2991.98px) {
 
   .navbar-expand-lg>.container,
   .navbar-expand-lg>.container-fluid {
@@ -5013,7 +5013,7 @@ input[type="button"].btn-block {
     flex-basis: auto;
   }
 
-  .navbar-expand-lg .navbar-toggler {
+  .navbar-expand-lg .navbar-toggler.none {
     display: none;
   }
 }
@@ -16071,9 +16071,11 @@ img {
     color: #344675;
   }
 
+}
   .navbar button.navbar-toggler[data-target="#navigation"] {
     padding-top: 0;
   }
+
 
   .navbar .navbar-toggler-bar {
     display: block;
@@ -16449,9 +16451,9 @@ img {
       opacity: 1;
     }
   }
-}
 
-@media screen and (min-width: 992px) {
+
+@media screen and (min-width: 2992px) {
   .navbar-collapse {
     background: none !important;
   }
@@ -17744,11 +17746,11 @@ table.tablesorter thead tr .headerSortDown {
 
 .sidebar[data="blue"],
 .off-canvas-sidebar[data="blue"] {
-  background: #3358f4;
-  background: -webkit-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
-  background: -o-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
-  background: -moz-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
-  background: linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
+  background: #14299f;
+  background: -webkit-linear-gradient(0deg, #3358f4 0%, #14299f 70%);
+  background: -o-linear-gradient(0deg, #3358f4 0%, #14299f 70%);
+  background: -moz-linear-gradient(0deg, #3358f4 0%, #14299f 70%);
+  background: linear-gradient(0deg, #3358f4 0%, #14299f 70%);
 }
 
 .sidebar[data="green"],
@@ -17856,7 +17858,7 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .main-panel[data="blue"] {
-  border-top: 2px solid #1d8cf8;
+  border-top: 2px solid #14299f;
 }
 
 .main-panel[data="green"] {
@@ -17886,7 +17888,7 @@ table.tablesorter thead tr .headerSortDown {
   max-height: 100%;
 }
 
-@media (min-width: 991px) {
+@media (min-width: 2991px) {
 
   .sidebar,
   .main-panel,
@@ -18037,7 +18039,7 @@ table.tablesorter thead tr .headerSortDown {
   height: 380px;
 }
 
-@media screen and (max-width: 1991px) {
+@media screen and (max-width: 2991px) {
   .sidebar {
     position: fixed;
     display: block;
@@ -18061,25 +18063,25 @@ table.tablesorter thead tr .headerSortDown {
   }
 }
 
-@media screen and (max-width: 1991px) and (prefers-reduced-motion: reduce) {
+@media screen and (max-width: 2991px) and (prefers-reduced-motion: reduce) {
   .sidebar {
     transition: none;
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 2991px) {
   .wrapper {
     transition: 0.5s, cubic-bezier(0.685, 0.0473, 0.346, 1);
   }
 }
 
-@media screen and (max-width: 991px) and (prefers-reduced-motion: reduce) {
+@media screen and (max-width: 2991px) and (prefers-reduced-motion: reduce) {
   .wrapper {
     transition: none;
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 2991px) {
   .main-panel {
     width: 100%;
   }
@@ -18107,13 +18109,13 @@ table.tablesorter thead tr .headerSortDown {
   }
 }
 
-@media screen and (max-width: 991px) and (prefers-reduced-motion: reduce) {
+@media screen and (max-width: 2991px) and (prefers-reduced-motion: reduce) {
   .nav-open .sidebar {
     transition: none;
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 2991px) {
   .nav-open .sidebar:before {
     content: unset;
   }
@@ -18171,7 +18173,7 @@ table.tablesorter thead tr .headerSortDown {
   }
 }
 
-@media screen and (max-width: 991px) and (prefers-reduced-motion: reduce) {
+@media screen and (max-width: 2991px) and (prefers-reduced-motion: reduce) {
   #bodyClick {
     transition: none;
   }

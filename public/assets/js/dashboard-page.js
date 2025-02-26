@@ -1,5 +1,5 @@
 class ChartManager {
-  constructor(chartId, type, data = {}, options = {},gradientColor) {
+  constructor(chartId, type, data = {}, options = {},gradientColor,tela) {
     this.chartId = chartId;
     this.ctx = document.getElementById(chartId).getContext("2d");
     if (gradientColor) {
@@ -15,7 +15,7 @@ class ChartManager {
       type: type,
       data: data,
       options: {
-        onClick: (event,elements) => this.handleClick(event,elements),
+        onClick: (event,elements) => this.handleClick(event,elements,tela),
         maintainAspectRatio: false,
         responsive: true,
         animation: {
@@ -42,7 +42,7 @@ class ChartManager {
                 padding: 20,
                 fontSize: 14,
               },
-              onClick: (event, legendItem) => this.legendClick(event, legendItem),
+              onClick: (event, legendItem) => this.legendClick(event, legendItem, tela),
             }
           :
             {
@@ -52,29 +52,30 @@ class ChartManager {
         ...options
       }
     });
-    Dashboard.instances_chart.push(this);
+    tela.instances_chart.push(this);
   }
-  legendClick(event, legendItem){
+  legendClick(event, legendItem, tela){
     const label = legendItem.text;
-    if (Dashboard.chartFilters_in[this.chartId] === label) {
-      delete Dashboard.chartFilters_in[this.chartId]
+    if (tela.chartFilters_in[this.chartId] === label) {
+      delete tela.chartFilters_in[this.chartId]
     } else {
-      Dashboard.chartFilters_in[this.chartId] = label;
+      tela.chartFilters_in[this.chartId] = label;
     }
-    Dashboard.update_charts();
-    Dashboard.update_tables();
+    tela.update_charts("Click");
+    tela.update_tables();
+    console.log(chartFilters_in[this.chartId])
   }
-  handleClick(event,elements) {
+  handleClick(event,elements,tela) {
     if (elements.length > 0) {
       const index = elements[0]._index;
-      const label =  this.chartId == "D/O Date"? Dashboard.DOCreatedFilter + " " + this.chart.data.labels[index]: this.chart.data.labels[index]
-      if (Dashboard.chartFilters_in[this.chartId] === label) {
-        delete Dashboard.chartFilters_in[this.chartId]
+      const label =  this.chartId == "D/O Date"? tela.DOCreatedFilter + " " + this.chart.data.labels[index]: this.chart.data.labels[index]
+      if (tela.chartFilters_in[this.chartId] === label) {
+        delete tela.chartFilters_in[this.chartId]
       } else {
-        Dashboard.chartFilters_in[this.chartId] = label;
+        tela.chartFilters_in[this.chartId] = label;
       }
-      Dashboard.update_charts();
-      Dashboard.update_tables();
+      tela.update_charts("Click");
+      tela.update_tables();
     }
   }
 };
@@ -108,6 +109,7 @@ const StrToDate = (str) => {
 
 let fulldata = null;
 let d2cdata = null;
+let ordem_status = ["W.Pre-Visit","CARR_ID Incorreto","P.Ship","W.Booking","W.Allocation","Allocation","Picking","Pick Send","With NF","Print","Checking","Mv. Dock","Mf.Created","Loading","GI"]
 
 const Dashboard = {
 
@@ -144,7 +146,7 @@ const Dashboard = {
         pointRadius: 4,
         backgroundColor: ["#00f2c3","rgba(0, 242, 194, 0.05)"],
         borderWidth: 3,
-        data: [78 , 22],
+        data: [],
       }],
     }
     var OptionsCap = {
@@ -198,10 +200,8 @@ const Dashboard = {
       
     };
 
-    const TransmetodLabels = [...new Set(d2cdata.map(row => row["Trans Method."]))];
-
     var DataTransmetod = {
-      labels: TransmetodLabels,
+      labels: [],
       datasets: [{
         label: "Itens",
         fill: true,
@@ -211,7 +211,7 @@ const Dashboard = {
         pointBackgroundColor: '#00f2c3',
         pointBorderColor: 'rgba(255,255,255,0)',
         pointRadius: 5,
-        data: TransmetodLabels.map(label => 0),
+        data: [],
       }],
     };
     var OptionsTransmetod = {
@@ -254,21 +254,15 @@ const Dashboard = {
       },
     };
 
-    var ordem_status = ["00_Waiting Pre-Visit","00_CARR_ID Incorreto","P.Shipmment","W.Booking","W.Allocation","Allocation","Picking","With NF","Print","Checking","Mf.Created","Loading","GI"]
-    const StatusLabels = [...new Set(d2cdata
-      .filter(item => item["Status"] !== "GI" )
-      .map(row => row["Status"]))]
-      .sort((a, b) => { return ordem_status.indexOf(a) - ordem_status.indexOf(b); });
-
     var DataStatus = {
-      labels: StatusLabels,
+      labels: [],
       datasets: [{
         label:"Itens",
         fill: true,
         backgroundColor:"rgba(31, 143, 241, 0.05)",
         borderColor: '#1f8ef1',
         borderWidth: 2,
-        data: StatusLabels.map(label => 0),
+        data: [],
       }]
     };
     var OptionsStatus = {
@@ -285,12 +279,11 @@ const Dashboard = {
       },
       scales: {
         yAxes: [{
+          display: false, // Oculta o eixo Y
           gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.1)',
-            zeroLineColor: "transparent",
-          },
-          display:false,
+              drawBorder: false, // Remove a borda do eixo
+              display: false // Remove as linhas do grid do eixo Y
+          }
         }],
         xAxes: [{
           gridLines: {
@@ -299,6 +292,8 @@ const Dashboard = {
             zeroLineColor: "transparent",
           },
           ticks: {
+            autoSkip: false,
+            maxRotation: 0,
             fontSize: 17,
             padding: 20,
             fontColor: "#9e9e9e"
@@ -315,17 +310,15 @@ const Dashboard = {
       },
     };
 
-    let DivisionLabels = [...new Set(d2cdata.map(row => row["Division"]))];
-
     var DataDivision = {
-      labels: DivisionLabels,
+      labels: [],
       datasets: [{
         label: "Itens",
         fill: true,
         backgroundColor: "rgba(0, 242, 194, 0.02)",
         borderColor: '#1f8ef1',
         borderWidth: 2,
-        data: DivisionLabels.map(label => 0),
+        data: [],
       }]
     }
     var OptionsDivision = {
@@ -448,17 +441,15 @@ const Dashboard = {
       },
     };
 
-    const TypeLabels = [...new Set(d2cdata.map(row => row["D/O Type"]))];
-
     var DataType = {
-      labels: TypeLabels,
+      labels: [],
       datasets: [{
         label: "Itens",
         borderColor: ["#00f2c3","#1f8ef1"],
         fill: true,
         backgroundColor: ["rgba(0, 242, 194, 0.05)","rgba(31, 143, 241, 0.05)"],
         borderWidth: 3,
-        data: TypeLabels.map(label => 0)
+        data: [],
       }]
     }
     var OptionsType = {
@@ -485,12 +476,12 @@ const Dashboard = {
       },
     };
 
-    this.myChartCap = new ChartManager("CapPorcent","doughnut",DataCap,OptionsCap);
-    this.myChartTransmetod = new ChartManager("Trans Method.","line",DataTransmetod,OptionsTransmetod,"Verde");
-    this.myChartStatus = new ChartManager("Status","bar",DataStatus,OptionsStatus,"Azul");
-    this.myChartDivision = new ChartManager("Division","horizontalBar",DataDivision,OptionsDivision,"Azul");
-    this.myChartDOCreated = new ChartManager("D/O Date","line",DataDOCreated,OptionsDOCreated,"Azul");
-    this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType)
+    this.myChartCap = new ChartManager("CapPorcent","doughnut",DataCap,OptionsCap,"",this);
+    this.myChartTransmetod = new ChartManager("Trans Method.","line",DataTransmetod,OptionsTransmetod,"Verde",this);
+    this.myChartStatus = new ChartManager("Status","bar",DataStatus,OptionsStatus,"Azul",this);
+    this.myChartDivision = new ChartManager("Division","horizontalBar",DataDivision,OptionsDivision,"Azul",this);
+    this.myChartDOCreated = new ChartManager("D/O Date","line",DataDOCreated,OptionsDOCreated,"Azul",this);
+    this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType,"",this)
 
   },
   initialize_table(){
@@ -688,7 +679,7 @@ const Dashboard = {
     this.myChartCap.chart.update();
 
   },
-  update_charts(){
+  update_charts(type){
     const processedChartDataDOCreated = this.ChartDataProcess(
       this.globalfilterdata(
         this.filterdata(d2cdata)
@@ -701,6 +692,7 @@ const Dashboard = {
       ),
       ["Trans Method.","Status","Division","D/O Type"]
     );
+    const ignoredCharts = ["CapPorcent"]
 
     this.instances_chart.forEach(instance => {
         const { chartId, chart } = instance;
@@ -710,26 +702,48 @@ const Dashboard = {
         if (chartData?.[chartId]) {
           const { labels, dados } = chartData[chartId];
 
-          if (chartId === "Division") {
-            const sortedData = labels
-            .map((label, index) => ({ label, value: dados[index] }))
-            .sort((a, b) => b.value - a.value); 
-            chart.data.labels = sortedData.map(item => item.label);
-            chart.data.datasets[0].data = sortedData.map(item => item.value);
-          } else if(chartId === "D/O Date") {
-              chart.data.datasets[0].data = chart.data.labels.map(label => {
-                const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
-                const index = labels.indexOf(searchLabel);
-                return index >= 0 ? dados[index] : 0;
-              });
-              chart.data.datasets[1].data = Array(24).fill(Math.round(fulldata.Capacidade.reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
+          if (type === "Click") {
+
+            chart.data.datasets[0].data = chart.data.labels.map(label => {
+              const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
+              const index = labels.indexOf(searchLabel);
+              return index >= 0 ? dados[index] : 0;
+            });
+            
           } else {
+            if (chartId === "Division") {
+
+              const sortedData = labels
+              .map((label, index) => ({ label, value: dados[index] }))
+              .sort((a, b) => b.value - a.value); 
+              chart.data.labels = sortedData.map(item => item.label);
+              chart.data.datasets[0].data = sortedData.map(item => item.value);
+
+            } else if (chartId === "Status") {
+
+              const sortedData = labels
+              .map((label, index) => ({ label, value: dados[index] }))
+              .sort((a, b) => { return ordem_status.indexOf(a.label) - ordem_status.indexOf(b.label); }); 
+              chart.data.labels = sortedData.map(item => item.label);
+              chart.data.datasets[0].data = sortedData.map(item => item.value);
+
+            } else if(chartId === "D/O Date") {
+
               chart.data.datasets[0].data = chart.data.labels.map(label => {
                 const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
                 const index = labels.indexOf(searchLabel);
                 return index >= 0 ? dados[index] : 0;
               });
+              chart.data.datasets[1].data = Array(24).fill(Math.round(fulldata.Capacidade.filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."])).reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
+            
+            } else {
+              chart.data.labels = labels;
+              chart.data.datasets[0].data = dados;
+            }
           }
+          chart.update();
+        } else if(!ignoredCharts.includes(chartId)) {
+          chart.data.datasets[0].data = []
           chart.update();
         }
     });
@@ -816,4 +830,495 @@ const Dashboard = {
     });
     return Data;
   }
+};
+
+const Aging = {
+  globalFilters_in: {"Status":[]},
+  globalFilters_out: {"Status":[]},
+  chartFilters_in: {},
+  chartFilters_out: {},
+  instances_chart: [],
+  instances_head: [],
+
+  Aging_start(data){
+    
+    fulldata = data;
+    d2cdata = data.RelatorioD2C;
+
+    this.initialize_charts();
+    this.initialize_table();
+    this.initialize_buttons();
+
+    this.update();
+
+  },
+  initialize_charts(){
+    const Labels = ["até 30m","30m até 1h","Maior que 1h"];
+
+    var DataPendCheck = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [50,70,90]
+      }]
+    }
+    var OptionsPendCheck = {
+      maintainAspectRatio: false,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'end',
+          align: 'top',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 40,
+          bottom: 0
+        }
+      },
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(29,140,248,0.1)',
+            zeroLineColor: "transparent",
+          },
+          ticks: {
+            beginAtZero: true,
+          },
+          display:false,
+        }],
+        xAxes: [{
+          gridLines: {
+            drawBorder: false,
+            color: 'rgba(29,140,248,0.1)',
+            zeroLineColor: "transparent",
+          },
+          ticks: {
+            fontSize: 17,
+            padding: 20,
+            fontColor: "#9e9e9e"
+          },
+        }]
+      },
+    };
+
+    var DataPendManifest = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [50,70,90]
+      }]
+    }
+    var OptionsPendManifest = {
+      maintainAspectRatio: false,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+    };
+
+    var DataPendLoad = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [50,70,90]
+      }]
+    }
+    var OptionsPendLoad = {
+      cutoutPercentage: 70,
+      maintainAspectRatio: false,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true, // Mantém apenas as linhas circulares
+            display: false // Remove todas as linhas, inclusive as radiais
+        },
+        angleLines: {
+            display: false // Remove as linhas radiais
+        },
+        ticks: {
+          display: false // Remove os números da escala radial
+        }
+      },
+    };
+
+    var DataPendGI = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [50,70,90]
+      }]
+    }
+    var OptionsPendGI = {
+      cutoutPercentage: 65,
+      maintainAspectRatio: false,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+    };
+
+    this.myChartPendCheck = new ChartManager("Chart_PendCheck","bar",DataPendCheck,OptionsPendCheck,"",this);
+    this.myChartPendManifest = new ChartManager("Chart_PendManifest","pie",DataPendManifest,OptionsPendManifest,"",this);
+    this.myChartPendLoad = new ChartManager("Chart_PendLoad","polarArea",DataPendLoad,OptionsPendLoad,"",this);
+    this.myChartPendGI = new ChartManager("Chart_PendGI","doughnut",DataPendGI,OptionsPendGI,"",this);
+  },
+  initialize_table(){
+    const container = document.getElementById('excelTable');
+    this.table = new Handsontable(container, {
+      data: [],
+      height: 450,
+      stretchH: 'all',
+      colHeaders: [        
+        "Warehouse Cd.",
+        "D/O No.",
+        "Item Code",
+        "Order Quantity",
+        "D/O Date",
+        "PGI Date",
+        "Pick Date",
+        "Check Date",
+        "Manifest Date",
+        "Load Date",
+        "Lsp Name",
+        "Storage Location",
+        "Plant Code",
+        "Trans Method.",
+        "D/O Type",
+        "Division",
+        "Status"
+      ],
+      manualColumnResize: true, 
+      manualRowResize: true,    
+      filters: true,            
+      dropdownMenu: true,       
+      licenseKey: 'non-commercial-and-evaluation'
+    });
+  },
+  initialize_buttons(){
+    $("#btn_check").click(function() {
+      const key = "Status";
+      const value = "With NF";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      // Aging.update();
+      console.log(Aging.globalFilters_in);
+    });
+    $("#btn_manifest").click(function() {
+      const key = "Status";
+      const value = "Checking";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      Aging.update();
+      console.log(globalFilters_in)
+    });
+    $("#btn_load").click(function() {
+      const key = "Status";
+      const value = "Mf.Created";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      Aging.update();
+      console.log(globalFilters_in)
+    });
+    $("#btn_gi").click(function() {
+      const key = "Status";
+      const value = "Loading";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      Aging.update();
+      console.log(globalFilters_in)
+    });
+  },
+  update(data){
+    if(data){
+      fulldata = data;
+      d2cdata = data.RelatorioD2C;
+    }
+
+    this.update_heads();
+    this.update_charts();
+    this.update_tables();
+  },
+  update_heads(){
+
+    const datadfiltered = this.globalfilterdata(d2cdata);
+
+    const lastupdate = fulldata.UltAtualizacao[0].Atualizacao;
+
+    const dataAtual = formatarData();
+    const dataMenos1 = formatarData(1);
+    const dataMenos2 = formatarData(2);
+
+    let Backlog = 0, GI_DMenos2 = 0, GI_DMenos1 = 0, GI_Current = 0, GI_Exp = 0, inprocess = 0;
+    let expected = ["Checking","Mf.Created","Loading"];
+    let trsMethod = ["T01","M02"];
+
+    datadfiltered.forEach(row => {
+        const pgiDate = row["PGI Date"].split(" ")[0];
+        const giDate = row["GI Date"].split(" ")[0];
+        const orderQty = row["Order Quantity"];
+
+        if (row["Storage Location"] !== "FCBA" && row["Status"] !== "GI" && StrToDate(pgiDate) < StrToDate(dataAtual) && !trsMethod.includes(row["Trans Method."])) {
+          Backlog += orderQty;
+        }
+        if (giDate === dataMenos2) {
+          GI_DMenos2 += orderQty;
+        }
+        if (giDate === dataMenos1) {
+          GI_DMenos1 += orderQty;
+        }
+        if (giDate === dataAtual) {
+          GI_Current += orderQty;
+        }
+        if (expected.includes(row["Status"])){
+          GI_Exp += orderQty;
+        }
+        if (row["Status"] !== "GI"){
+          inprocess += orderQty;
+        }
+    });
+
+    GI_Exp = GI_Exp + GI_Current
+
+    const Capacidade = fulldata.Capacidade
+    .filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."]))
+    .reduce((acc, item) => {return acc + item["Cap"];}, 0);
+
+    const PendingCap = GI_Current > Capacidade ? 0 : Capacidade - GI_Current;
+
+    var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>";
+    var lastupdateDescription = " Last Update: ";
+
+    var capIcon = "<i class='tim-icons  icon-app text-info'></i>";
+    var capDescription = " Target: ";
+
+    var inprocessDescription = "In process: "
+
+    document.getElementById("lastupdate").innerHTML = lastupdateIcon + lastupdateDescription + (lastupdate.toLocaleString('pt-BR'));
+    document.getElementById("backlog").innerHTML = Backlog.toLocaleString('pt-BR');
+    document.getElementById("GID2").innerHTML = GI_DMenos2.toLocaleString('pt-BR');
+    document.getElementById("GID1").innerHTML = GI_DMenos1.toLocaleString('pt-BR');
+    document.getElementById("GICurrent").innerHTML = (GI_Current.toLocaleString('pt-BR'))
+    document.getElementById("Cap").innerHTML = (capIcon + capDescription + Capacidade.toLocaleString('pt-BR'));
+    document.getElementById("PendingCap").innerHTML = PendingCap.toLocaleString('pt-BR');
+    document.getElementById("GIExpected").innerHTML = GI_Exp.toLocaleString('pt-BR');
+    document.getElementById("inprocess").innerHTML = inprocessDescription + inprocess.toLocaleString('pt-BR');
+    
+    const currentValue = Math.round(GI_Current / Capacidade * 100) > 100 ? 100 : Math.round(GI_Current / Capacidade * 100);
+    this.myChartCap.chart.data.datasets[0].data = [currentValue, 100-currentValue];
+    this.myChartCap.chart.update();
+
+  },
+  update_charts(type){
+    const processedChartDataDOCreated = this.ChartDataProcess(
+      this.globalfilterdata(
+        this.filterdata(d2cdata)
+      ),
+      ["D/O Date"]
+    );
+    const processedChartData = this.ChartDataProcess(
+      this.globalfilterdata(
+        this.filterdata(d2cdata.filter(item => item["Status"] !== "GI"))
+      ),
+      ["Trans Method.","Status","Division","D/O Type"]
+    );
+    const ignoredCharts = ["CapPorcent"]
+
+    this.instances_chart.forEach(instance => {
+        const { chartId, chart } = instance;
+        const isDODate = chartId === "D/O Date";
+        const chartData = isDODate ? processedChartDataDOCreated : processedChartData;
+
+        if (chartData?.[chartId]) {
+          const { labels, dados } = chartData[chartId];
+
+          if (type === "Click") {
+
+            chart.data.datasets[0].data = chart.data.labels.map(label => {
+              const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
+              const index = labels.indexOf(searchLabel);
+              return index >= 0 ? dados[index] : 0;
+            });
+            
+          } else {
+            if (chartId === "Division") {
+
+              const sortedData = labels
+              .map((label, index) => ({ label, value: dados[index] }))
+              .sort((a, b) => b.value - a.value); 
+              chart.data.labels = sortedData.map(item => item.label);
+              chart.data.datasets[0].data = sortedData.map(item => item.value);
+
+            } else if (chartId === "Status") {
+
+              const sortedData = labels
+              .map((label, index) => ({ label, value: dados[index] }))
+              .sort((a, b) => { return ordem_status.indexOf(a.label) - ordem_status.indexOf(b.label); }); 
+              chart.data.labels = sortedData.map(item => item.label);
+              chart.data.datasets[0].data = sortedData.map(item => item.value);
+
+            } else if(chartId === "D/O Date") {
+
+              chart.data.datasets[0].data = chart.data.labels.map(label => {
+                const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
+                const index = labels.indexOf(searchLabel);
+                return index >= 0 ? dados[index] : 0;
+              });
+              chart.data.datasets[1].data = Array(24).fill(Math.round(fulldata.Capacidade.filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."])).reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
+            
+            } else {
+              chart.data.labels = labels;
+              chart.data.datasets[0].data = dados;
+            }
+          }
+          chart.update();
+        } else if(!ignoredCharts.includes(chartId)) {
+          chart.data.datasets[0].data = []
+          chart.update();
+        }
+    });
+  },
+  update_tables(){
+    this.table.loadData(
+      this.globalfilterdata(this.filterdata(d2cdata))
+      .filter(item => item["Status"] !== "GI")
+      .map(row => ([
+        row["Warehouse Cd."] ?? "",
+        row["D/O No."] ?? "",
+        row["D/O Date"] ?? "",
+        row["PGI Date"] ?? "",
+        row["Item Code"] ?? "",
+        row["Storage Location"] ?? "",
+        row["Plant Code"] ?? "",
+        row["Trans Method."] ?? "",
+        row["Order Quantity"] ?? "",
+        row["D/O Type"] ?? "",
+        row["Division"] ?? "",
+        row["Status"] ?? ""
+      ]))
+    );
+  },
+  filterdata(data){
+    const filter_out = data.filter(item =>
+      Object.entries(this.chartFilters_out).every(([key, values]) =>
+        key === "PGI Date" ?
+          StrToDate(item[key]) < StrToDate(values):
+          Array.isArray(values) ?
+            !values.includes(item[key]) : item[key] !== values
+      )
+    );
+    const filter_in = filter_out.filter(item =>
+      Object.entries(this.chartFilters_in).every(([key, value]) => key == "D/O Date"? item[key].split(":")[0]+":00" === value: item[key] === value)
+    );
+    return filter_in;
+  },
+  globalfilterdata(data){
+    const filter_out = data.filter(item =>
+      Object.entries(this.globalFilters_out).every(([key, values]) =>
+        key === "Item Code" ?
+          !values.includes(item[key].substr(0, 8)):
+          key === "PGI Date" ?
+            StrToDate(item[key]) < StrToDate(values):
+            Array.isArray(values) ?
+              !values.includes(item[key]) : item[key] !== values
+      )
+    );
+    const filter_in = filter_out.filter(item =>
+      Object.entries(this.globalFilters_in).every(([key, values]) =>
+        key === "Item Code" ?
+        values.includes(item[key].substr(0, 8)):
+        Array.isArray(values) ? values.includes(item[key]) : item[key] === values
+      )
+    );
+    return filter_in;
+  },
+
 };
