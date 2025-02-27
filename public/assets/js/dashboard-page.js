@@ -58,10 +58,12 @@ class ChartManager {
     const label = legendItem.text;
     if (tela.chartFilters_in[this.chartId] === label) {
       delete tela.chartFilters_in[this.chartId]
+      tela.update_charts();
     } else {
       tela.chartFilters_in[this.chartId] = label;
+      tela.update_charts("Click");
     }
-    tela.update_charts("Click");
+    
     tela.update_tables();
     console.log(chartFilters_in[this.chartId])
   }
@@ -71,10 +73,12 @@ class ChartManager {
       const label =  this.chartId == "D/O Date"? tela.DOCreatedFilter + " " + this.chart.data.labels[index]: this.chart.data.labels[index]
       if (tela.chartFilters_in[this.chartId] === label) {
         delete tela.chartFilters_in[this.chartId]
+        tela.update_charts();
       } else {
         tela.chartFilters_in[this.chartId] = label;
+        tela.update_charts("Click");
       }
-      tela.update_charts("Click");
+      
       tela.update_tables();
     }
   }
