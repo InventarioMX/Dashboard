@@ -1,21 +1,3 @@
-/*!
-
-=========================================================
-* Black Dashboard - v1.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/black-dashboard
-* Copyright 2019 Creative Tim (https://www.creative-tim.com)
-
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 var transparent = true;
 var transparentDemo = true;
 var fixedTop = false;
@@ -49,7 +31,6 @@ var seq2 = 0,
   var isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
 
   if (isWindows) {
-    // if we are on windows OS we activate the perfectScrollbar function
     if ($('.main-panel').length != 0) {
       var ps = new PerfectScrollbar('.main-panel', {
         wheelSpeed: 2,
@@ -103,7 +84,6 @@ $(document).ready(function() {
   });
 
   if ($('.full-screen-map').length == 0 && $('.bd-docs').length == 0) {
-    // On click navbar-collapse the menu will be white not transparent
     $('.collapse').on('show.bs.collapse', function() {
       $(this).closest('.navbar').removeClass('navbar-transparent').addClass('bg-white');
     }).on('hide.bs.collapse', function() {
@@ -116,7 +96,6 @@ $(document).ready(function() {
   $navbar = $('.navbar[color-on-scroll]');
   scroll_distance = $navbar.attr('color-on-scroll') || 500;
 
-  // Check if we have the class "navbar-color-on-scroll" then add the function to remove the class "navbar-transparent" so it will transform to a plain color.
   if ($('.navbar[color-on-scroll]').length != 0) {
     blackDashboard.checkScrollForTransparentNavbar();
     $(window).on('scroll', blackDashboard.checkScrollForTransparentNavbar)
@@ -128,7 +107,6 @@ $(document).ready(function() {
     $(this).parent(".input-group").removeClass("input-group-focus");
   });
 
-  // Activate bootstrapSwitch
   $('.bootstrap-switch').each(function() {
     $this = $(this);
     data_on_label = $this.data('on-label') || '';
@@ -173,7 +151,6 @@ $(document).on('click', '.navbar-toggle', function() {
 });
 
 $(window).resize(function() {
-  // reset the seq for charts drawing animations
   seq = seq2 = 0;
 
   if ($full_screen_map.length == 0 && $('.bd-docs').length == 0) {
@@ -209,12 +186,10 @@ blackDashboard = {
         blackDashboard.showSidebarMessage('Sidebar mini activated...');
       }
 
-      // we simulate the window Resize so the charts will get updated in realtime.
       var simulateWindowResize = setInterval(function() {
         window.dispatchEvent(new Event('resize'));
       }, 180);
 
-      // we stop the simulation of Window Resize after the animations are completed
       setTimeout(function() {
         clearInterval(simulateWindowResize);
       }, 1000);

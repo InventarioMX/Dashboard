@@ -65,7 +65,6 @@ class ChartManager {
     }
     
     tela.update_tables();
-    console.log(chartFilters_in[this.chartId])
   }
   handleClick(event,elements,tela) {
     if (elements.length > 0) {
@@ -84,22 +83,6 @@ class ChartManager {
   }
 };
 
-class HeadManager{
-  constructor(id,icon,description){
-    this.id = id;
-    this.ctx = document.getElementById(id);
-    this.icon = icon;
-    this.description = description;
-
-    this.ctx.innerHTML = (icon?icon:"") + (description?description:"");
-
-    Dashboard.instances_head.push(this);
-  }
-  update(value){
-    this.ctx.innerHTML = (this.icon?this.icon:"") + (this.description?this.description:"") + value.toLocaleString('pt-BR');
-  }
-};
-
 const formatarData = (diasAtras = 0) => {
   let data = new Date();
   data.setDate(data.getDate() - diasAtras);
@@ -109,6 +92,34 @@ const formatarData = (diasAtras = 0) => {
 const StrToDate = (str) => {
   var date = new Date(str.split('/').reverse().join('/'));
   return date;
+}
+
+function convertToUSFormat(dateString,ss) {
+  if(ss){
+    let [day, month, year, hours, minutes, seconds] = dateString.match(/\d+/g);
+    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+  } else {
+    let [day, month, year, hours, minutes] = dateString.match(/\d+/g);
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
+  }
+}
+
+function formatMtoDH(minutos) {
+  const dias = Math.floor(minutos / 1440);
+  const horas = Math.floor((minutos % 1440) / 60);
+  const min = minutos % 60;
+
+  return `${dias}d ${String(horas).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+}
+function convDHtoM(tempo) {
+  const regex = /(\d+)d (\d{2}):(\d{2})/;
+  const match = tempo.match(regex);
+
+  const dias = parseInt(match[1], 10);
+  const horas = parseInt(match[2], 10);
+  const minutos = parseInt(match[3], 10);
+
+  return (dias * 1440) + (horas * 60) + minutos;
 }
 
 let fulldata = null;
@@ -283,10 +294,10 @@ const Dashboard = {
       },
       scales: {
         yAxes: [{
-          display: false, // Oculta o eixo Y
+          display: false, 
           gridLines: {
-              drawBorder: false, // Remove a borda do eixo
-              display: false // Remove as linhas do grid do eixo Y
+              drawBorder: false, 
+              display: false 
           }
         }],
         xAxes: [{
@@ -508,10 +519,15 @@ const Dashboard = {
         "Division",
         "Status"
       ],
-      manualColumnResize: true, 
-      manualRowResize: true,    
-      filters: true,            
-      dropdownMenu: true,       
+      columnSorting: true,
+      columnSorting: {
+        headerAction: false,
+      },
+      autoWrapRow: true,
+      autoWrapCol: true,
+      filters: true,        
+      dropdownMenu: ['filter_by_condition', 'filter_by_value', 'filter_action_bar'],
+      contextMenu: ['copy'],       
       licenseKey: 'non-commercial-and-evaluation'
     });
   },
@@ -837,8 +853,8 @@ const Dashboard = {
 };
 
 const Aging = {
-  globalFilters_in: {"Status":[]},
-  globalFilters_out: {"Status":[]},
+  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
+  globalFilters_out: {},
   chartFilters_in: {},
   chartFilters_out: {},
   instances_chart: [],
@@ -867,7 +883,7 @@ const Aging = {
         fill: true,
         backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
         borderWidth: 3,
-        data: [50,70,90]
+        data: [0,0,0]
       }]
     }
     var OptionsPendCheck = {
@@ -926,11 +942,10 @@ const Aging = {
         fill: true,
         backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
         borderWidth: 3,
-        data: [50,70,90]
+        data: [0,0,0]
       }]
     }
     var OptionsPendManifest = {
-      maintainAspectRatio: false,
       plugins: {
         datalabels: {
           color: 'rgb(255, 255, 255)',
@@ -960,12 +975,11 @@ const Aging = {
         fill: true,
         backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
         borderWidth: 3,
-        data: [50,70,90]
+        data: [0,0,0]
       }]
     }
     var OptionsPendLoad = {
       cutoutPercentage: 70,
-      maintainAspectRatio: false,
       plugins: {
         datalabels: {
           color: 'rgb(255, 255, 255)',
@@ -987,14 +1001,14 @@ const Aging = {
       },
       scale: {
         gridLines: {
-            circular: true, // Mantém apenas as linhas circulares
-            display: false // Remove todas as linhas, inclusive as radiais
+            circular: true,
+            display: false 
         },
         angleLines: {
-            display: false // Remove as linhas radiais
+            display: false 
         },
         ticks: {
-          display: false // Remove os números da escala radial
+          display: false 
         }
       },
     };
@@ -1007,12 +1021,11 @@ const Aging = {
         fill: true,
         backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
         borderWidth: 3,
-        data: [50,70,90]
+        data: [0,0,0]
       }]
     }
     var OptionsPendGI = {
       cutoutPercentage: 65,
-      maintainAspectRatio: false,
       plugins: {
         datalabels: {
           color: 'rgb(255, 255, 255)',
@@ -1034,10 +1047,10 @@ const Aging = {
       },
     };
 
-    this.myChartPendCheck = new ChartManager("Chart_PendCheck","bar",DataPendCheck,OptionsPendCheck,"",this);
-    this.myChartPendManifest = new ChartManager("Chart_PendManifest","pie",DataPendManifest,OptionsPendManifest,"",this);
-    this.myChartPendLoad = new ChartManager("Chart_PendLoad","polarArea",DataPendLoad,OptionsPendLoad,"",this);
-    this.myChartPendGI = new ChartManager("Chart_PendGI","doughnut",DataPendGI,OptionsPendGI,"",this);
+    this.myChartPendCheck = new ChartManager("With NF","bar",DataPendCheck,OptionsPendCheck,"",this);
+    this.myChartPendManifest = new ChartManager("Checking","pie",DataPendManifest,OptionsPendManifest,"",this);
+    this.myChartPendLoad = new ChartManager("Mf.Created","polarArea",DataPendLoad,OptionsPendLoad,"",this);
+    this.myChartPendGI = new ChartManager("Loading","doughnut",DataPendGI,OptionsPendGI,"",this);
   },
   initialize_table(){
     const container = document.getElementById('excelTable');
@@ -1048,77 +1061,108 @@ const Aging = {
       colHeaders: [        
         "Warehouse Cd.",
         "D/O No.",
-        "Item Code",
+        "Item Code ㅤ",
         "Order Quantity",
+        "Temp. Decorrido",
         "D/O Date",
         "PGI Date",
         "Pick Date",
+        "XML Date",
+        "Packing Labeling Date",
         "Check Date",
+        "Move To Dock Date",
         "Manifest Date",
         "Load Date",
         "Lsp Name",
         "Storage Location",
-        "Plant Code",
-        "Trans Method.",
-        "D/O Type",
         "Division",
         "Status"
       ],
-      manualColumnResize: true, 
-      manualRowResize: true,    
-      filters: true,            
-      dropdownMenu: true,       
+      columnSorting: true,
+      columnSorting: {
+        headerAction: false,
+      },
+      autoWrapRow: true,
+      autoWrapCol: true,
+      filters: true,        
+      dropdownMenu: ['filter_by_condition', 'filter_by_value', 'filter_action_bar'],
+      contextMenu: ['copy'],       
       licenseKey: 'non-commercial-and-evaluation'
     });
   },
   initialize_buttons(){
-    $("#btn_check").click(function() {
-      const key = "Status";
-      const value = "With NF";
+    $("#C820_L").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_L";
       const index = Aging.globalFilters_in[key].indexOf(value);
       if (index !== -1) {
         Aging.globalFilters_in[key].splice(index, 1);
       } else {
         Aging.globalFilters_in[key].push(value);
       }
-      // Aging.update();
-      console.log(Aging.globalFilters_in);
+      Aging.update();
+    });
+    $("#C820_J").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_J";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      Aging.update();
+    });
+    $("#C820_R").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_R";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      Aging.update();
+    });
+    $("#btn_check").click(function() {
+      const key = "With NF";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
+      } else {
+        Aging.chartFilters_in[key] = value;
+      }
+      Aging.update();
     });
     $("#btn_manifest").click(function() {
-      const key = "Status";
-      const value = "Checking";
-      const index = Aging.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Aging.globalFilters_in[key].splice(index, 1);
+      const key = "Checking";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
       } else {
-        Aging.globalFilters_in[key].push(value);
+        Aging.chartFilters_in[key] = value;
       }
       Aging.update();
-      console.log(globalFilters_in)
     });
     $("#btn_load").click(function() {
-      const key = "Status";
-      const value = "Mf.Created";
-      const index = Aging.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Aging.globalFilters_in[key].splice(index, 1);
+      const key = "Mf.Created";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
       } else {
-        Aging.globalFilters_in[key].push(value);
+        Aging.chartFilters_in[key] = value;
       }
       Aging.update();
-      console.log(globalFilters_in)
     });
     $("#btn_gi").click(function() {
-      const key = "Status";
-      const value = "Loading";
-      const index = Aging.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Aging.globalFilters_in[key].splice(index, 1);
+      const key = "Loading";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
       } else {
-        Aging.globalFilters_in[key].push(value);
+        Aging.chartFilters_in[key] = value;
       }
       Aging.update();
-      console.log(globalFilters_in)
     });
   },
   update(data){
@@ -1137,135 +1181,54 @@ const Aging = {
 
     const lastupdate = fulldata.UltAtualizacao[0].Atualizacao;
 
-    const dataAtual = formatarData();
-    const dataMenos1 = formatarData(1);
-    const dataMenos2 = formatarData(2);
-
-    let Backlog = 0, GI_DMenos2 = 0, GI_DMenos1 = 0, GI_Current = 0, GI_Exp = 0, inprocess = 0;
-    let expected = ["Checking","Mf.Created","Loading"];
-    let trsMethod = ["T01","M02"];
+    let Pendcheck = 0, Pendmanifest = 0, Pendload = 0, Pendgi = 0;
 
     datadfiltered.forEach(row => {
-        const pgiDate = row["PGI Date"].split(" ")[0];
-        const giDate = row["GI Date"].split(" ")[0];
+
         const orderQty = row["Order Quantity"];
 
-        if (row["Storage Location"] !== "FCBA" && row["Status"] !== "GI" && StrToDate(pgiDate) < StrToDate(dataAtual) && !trsMethod.includes(row["Trans Method."])) {
-          Backlog += orderQty;
+        if (row["Status"] === "With NF") {
+          Pendcheck += orderQty;
         }
-        if (giDate === dataMenos2) {
-          GI_DMenos2 += orderQty;
+        if (row["Status"] === "Checking") {
+          Pendmanifest += orderQty;
         }
-        if (giDate === dataMenos1) {
-          GI_DMenos1 += orderQty;
+        if (row["Status"] === "Mf.Created") {
+          Pendload += orderQty;
         }
-        if (giDate === dataAtual) {
-          GI_Current += orderQty;
+        if (row["Status"] === "Loading") {
+          Pendgi += orderQty;
         }
-        if (expected.includes(row["Status"])){
-          GI_Exp += orderQty;
-        }
-        if (row["Status"] !== "GI"){
-          inprocess += orderQty;
-        }
+
     });
-
-    GI_Exp = GI_Exp + GI_Current
-
-    const Capacidade = fulldata.Capacidade
-    .filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."]))
-    .reduce((acc, item) => {return acc + item["Cap"];}, 0);
-
-    const PendingCap = GI_Current > Capacidade ? 0 : Capacidade - GI_Current;
 
     var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>";
     var lastupdateDescription = " Last Update: ";
 
-    var capIcon = "<i class='tim-icons  icon-app text-info'></i>";
-    var capDescription = " Target: ";
-
-    var inprocessDescription = "In process: "
-
     document.getElementById("lastupdate").innerHTML = lastupdateIcon + lastupdateDescription + (lastupdate.toLocaleString('pt-BR'));
-    document.getElementById("backlog").innerHTML = Backlog.toLocaleString('pt-BR');
-    document.getElementById("GID2").innerHTML = GI_DMenos2.toLocaleString('pt-BR');
-    document.getElementById("GID1").innerHTML = GI_DMenos1.toLocaleString('pt-BR');
-    document.getElementById("GICurrent").innerHTML = (GI_Current.toLocaleString('pt-BR'))
-    document.getElementById("Cap").innerHTML = (capIcon + capDescription + Capacidade.toLocaleString('pt-BR'));
-    document.getElementById("PendingCap").innerHTML = PendingCap.toLocaleString('pt-BR');
-    document.getElementById("GIExpected").innerHTML = GI_Exp.toLocaleString('pt-BR');
-    document.getElementById("inprocess").innerHTML = inprocessDescription + inprocess.toLocaleString('pt-BR');
-    
-    const currentValue = Math.round(GI_Current / Capacidade * 100) > 100 ? 100 : Math.round(GI_Current / Capacidade * 100);
-    this.myChartCap.chart.data.datasets[0].data = [currentValue, 100-currentValue];
-    this.myChartCap.chart.update();
+    document.getElementById("Lb_PendCheck").innerHTML = Pendcheck.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendManifest").innerHTML = Pendmanifest.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendLoad").innerHTML = Pendload.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendGI").innerHTML = Pendgi.toLocaleString('pt-BR');
 
   },
   update_charts(type){
-    const processedChartDataDOCreated = this.ChartDataProcess(
-      this.globalfilterdata(
-        this.filterdata(d2cdata)
-      ),
-      ["D/O Date"]
-    );
     const processedChartData = this.ChartDataProcess(
       this.globalfilterdata(
         this.filterdata(d2cdata.filter(item => item["Status"] !== "GI"))
-      ),
-      ["Trans Method.","Status","Division","D/O Type"]
+      )
     );
-    const ignoredCharts = ["CapPorcent"]
-
     this.instances_chart.forEach(instance => {
         const { chartId, chart } = instance;
-        const isDODate = chartId === "D/O Date";
-        const chartData = isDODate ? processedChartDataDOCreated : processedChartData;
+        const chartData = processedChartData;
 
         if (chartData?.[chartId]) {
-          const { labels, dados } = chartData[chartId];
-
-          if (type === "Click") {
-
-            chart.data.datasets[0].data = chart.data.labels.map(label => {
-              const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
-              const index = labels.indexOf(searchLabel);
-              return index >= 0 ? dados[index] : 0;
-            });
-            
-          } else {
-            if (chartId === "Division") {
-
-              const sortedData = labels
-              .map((label, index) => ({ label, value: dados[index] }))
-              .sort((a, b) => b.value - a.value); 
-              chart.data.labels = sortedData.map(item => item.label);
-              chart.data.datasets[0].data = sortedData.map(item => item.value);
-
-            } else if (chartId === "Status") {
-
-              const sortedData = labels
-              .map((label, index) => ({ label, value: dados[index] }))
-              .sort((a, b) => { return ordem_status.indexOf(a.label) - ordem_status.indexOf(b.label); }); 
-              chart.data.labels = sortedData.map(item => item.label);
-              chart.data.datasets[0].data = sortedData.map(item => item.value);
-
-            } else if(chartId === "D/O Date") {
-
-              chart.data.datasets[0].data = chart.data.labels.map(label => {
-                const searchLabel = isDODate ? `${this.DOCreatedFilter} ${label}` : label;
-                const index = labels.indexOf(searchLabel);
-                return index >= 0 ? dados[index] : 0;
-              });
-              chart.data.datasets[1].data = Array(24).fill(Math.round(fulldata.Capacidade.filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."])).reduce((acc, item) => {return acc + item["Cap"]}, 0)/24));
-            
-            } else {
-              chart.data.labels = labels;
-              chart.data.datasets[0].data = dados;
-            }
-          }
+          chart.data.datasets[0].data = chart.data.labels.map(label => {
+            return chartData[chartId][0][label]
+          });
           chart.update();
-        } else if(!ignoredCharts.includes(chartId)) {
-          chart.data.datasets[0].data = []
+        } else {
+          chart.data.datasets[0].data = [0,0,0]
           chart.update();
         }
     });
@@ -1277,18 +1240,29 @@ const Aging = {
       .map(row => ([
         row["Warehouse Cd."] ?? "",
         row["D/O No."] ?? "",
+        row["Item Code"] ?? "",
+        row["Order Quantity"] ?? "",
+        row["Temp. Decorrido"] ?? "",
         row["D/O Date"] ?? "",
         row["PGI Date"] ?? "",
-        row["Item Code"] ?? "",
+        row["Pick Date"] ?? "",
+        row["XML Date"] ?? "",
+        row["Packing Labeling Date"] ?? "",
+        row["Check Date"] ?? "",
+        row["Move To Dock Date"] ?? "",
+        row["Manifest Date"] ?? "",
+        row["Load Date"] ?? "",
+        row["Lsp Name"] ?? "",
         row["Storage Location"] ?? "",
-        row["Plant Code"] ?? "",
-        row["Trans Method."] ?? "",
-        row["Order Quantity"] ?? "",
-        row["D/O Type"] ?? "",
         row["Division"] ?? "",
         row["Status"] ?? ""
+
       ]))
     );
+    this.table.getPlugin('columnSorting').sort({
+      column: 4, 
+      sortOrder: 'desc'
+    });
   },
   filterdata(data){
     const filter_out = data.filter(item =>
@@ -1299,8 +1273,44 @@ const Aging = {
             !values.includes(item[key]) : item[key] !== values
       )
     );
-    const filter_in = filter_out.filter(item =>
-      Object.entries(this.chartFilters_in).every(([key, value]) => key == "D/O Date"? item[key].split(":")[0]+":00" === value: item[key] === value)
+    const agora = new Date();
+    const filter_in = filter_out.map(item => {
+      let dataItem;
+      let transformedStatus = item["Status"];
+  
+      if (transformedStatus === "With NF" || transformedStatus === "Print") {
+        item["Status"] = "With NF";
+        dataItem = new Date(convertToUSFormat(item["XML Date"]));
+      } else if (transformedStatus === "Checking" || transformedStatus === "Mv. Dock") {
+        item["Status"] = "Checking";
+        dataItem = new Date(convertToUSFormat(item["Check Date"]));
+      } else if (transformedStatus === "Mf.Created") {
+        dataItem = new Date(convertToUSFormat(item["Manifest Date"]));
+      } else if (transformedStatus === "Loading") {
+        dataItem = new Date(convertToUSFormat(item["Load Date"]));
+      }
+  
+      let diffMinutos = dataItem ? Math.floor((agora - dataItem) / (1000 * 60)) : null;
+      
+      item["Temp. Decorrido"] = formatMtoDH(diffMinutos);
+  
+      return item;
+    })
+    .filter(item =>
+      Object.entries(this.chartFilters_in).every(([key, values]) => {
+        if (!item["Temp. Decorrido"]) return false; 
+
+        if (values === null) {
+          return item["Status"] === key;
+        }
+
+        const tempo = convDHtoM(item["Temp. Decorrido"]);
+
+        return item["Status"] === key &&
+          (values === "até 30m" ? tempo < 30 :
+          values === "30m até 1h" ? tempo >= 30 && tempo <= 60 :
+          tempo > 60);
+      })
     );
     return filter_in;
   },
@@ -1324,5 +1334,46 @@ const Aging = {
     );
     return filter_in;
   },
+  ChartDataProcess(tabela) {
+    const resultado = {};
+    const agora = new Date();
 
+    tabela.forEach(item => {
+        let dataItem;
+        if (item.Status === "With NF" || item.Status ==="Print"){
+          item.Status = "With NF"
+          dataItem = new Date(convertToUSFormat(item["XML Date"]));
+        } else
+        if (item.Status === "Checking" || item.Status === "Mv. Dock"){
+          item.Status = "Checking"
+          dataItem = new Date(convertToUSFormat(item["Check Date"]));
+        } else
+        if (item.Status === "Mf.Created"){
+          dataItem = new Date(convertToUSFormat(item["Manifest Date"]));
+        } else
+        if (item.Status === "Loading"){
+          dataItem = new Date(convertToUSFormat(item["Load Date"]));
+        } else {
+         return;
+        }
+
+        const diffMinutos = Math.floor((agora - dataItem) / (1000 * 60));
+        
+        let categoria;
+        if (diffMinutos < 30) {
+            categoria = "até 30m";
+        } else if (diffMinutos >= 30 && diffMinutos <= 60) {
+            categoria = "30m até 1h";
+        } else {
+            categoria = "Maior que 1h";
+        }
+
+        if (!resultado[item.Status]) {
+            resultado[item.Status] = [{ "até 30m": 0, "30m até 1h": 0, "Maior que 1h": 0 }];
+        }
+        resultado[item.Status][0][categoria] += item["Order Quantity"];
+    });
+    
+    return resultado;
+  }
 };

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/favicon.png">
     <link rel="icon" type="image/png" href="./assets/img/favicon.png">
     <title>
         Dashboard Operation's
@@ -495,12 +495,15 @@
 
                 const url = {"C820_L":"/MX","C820_J":"/CE","C820_R":"/REC" }
             
-                window.history.pushState({}, "", url[params.get("wh")]); // Volta a URL para "/mx"
+                window.history.pushState({}, "", url[params.get("wh")]);
             }
             await carregarDadosIniciais();
             iniciarAtualizacaoAutomatica();
         });
 
+        const intervalo = 5 * 60 * 1000; 
+        let ultimaAtualizacao;
+        let proximaAtualizacao;
         async function carregarDadosIniciais() {
             try {
                 const response = await fetch('/api/dados');
@@ -508,24 +511,30 @@
                 
                 Dashboard.Dashboard_start(dados);
 
+                ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
+                proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 15000);
+
             } catch (error) {
                 console.error('Erro ao buscar dados iniciais:', error);
             }
         }
 
-        const intervalo = 1 * 60 * 1000; // 1 minuto
-        let proximaAtualizacao = new Date(Date.now() + intervalo);
-
         async function update() {
             try {
-                proximaAtualizacao = new Date(Date.now() + intervalo);
-                
                 const response = await fetch('/api/dados');
                 const dados = await response.json();
+
+                ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
+                proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 15000);
+
+                const progamar = new Date();
+                const proximo = proximaAtualizacao - progamar;
+                setTimeout(update, proximo<0?intervalo:proximo);
 
                 console.log("Atualizando dados...");
                 
                 Dashboard.update(dados);
+                
             } catch (error) {
                 console.error('Erro ao buscar dados na atualização:', error);
             }
@@ -543,7 +552,11 @@
 
         function iniciarAtualizacaoAutomatica() {
             setInterval(mostrarTempoRestante, 1000);
-            setInterval(update, intervalo);
+
+            const progamar = new Date();
+            const proximo = proximaAtualizacao - progamar;
+
+            setTimeout(update, proximo<0?intervalo:proximo);
         }
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/favicon.png">
     <link rel="icon" type="image/png" href="./assets/img/favicon.png">
     <title>
         Dashboard Operation's
@@ -134,17 +134,17 @@
                         <div class="card card-chart">
                             <div class="card-header btn btn-simple mb-xl-0" id="btn_check">
                                 <div class="row">
-                                    <div class="col-sm-6 text-left">
+                                    <div class="col-sm-8 text-left">
                                         <h3><i class="tim-icons icon-bag-16 text-info"></i> Pend. Check</h3>
                                     </div>
-                                    <div class="col-sm-6 text-right">
+                                    <div class="col-sm-4 text-right">
                                         <h3 id="Lb_PendCheck">1.000</h3>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="Chart_PendCheck"></canvas>
+                                    <canvas id="With NF"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +163,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="Chart_PendManifest"></canvas>
+                                    <canvas id="Checking"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -172,17 +172,17 @@
                         <div class="card card-chart">
                             <div class="card-header btn btn-simple mb-xl-0" id="btn_load">
                                 <div class="row">
-                                    <div class="col-sm-6 text-left">
+                                    <div class="col-sm-8 text-left">
                                         <h3><i class="tim-icons icon-gift-2 text-info"></i> Pend. Load</h3>
                                     </div>
-                                    <div class="col-sm-6 text-right">
+                                    <div class="col-sm-4 text-right">
                                         <h3 id="Lb_PendLoad">2.000</h3>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="Chart_PendLoad"></canvas>
+                                    <canvas id="Mf.Created"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -201,7 +201,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="Chart_PendGI"></canvas>
+                                    <canvas id="Loading"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -362,8 +362,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
             if (params.get("wh")) {
-                Dashboard.globalFilters_in["Warehouse Cd."] = []
-                Dashboard.globalFilters_in["Warehouse Cd."].push(params.get("wh"));
+                Aging.globalFilters_in["Warehouse Cd."] = []
+                Aging.globalFilters_in["Warehouse Cd."].push(params.get("wh"));
 
                 document.getElementById('C820_L').checked = false;
                 document.getElementById('C820_J').checked = false;
@@ -373,12 +373,15 @@
 
                 const url = {"C820_L":"/MX","C820_J":"/CE","C820_R":"/REC" }
             
-                window.history.pushState({}, "", url[params.get("wh")]); // Volta a URL para "/mx"
+                window.history.pushState({}, "", url[params.get("wh")] + "/aging.html");
             }
             await carregarDadosIniciais();
             iniciarAtualizacaoAutomatica();
         });
 
+        const intervalo = 5 * 60 * 1000; 
+        let ultimaAtualizacao;
+        let proximaAtualizacao;
         async function carregarDadosIniciais() {
             try {
                 const response = await fetch('/api/dados');
@@ -386,24 +389,30 @@
                 
                 Aging.Aging_start(dados);
 
+                ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
+                proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 15000);
+
             } catch (error) {
                 console.error('Erro ao buscar dados iniciais:', error);
             }
         }
 
-        const intervalo = 1 * 60 * 1000; // 1 minuto
-        let proximaAtualizacao = new Date(Date.now() + intervalo);
-
         async function update() {
             try {
-                proximaAtualizacao = new Date(Date.now() + intervalo);
-                
                 const response = await fetch('/api/dados');
                 const dados = await response.json();
 
+                ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
+                proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 15000);
+
+                const progamar = new Date();
+                const proximo = proximaAtualizacao - progamar;
+                setTimeout(update, proximo<0?intervalo:proximo);
+
                 console.log("Atualizando dados...");
                 
-                Dashboard.update(dados);
+                Aging.update(dados);
+                
             } catch (error) {
                 console.error('Erro ao buscar dados na atualização:', error);
             }
@@ -421,7 +430,11 @@
 
         function iniciarAtualizacaoAutomatica() {
             setInterval(mostrarTempoRestante, 1000);
-            setInterval(update, intervalo);
+
+            const progamar = new Date();
+            const proximo = proximaAtualizacao - progamar;
+
+            setTimeout(update, proximo<0?intervalo:proximo);
         }
     </script>
 </body>

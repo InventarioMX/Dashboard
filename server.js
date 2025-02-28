@@ -48,6 +48,16 @@ fastify.get('/REC', async (request, reply) => {
   reply.redirect('/?wh=C820_R');
 });
 
+fastify.get('/MX/aging.html', async (request, reply) => {
+  reply.redirect('/aging.html?wh=C820_L');
+});
+fastify.get('/CE/aging.html', async (request, reply) => {
+  reply.redirect('/aging.html?wh=C820_J');
+});
+fastify.get('/REC/aging.html', async (request, reply) => {
+  reply.redirect('/aging.html?wh=C820_R');
+});
+
 // Inicializando o servidor
 const start = async () => {
   try {
