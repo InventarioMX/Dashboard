@@ -18,6 +18,17 @@ Created using IcoMoon - icomoon.io
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Nucleo';
+  src: url('../fonts/teste.eot');
+  src: url('../fonts/teste.eot') format('embedded-opentype'),
+    url('../fonts/teste.woff') format('woff'),
+    url('../fonts/teste.ttf') format('truetype'),
+    url('../fonts/nucleo.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /*------------------------
 	base class definition
 -------------------------*/
@@ -547,4 +558,8 @@ Created using IcoMoon - icomoon.io
 
 .icon-components::before {
   content: "\ea65";
+}
+
+.icon-filter-remove::before {
+  content: "\e900";
 }

@@ -912,7 +912,25 @@ pre code {
   margin-left: 91.666667%;
 }
 
-@media (min-width: 576px) {
+@media (min-width: 430px) {
+
+  #divShipType {
+    order: 1;
+  }
+  #divTypeDO {
+    order: 2;
+  }
+  #divDivision {
+    order: 3;
+  }
+  #divStep {
+    order: 4;
+  }
+  #divDOCreated {
+    order: 5;
+  }
+
+  
   .col-sm {
     flex-basis: 0;
     flex-grow: 1;
@@ -1095,6 +1113,24 @@ pre code {
 }
 
 @media (min-width: 768px) {
+
+  #divShipType {
+    order: 1;
+  }
+  #divTypeDO {
+    order: 2;
+  }
+  #divDivision {
+    order: 3;
+  }
+  #divStep {
+    order: 4;
+  }
+  #divDOCreated {
+    order: 5;
+  }
+
+
   .col-md {
     flex-basis: 0;
     flex-grow: 1;
@@ -20291,13 +20327,13 @@ Copyright (c) 2015 Daniel Eden
   width: 100%;
 }
 
-.card-chart .chart-area-dunut {
-  height: 130px;
+.card-chart .chart-area-desc {
+  height: 255px;
   width: 100%;
 }
 
-.card-chart .chart-area-division {
-  height: 647px;
+.card-chart .chart-area-mob {
+  height: 450px;
   width: 100%;
 }
 

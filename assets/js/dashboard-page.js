@@ -15,7 +15,7 @@ class ChartManager {
       type: type,
       data: data,
       options: {
-        onClick: (event,elements) => this.handleClick(event,elements,tela),
+        onClick: (event,elements) => this.handleClick(event,elements,tela,chartId),
         maintainAspectRatio: false,
         responsive: true,
         animation: {
@@ -42,7 +42,7 @@ class ChartManager {
                 padding: 20,
                 fontSize: 14,
               },
-              onClick: (event, legendItem) => this.legendClick(event, legendItem, tela),
+              onClick: (event, legendItem) => this.legendClick(event, legendItem, tela, chartId),
             }
           :
             {
@@ -54,28 +54,46 @@ class ChartManager {
     });
     tela.instances_chart.push(this);
   }
-  legendClick(event, legendItem, tela){
+  legendClick(event, legendItem, tela, chartId){
     const label = legendItem.text;
     if (tela.chartFilters_in[this.chartId] === label) {
       delete tela.chartFilters_in[this.chartId]
       tela.update_charts();
+      if (tela === Dashboard) {
+        $("[id='filter-clear-" + chartId + "']").removeClass("icon-filter-remove")
+        tela.verificafilters()
+      }
     } else {
       tela.chartFilters_in[this.chartId] = label;
       tela.update_charts("Click");
+      if (tela === Dashboard) {
+        $("[id='filter-clear-" + chartId + "']").addClass("icon-filter-remove")
+        tela.verificafilters()
+      }
     }
     
     tela.update_tables();
   }
-  handleClick(event,elements,tela) {
+  handleClick(event,elements,tela,chartId) {
     if (elements.length > 0) {
       const index = elements[0]._index;
       const label =  this.chartId == "D/O Date"? tela.DOCreatedFilter + " " + this.chart.data.labels[index]: this.chart.data.labels[index]
       if (tela.chartFilters_in[this.chartId] === label) {
         delete tela.chartFilters_in[this.chartId]
         tela.update_charts();
+        
+        if (tela === Dashboard) {
+          $("[id='filter-clear-" + chartId + "']").removeClass("icon-filter-remove")
+          tela.verificafilters()
+        } 
+        
       } else {
         tela.chartFilters_in[this.chartId] = label;
         tela.update_charts("Click");
+        if (tela === Dashboard) {
+          $("[id='filter-clear-" + chartId + "']").addClass("icon-filter-remove")
+          tela.verificafilters()
+        }
       }
       
       tela.update_tables();
@@ -128,11 +146,12 @@ let ordem_status = ["W.Pre-Visit","CARR_ID Incorreto","P.Ship","W.Booking","W.Al
 
 const Dashboard = {
 
-  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
+  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R","C820_G"]},
   globalFilters_out: {},
   chartFilters_in: {},
-  chartFilters_out: {},
+  chartFilters_out: {"Trans Method.":""},
   DOCreatedFilter: formatarData(),
+  DOCreatedBtn: null,
   instances_chart: [],
   instances_head: [],
 
@@ -144,9 +163,48 @@ const Dashboard = {
     this.initialize_charts();
     this.initialize_table();
     this.initialize_buttons();
+    this.initialize_redim();
 
     this.update();
+  
+  },
+  initialize_redim(){
+    const mobileQuery = window.matchMedia("(max-width: 768px)");
 
+    function verificarDispositivo(e) {
+      if (e.matches) {
+        Dashboard.myChartStatus.chart.destroy()
+        Dashboard.myChartDOCreated.chart.destroy()
+        Dashboard.instances_chart = Dashboard.instances_chart.filter(
+          item => item && item.chartId !== 'Status' && item.chartId !== 'D/O Date'
+        );        
+        Dashboard.myChartStatus = new ChartManager("Status","horizontalBar",Dashboard.myChartStatusData,Dashboard.myChartDivisionOpt,"Azul",Dashboard);
+        Dashboard.myChartDOCreated = new ChartManager("D/O Date","horizontalBar",Dashboard.myChartDOCreatedData,Dashboard.myChartDivisionOpt,"Azul",Dashboard);
+      
+        document.querySelectorAll(".chart-area-desc").forEach(el => {
+          el.classList.remove("chart-area-desc");
+          el.classList.add("chart-area-mob");
+        })
+
+      } else {
+        Dashboard.myChartStatus.chart.destroy()
+        Dashboard.myChartDOCreated.chart.destroy()
+        Dashboard.instances_chart = Dashboard.instances_chart.filter(
+          item => item && item.chartId !== 'Status' && item.chartId !== 'D/O Date'
+        );      
+        Dashboard.myChartStatus = new ChartManager("Status","bar",Dashboard.myChartStatusData,Dashboard.myChartStatusOpt,"Azul",Dashboard);
+        Dashboard.myChartDOCreated = new ChartManager("D/O Date","line",Dashboard.myChartDOCreatedData,Dashboard.myChartDOCreatedOpt,"Azul",Dashboard);
+
+        document.querySelectorAll(".chart-area-mob").forEach(el => {
+          el.classList.remove("chart-area-mob");
+          el.classList.add("chart-area-desc");
+        })
+      }
+    }
+
+    verificarDispositivo(mobileQuery);
+
+    mobileQuery.addEventListener("change", verificarDispositivo);
   },
   initialize_charts(){
     var DataCap = {
@@ -361,6 +419,7 @@ const Dashboard = {
             zeroLineColor: 'rgba(29,140,248,0.1)',
           },
           ticks: {
+            padding: 20,
             fontSize: 17,
             fontColor: "#9e9e9e"
           }
@@ -403,6 +462,7 @@ const Dashboard = {
         pointHoverRadius: 0,
         pointRadius: 0,
         data: [],
+        type: "line",
         datalabels: {
           display: false,
         },
@@ -498,11 +558,19 @@ const Dashboard = {
     this.myChartDOCreated = new ChartManager("D/O Date","line",DataDOCreated,OptionsDOCreated,"Azul",this);
     this.myChartType = new ChartManager("D/O Type","doughnut",DataType,OptionsType,"",this)
 
+    this.myChartStatusOpt = OptionsStatus
+    this.myChartStatusData = DataStatus
+
+    this.myChartDOCreatedOpt = OptionsDOCreated
+    this.myChartDOCreatedData = DataDOCreated
+
+    this.myChartDivisionOpt = OptionsDivision
+    
   },
   initialize_table(){
     const container = document.getElementById('excelTable');
     this.table = new Handsontable(container, {
-      data: [],
+      data: [0,0,0,0,0,0,0,0,0,0,0,0],
       height: 450,
       stretchH: 'all',
       colHeaders: [        
@@ -523,25 +591,57 @@ const Dashboard = {
       columnSorting: {
         headerAction: false,
       },
+      copyPaste: {
+      copyColumnHeaders: true,
+      },
       autoWrapRow: true,
       autoWrapCol: true,
       filters: true,        
       dropdownMenu: ['filter_by_condition', 'filter_by_value', 'filter_action_bar'],
-      contextMenu: ['copy'],       
-      licenseKey: 'non-commercial-and-evaluation'
+      contextMenu: ['copy','copy-with-headers','alignment'],       
+      licenseKey: 'non-commercial-and-evaluation',
+      beforecopy: (data, coords) => {
+        if (!coords.length) return;
+
+        const startCol = coords[0].startCol;
+        const endCol = coords[0].endCol;
+
+        const headers = [];
+        for (let col = startCol; col <= endCol; col++){
+          headers.push(this.table.getColHeader(col));
+        }
+        data.unshift(headers);
+      }
     });
+  },
+  verificafilters(){
+    btn_filters = document.querySelectorAll('.icon-filter-remove:not(#clear-all)').length
+    if(btn_filters === 0 ){
+      $("[id='clear-all']").removeClass("icon-filter-remove")
+      $("[id='clear-all']").removeClass("btn")
+      $("[id='clear-all']").removeClass("btn-info")
+      document.getElementById("clear-all").innerHTML = ""
+    } else {
+      $("[id='clear-all']").addClass('icon-filter-remove');
+      $("[id='clear-all']").addClass("btn")
+      $("[id='clear-all']").addClass("btn-info")
+      document.getElementById("clear-all").innerHTML = " All"
+    }
   },
   initialize_buttons(){
     $("#Current").click(function() {
-      Dashboard.DOCreatedFilter = formatarData();
+      Dashboard.DOCreatedBtn = null
+      Dashboard.DOCreatedFilter = formatarData(Dashboard.DOCreatedBtn);
       Dashboard.update_charts();
     });
     $("#D-1").click(function() {
-      Dashboard.DOCreatedFilter = formatarData(1);
+      Dashboard.DOCreatedBtn = 1
+      Dashboard.DOCreatedFilter = formatarData(Dashboard.DOCreatedBtn);
       Dashboard.update_charts();
     });
     $("#D-2").click(function() {
-      Dashboard.DOCreatedFilter = formatarData(2);
+      Dashboard.DOCreatedBtn = 2
+      Dashboard.DOCreatedFilter = formatarData(Dashboard.DOCreatedBtn);
       Dashboard.update_charts();
     });
     $("#C820_L").click(function() {
@@ -569,6 +669,17 @@ const Dashboard = {
     $("#C820_R").click(function() {
       const key = "Warehouse Cd.";
       const value = "C820_R";
+      const index = Dashboard.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Dashboard.globalFilters_in[key].splice(index, 1);
+      } else {
+        Dashboard.globalFilters_in[key].push(value);
+      }
+      Dashboard.update();
+    });
+    $("#C820_G").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_G";
       const index = Dashboard.globalFilters_in[key].indexOf(value);
       if (index !== -1) {
         Dashboard.globalFilters_in[key].splice(index, 1);
@@ -611,12 +722,53 @@ const Dashboard = {
       Object.entries(filtros).forEach(([key, value]) => {
         if (Dashboard.chartFilters_out[key]) {
           delete Dashboard.chartFilters_out[key];
+          $("[id='filter-clear-backlog']").removeClass("icon-filter-remove")
         } else {
           Dashboard.chartFilters_out[key] = value;
+          $("[id='filter-clear-backlog']").addClass("icon-filter-remove")
         }
       });
+      Dashboard.verificafilters();
       Dashboard.update_charts();
       Dashboard.update_tables();
+    });
+    $("[id='filter-clear-Trans Method.']").click(function() {
+      delete Dashboard.chartFilters_in["Trans Method."]
+      $("[id='filter-clear-Trans Method.']").removeClass("icon-filter-remove")
+      Dashboard.update_charts();
+      Dashboard.update_tables();
+      Dashboard.verificafilters();
+    });
+    $("[id='filter-clear-D/O Type']").click(function() {
+      delete Dashboard.chartFilters_in["D/O Type"]
+      $("[id='filter-clear-D/O Type']").removeClass("icon-filter-remove")
+      Dashboard.update_charts();
+      Dashboard.update_tables();
+      Dashboard.verificafilters();
+    });
+    $("[id='filter-clear-Division']").click(function() {
+      delete Dashboard.chartFilters_in["Division"]
+      $("[id='filter-clear-Division']").removeClass("icon-filter-remove")
+      Dashboard.update_charts();
+      Dashboard.update_tables();
+      Dashboard.verificafilters();
+    });
+    $("[id='filter-clear-Status']").click(function() {
+      delete Dashboard.chartFilters_in["Status"]
+      $("[id='filter-clear-Status']").removeClass("icon-filter-remove")
+      Dashboard.update_charts();
+      Dashboard.update_tables();
+      Dashboard.verificafilters();
+    });
+    $("[id='filter-clear-D/O Date']").click(function() {
+      delete Dashboard.chartFilters_in["D/O Date"]
+      $("[id='filter-clear-D/O Date']").removeClass("icon-filter-remove")
+      Dashboard.update_charts();
+      Dashboard.update_tables();
+      Dashboard.verificafilters();
+    });
+    $("[id='clear-all']").click(function() {
+      document.querySelectorAll('.icon-filter-remove:not(#clear-all)').forEach(button => button.click());
     });
   },
   update(data){
@@ -674,17 +826,28 @@ const Dashboard = {
     .filter(row => this.globalFilters_in["Warehouse Cd."].includes(row["Warehouse Cd."]))
     .reduce((acc, item) => {return acc + item["Cap"];}, 0);
 
-    const PendingCap = GI_Current > Capacidade ? 0 : Capacidade - GI_Current;
+    let PendingCap = Capacidade - GI_Current;
+    let porcentagemmeta;
 
-    var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>";
-    var lastupdateDescription = " Last Update: ";
+    if(GI_Current >= Capacidade){
+      PendingCap = 0
+      porcentagemmeta = 100
+    } else if(PendingCap > inprocess) {
+      PendingCap = inprocess;
+      porcentagemmeta = Math.round(GI_Current / (PendingCap + GI_Current) * 100)
+    } else {
+      porcentagemmeta = Math.round(GI_Current / (PendingCap + GI_Current) * 100)
+    }
+
+    var lastupdateIcon = " <i class='tim-icons icon-refresh-01 text-info'></i> ";
+    // var lastupdateDescription = " Last Update: ";
 
     var capIcon = "<i class='tim-icons  icon-app text-info'></i>";
     var capDescription = " Target: ";
 
     var inprocessDescription = "In process: "
 
-    document.getElementById("lastupdate").innerHTML = lastupdateIcon + lastupdateDescription + (lastupdate.toLocaleString('pt-BR'));
+    document.getElementById("lastupdate").innerHTML = lastupdateIcon + (lastupdate.toLocaleString('pt-BR')) ;
     document.getElementById("backlog").innerHTML = Backlog.toLocaleString('pt-BR');
     document.getElementById("GID2").innerHTML = GI_DMenos2.toLocaleString('pt-BR');
     document.getElementById("GID1").innerHTML = GI_DMenos1.toLocaleString('pt-BR');
@@ -692,14 +855,14 @@ const Dashboard = {
     document.getElementById("Cap").innerHTML = (capIcon + capDescription + Capacidade.toLocaleString('pt-BR'));
     document.getElementById("PendingCap").innerHTML = PendingCap.toLocaleString('pt-BR');
     document.getElementById("GIExpected").innerHTML = GI_Exp.toLocaleString('pt-BR');
-    document.getElementById("inprocess").innerHTML = inprocessDescription + inprocess.toLocaleString('pt-BR');
+    document.getElementById("inprocess").innerHTML = inprocessDescription + inprocess.toLocaleString('pt-BR') + "  ";
     
-    const currentValue = Math.round(GI_Current / Capacidade * 100) > 100 ? 100 : Math.round(GI_Current / Capacidade * 100);
-    this.myChartCap.chart.data.datasets[0].data = [currentValue, 100-currentValue];
+    this.myChartCap.chart.data.datasets[0].data = [porcentagemmeta, 100-porcentagemmeta];
     this.myChartCap.chart.update();
 
   },
   update_charts(type){
+    
     const processedChartDataDOCreated = this.ChartDataProcess(
       this.globalfilterdata(
         this.filterdata(d2cdata)
@@ -853,7 +1016,7 @@ const Dashboard = {
 };
 
 const Aging = {
-  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R"]},
+  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R","C820_G"]},
   globalFilters_out: {},
   chartFilters_in: {},
   chartFilters_out: {},
@@ -887,65 +1050,7 @@ const Aging = {
       }]
     }
     var OptionsPendCheck = {
-      maintainAspectRatio: false,
-      plugins: {
-        datalabels: {
-          color: 'rgb(255, 255, 255)',
-          anchor: 'end',
-          align: 'top',
-          font: {
-            size: 18,
-          },
-          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
-        },
-      },
-      layout: {
-        padding: {
-          left:10,
-          right: 10,
-          top: 40,
-          bottom: 0
-        }
-      },
-      scales: {
-        yAxes: [{
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.1)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            beginAtZero: true,
-          },
-          display:false,
-        }],
-        xAxes: [{
-          gridLines: {
-            drawBorder: false,
-            color: 'rgba(29,140,248,0.1)',
-            zeroLineColor: "transparent",
-          },
-          ticks: {
-            fontSize: 17,
-            padding: 20,
-            fontColor: "#9e9e9e"
-          },
-        }]
-      },
-    };
-
-    var DataPendManifest = {
-      labels: Labels,
-      datasets: [{
-        label: "Itens",
-        borderColor: ["#2dce89","#ffd600","#f5365c"],
-        fill: true,
-        backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
-        borderWidth: 3,
-        data: [0,0,0]
-      }]
-    }
-    var OptionsPendManifest = {
+      cutoutPercentage: 70,
       plugins: {
         datalabels: {
           color: 'rgb(255, 255, 255)',
@@ -963,6 +1068,64 @@ const Aging = {
           right: 10,
           top: 20,
           bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
+    };
+
+    var DataPendManifest = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor: ["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [0,0,0]
+      }]
+    }
+    var OptionsPendManifest = {
+      cutoutPercentage: 70,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
         }
       },
     };
@@ -1025,7 +1188,7 @@ const Aging = {
       }]
     }
     var OptionsPendGI = {
-      cutoutPercentage: 65,
+      cutoutPercentage: 70,
       plugins: {
         datalabels: {
           color: 'rgb(255, 255, 255)',
@@ -1045,12 +1208,260 @@ const Aging = {
           bottom: 0
         }
       },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
     };
 
-    this.myChartPendCheck = new ChartManager("With NF","bar",DataPendCheck,OptionsPendCheck,"",this);
-    this.myChartPendManifest = new ChartManager("Checking","pie",DataPendManifest,OptionsPendManifest,"",this);
+
+    var DataPendPick = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [0,0,0]
+      }]
+    }
+    var OptionsPendPick = {
+      cutoutPercentage: 70,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
+    };
+
+    var DataPendPickSend = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [0,0,0]
+      }]
+    }
+    var OptionsPendPickSend = {
+      cutoutPercentage: 70,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
+    };
+
+    var DataPendNF = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [0,0,0]
+      }]
+    }
+    var OptionsPendNF = {
+      cutoutPercentage: 70,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
+    };
+
+    var DataPendPrint = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [0,0,0]
+      }]
+    }
+    var OptionsPendPrint = {
+      cutoutPercentage: 70,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
+    };
+
+    var DataPendMvDock = {
+      labels: Labels,
+      datasets: [{
+        label: "Itens",
+        borderColor: ["#2dce89","#ffd600","#f5365c"],
+        fill: true,
+        backgroundColor:["rgba(45, 206, 136, 0.15)","rgba(255, 213, 0, 0.15)","rgba(245, 54, 92, 0.15)"],
+        borderWidth: 3,
+        data: [0,0,0]
+      }]
+    }
+    var OptionsPendMvDock = {
+      cutoutPercentage: 70,
+      plugins: {
+        datalabels: {
+          color: 'rgb(255, 255, 255)',
+          anchor: 'center',
+          align: 'center',
+          font: {
+            size: 18,
+          },
+          formatter: (value) => `${value.toLocaleString('pt-BR')}`,
+        },
+      },
+      layout: {
+        padding: {
+          left:10,
+          right: 10,
+          top: 20,
+          bottom: 0
+        }
+      },
+      scale: {
+        gridLines: {
+            circular: true,
+            display: false 
+        },
+        angleLines: {
+            display: false 
+        },
+        ticks: {
+          display: false 
+        }
+      },
+    };
+
+    this.myChartPendPick = new ChartManager("Allocation","polarArea",DataPendPick,OptionsPendPick,"",this);
+    this.myChartPendPickSend = new ChartManager("Picking","polarArea",DataPendPickSend,OptionsPendPickSend,"",this);
+    this.myChartPendNF = new ChartManager("Pick Send","polarArea",DataPendNF,OptionsPendNF,"",this);
+    this.myChartPendPrint = new ChartManager("With NF","polarArea",DataPendPrint,OptionsPendPrint,"",this);
+    this.myChartPendCheck = new ChartManager("Print","polarArea",DataPendCheck,OptionsPendCheck,"",this);
+    this.myChartPendMvDock = new ChartManager("Checking","polarArea",DataPendMvDock,OptionsPendMvDock,"",this);
+    this.myChartPendManifest = new ChartManager("Mv. Dock","polarArea",DataPendManifest,OptionsPendManifest,"",this);
     this.myChartPendLoad = new ChartManager("Mf.Created","polarArea",DataPendLoad,OptionsPendLoad,"",this);
-    this.myChartPendGI = new ChartManager("Loading","doughnut",DataPendGI,OptionsPendGI,"",this);
+    this.myChartPendGI = new ChartManager("Loading","polarArea",DataPendGI,OptionsPendGI,"",this);
   },
   initialize_table(){
     const container = document.getElementById('excelTable');
@@ -1066,7 +1477,9 @@ const Aging = {
         "Temp. Decorrido",
         "D/O Date",
         "PGI Date",
+        "Alloc Date",
         "Pick Date",
+        "Pick Send Date",
         "XML Date",
         "Packing Labeling Date",
         "Check Date",
@@ -1124,7 +1537,48 @@ const Aging = {
       }
       Aging.update();
     });
-    $("#btn_check").click(function() {
+    $("#C820_G").click(function() {
+      const key = "Warehouse Cd.";
+      const value = "C820_G";
+      const index = Aging.globalFilters_in[key].indexOf(value);
+      if (index !== -1) {
+        Aging.globalFilters_in[key].splice(index, 1);
+      } else {
+        Aging.globalFilters_in[key].push(value);
+      }
+      Aging.update();
+    });
+    $("#btn_pick").click(function() {
+      const key = "Allocation";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
+      } else {
+        Aging.chartFilters_in[key] = value;
+      }
+      Aging.update();
+    });
+    $("#btn_picksend").click(function() {
+      const key = "Picking";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
+      } else {
+        Aging.chartFilters_in[key] = value;
+      }
+      Aging.update();
+    });
+    $("#btn_nf").click(function() {
+      const key = "Pick Send";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
+      } else {
+        Aging.chartFilters_in[key] = value;
+      }
+      Aging.update();
+    });
+    $("#btn_print").click(function() {
       const key = "With NF";
       const value = null;
       if (Aging.chartFilters_in[key] === value) {
@@ -1134,8 +1588,28 @@ const Aging = {
       }
       Aging.update();
     });
-    $("#btn_manifest").click(function() {
+    $("#btn_check").click(function() {
+      const key = "Print";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
+      } else {
+        Aging.chartFilters_in[key] = value;
+      }
+      Aging.update();
+    });
+    $("#btn_mvdock").click(function() {
       const key = "Checking";
+      const value = null;
+      if (Aging.chartFilters_in[key] === value) {
+        delete Aging.chartFilters_in[key]
+      } else {
+        Aging.chartFilters_in[key] = value;
+      }
+      Aging.update();
+    });
+    $("#btn_manifest").click(function() {
+      const key = "Mv. Dock";
       const value = null;
       if (Aging.chartFilters_in[key] === value) {
         delete Aging.chartFilters_in[key]
@@ -1181,32 +1655,52 @@ const Aging = {
 
     const lastupdate = fulldata.UltAtualizacao[0].Atualizacao;
 
-    let Pendcheck = 0, Pendmanifest = 0, Pendload = 0, Pendgi = 0;
+    // Mapeia os status para os nomes das variáveis correspondentes
+    const pendingsMap = {
+      "Allocation": "PendPick",
+      "Picking": "PendPickSend",
+      "Picking Send": "PendNF",
+      "With NF": "PendPrint",
+      "Print": "Pendcheck",
+      "Checking": "PendMvDock",
+      "MV. Dock": "Pendmanifest",
+      "Mf.Created": "Pendload",
+      "Loading": "Pendgi",
+    };
 
+    // Inicializa todas as variáveis dinamicamente
+    let counts = {
+      PendPick: 0,
+      PendPickSend: 0,
+      PendNF: 0,
+      PendPrint: 0,
+      Pendcheck: 0,
+      PendMvDock: 0,
+      Pendmanifest: 0,
+      Pendload: 0,
+      Pendgi: 0,
+    };
+
+    // Percorre os dados filtrados e atualiza os contadores dinamicamente
     datadfiltered.forEach(row => {
-
-        const orderQty = row["Order Quantity"];
-
-        if (row["Status"] === "With NF") {
-          Pendcheck += orderQty;
-        }
-        if (row["Status"] === "Checking") {
-          Pendmanifest += orderQty;
-        }
-        if (row["Status"] === "Mf.Created") {
-          Pendload += orderQty;
-        }
-        if (row["Status"] === "Loading") {
-          Pendgi += orderQty;
-        }
-
+      const key = pendingsMap[row["Status"]];
+      if (key) counts[key] += row["Order Quantity"];
     });
+
+    // Desestruturação opcional para acessar as variáveis diretamente
+    const { PendPick, PendPickSend, PendNF, PendPrint, Pendcheck, PendMvDock, Pendmanifest, Pendload, Pendgi } = counts;
+
 
     var lastupdateIcon = "<i class='tim-icons icon-refresh-01 text-info'></i>";
     var lastupdateDescription = " Last Update: ";
 
     document.getElementById("lastupdate").innerHTML = lastupdateIcon + lastupdateDescription + (lastupdate.toLocaleString('pt-BR'));
+    document.getElementById("Lb_PendPick").innerHTML = PendPick.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendPickSend").innerHTML = PendPickSend.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendNF").innerHTML = PendNF.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendPrint").innerHTML = PendPrint.toLocaleString('pt-BR');
     document.getElementById("Lb_PendCheck").innerHTML = Pendcheck.toLocaleString('pt-BR');
+    document.getElementById("Lb_PendMvDock").innerHTML = PendMvDock.toLocaleString('pt-BR');
     document.getElementById("Lb_PendManifest").innerHTML = Pendmanifest.toLocaleString('pt-BR');
     document.getElementById("Lb_PendLoad").innerHTML = Pendload.toLocaleString('pt-BR');
     document.getElementById("Lb_PendGI").innerHTML = Pendgi.toLocaleString('pt-BR');
@@ -1245,7 +1739,9 @@ const Aging = {
         row["Temp. Decorrido"] ?? "",
         row["D/O Date"] ?? "",
         row["PGI Date"] ?? "",
+        row["Alloc Date"] ?? "",
         row["Pick Date"] ?? "",
+        row["Pick Send Date"] ?? "",
         row["XML Date"] ?? "",
         row["Packing Labeling Date"] ?? "",
         row["Check Date"] ?? "",
@@ -1275,21 +1771,26 @@ const Aging = {
     );
     const agora = new Date();
     const filter_in = filter_out.map(item => {
-      let dataItem;
-      let transformedStatus = item["Status"];
-  
-      if (transformedStatus === "With NF" || transformedStatus === "Print") {
-        item["Status"] = "With NF";
-        dataItem = new Date(convertToUSFormat(item["XML Date"]));
-      } else if (transformedStatus === "Checking" || transformedStatus === "Mv. Dock") {
-        item["Status"] = "Checking";
-        dataItem = new Date(convertToUSFormat(item["Check Date"]));
-      } else if (transformedStatus === "Mf.Created") {
-        dataItem = new Date(convertToUSFormat(item["Manifest Date"]));
-      } else if (transformedStatus === "Loading") {
-        dataItem = new Date(convertToUSFormat(item["Load Date"]));
+      let dataItem;  
+
+      const statusDateMap = {
+        "Allocation": "Alloc Date",
+        "Picking": "Pick Date",
+        "Pick Send": "Pick Send Date",
+        "With NF": "XML Date",
+        "Print": "Packing Labeling Date",
+        "Checking": "Check Date",
+        "Mv. Dock": "Move To Dock Date",
+        "Mf.Created": "Manifest Date",
+        "Loading": "Load Date"
+      };
+    
+      const dateKey = statusDateMap[item.Status];
+      
+      if (dateKey) {
+        dataItem = new Date(convertToUSFormat(item[dateKey]));
       }
-  
+
       let diffMinutos = dataItem ? Math.floor((agora - dataItem) / (1000 * 60)) : null;
       
       item["Temp. Decorrido"] = formatMtoDH(diffMinutos);
@@ -1339,39 +1840,39 @@ const Aging = {
     const agora = new Date();
 
     tabela.forEach(item => {
-        let dataItem;
-        if (item.Status === "With NF" || item.Status ==="Print"){
-          item.Status = "With NF"
-          dataItem = new Date(convertToUSFormat(item["XML Date"]));
-        } else
-        if (item.Status === "Checking" || item.Status === "Mv. Dock"){
-          item.Status = "Checking"
-          dataItem = new Date(convertToUSFormat(item["Check Date"]));
-        } else
-        if (item.Status === "Mf.Created"){
-          dataItem = new Date(convertToUSFormat(item["Manifest Date"]));
-        } else
-        if (item.Status === "Loading"){
-          dataItem = new Date(convertToUSFormat(item["Load Date"]));
-        } else {
-         return;
-        }
+      let dataItem;
+      const statusDateMap = {
+        "Picking": "Pick Date",
+        "Pick Send": "Pick Send Date",
+        "With NF": "XML Date",
+        "Print": "Packing Labeling Date",
+        "Checking": "Check Date",
+        "Mv. Dock": "Move To Dock Date",
+        "Mf.Created": "Manifest Date",
+        "Loading": "Load Date"
+      };
+    
+      const dateKey = statusDateMap[item.Status];
+      
+      if (dateKey) {
+        dataItem = new Date(convertToUSFormat(item[dateKey]));
+      }
+    
+      const diffMinutos = Math.floor((agora - dataItem) / (1000 * 60));
+      
+      let categoria;
+      if (diffMinutos < 30) {
+          categoria = "até 30m";
+      } else if (diffMinutos >= 30 && diffMinutos <= 60) {
+          categoria = "30m até 1h";
+      } else {
+          categoria = "Maior que 1h";
+      }
 
-        const diffMinutos = Math.floor((agora - dataItem) / (1000 * 60));
-        
-        let categoria;
-        if (diffMinutos < 30) {
-            categoria = "até 30m";
-        } else if (diffMinutos >= 30 && diffMinutos <= 60) {
-            categoria = "30m até 1h";
-        } else {
-            categoria = "Maior que 1h";
-        }
-
-        if (!resultado[item.Status]) {
-            resultado[item.Status] = [{ "até 30m": 0, "30m até 1h": 0, "Maior que 1h": 0 }];
-        }
-        resultado[item.Status][0][categoria] += item["Order Quantity"];
+      if (!resultado[item.Status]) {
+          resultado[item.Status] = [{ "até 30m": 0, "30m até 1h": 0, "Maior que 1h": 0 }];
+      }
+      resultado[item.Status][0][categoria] += item["Order Quantity"];
     });
     
     return resultado;
