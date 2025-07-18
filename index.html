@@ -586,17 +586,12 @@
 
         respostas.forEach((res, i) => {
             if (res.status === 'fulfilled') {
-            const json = res.value;
-
-            for (const chave in json) {
-                if (!Array.isArray(json[chave])) continue;
-                if (!combinado[chave]) combinado[chave] = [];
-                combinado[chave].push(...json[chave]);
-            }
-
-            console.log(`✅ Processado: ${links[i]}`);
+                const json = res.value;
+                for (const chave in json) {
+                    if (!Array.isArray(json[chave])) continue; if (!combinado[chave]) combinado[chave] = [];combinado[chave].push(...json[chave]);
+                }
             } else {
-            console.error(`❌ Erro ao processar ${links[i]}: ${res.reason}`);
+                console.error(`❌ Erro ao processar ${links[i]}: ${res.reason}`);
             }
         });
 
@@ -604,22 +599,6 @@
     }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // const params = new URLSearchParams(window.location.search);
-            // if (params.get("wh")) {
-            //     Dashboard.globalFilters_in["Warehouse Cd."] = []
-            //     Dashboard.globalFilters_in["Warehouse Cd."].push(params.get("wh"));
-
-            //     document.getElementById('C820_L').checked = false;
-            //     document.getElementById('C820_J').checked = false;
-            //     document.getElementById('C820_R').checked = false;
-            //     document.getElementById('C820_G').checked = false;
-
-            //     document.getElementById(params.get("wh")).checked = true;
-
-            //     const url = {"C820_L":"/MX","C820_J":"/CE","C820_R":"/REC","C820_G":"/GRV" }
-            
-            //     window.history.pushState({}, "", url[params.get("wh")]);
-            // }
             await carregarDadosIniciais();
             iniciarAtualizacaoAutomatica();
         });
@@ -632,7 +611,7 @@
             'https://script.google.com/macros/s/AKfycbwPtszFPj8nPo--QKFaeEWFqVdDhKDikXfX8DA5TAU1XdacADxZK1OUtdBc9xPsQla7/exec'
         ];
 
-        const intervalo = 10 * 60 * 1000; 
+        const intervalo = 5 * 60 * 1000;
         let ultimaAtualizacao;
         let proximaAtualizacao;
         async function carregarDadosIniciais() {
@@ -659,7 +638,7 @@
 
                 const progamar = new Date();
                 const proximo = proximaAtualizacao - progamar;
-                setTimeout(update, proximo<0?30000:proximo);
+                setTimeout(update, proximo<0?intervalo:proximo);
 
                 console.log("Atualizando dados...");
                 
@@ -688,7 +667,7 @@
             const progamar = new Date();
             const proximo = proximaAtualizacao - progamar;
 
-            setTimeout(update, proximo<0?30000:proximo);
+            setTimeout(update, proximo<0?intervalo:proximo);
         }
     </script>
 </body>
