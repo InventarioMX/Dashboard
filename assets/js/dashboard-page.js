@@ -146,7 +146,7 @@ let ordem_status = ["W.Pre-Visit","CARR_ID Incorreto","P.Ship","W.Booking","W.Al
 
 const Dashboard = {
 
-  globalFilters_in: {"Warehouse Cd.":["C820_L","C820_J","C820_R","C820_G"]},
+  globalFilters_in: {"Warehouse Cd.":["C820_L"]},
   globalFilters_out: {},
   chartFilters_in: {},
   chartFilters_out: {"Trans Method.":""},
@@ -648,44 +648,53 @@ const Dashboard = {
       const key = "Warehouse Cd.";
       const value = "C820_L";
       const index = Dashboard.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters_in[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters_in[key].push(value);
-      }
+      Dashboard.globalFilters_in[key] = value;
+      document.getElementById('plant_btn').textContent = "CAJ MX";
+      document.querySelectorAll('[id^="C820_"]').forEach(button =>{
+        if (button.id !== value){
+          button.checked = false;
+        }
+      });
+      
       Dashboard.update();
     });
     $("#C820_J").click(function() {
       const key = "Warehouse Cd.";
       const value = "C820_J";
       const index = Dashboard.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters_in[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters_in[key].push(value);
-      }
+      Dashboard.globalFilters_in[key] = value;
+      document.getElementById('plant_btn').textContent = "CAJ CE";
+      document.querySelectorAll('[id^="C820_"]').forEach(button =>{
+        if (button.id !== value){
+          button.checked = false;
+        }
+      });
       Dashboard.update();
     });
     $("#C820_R").click(function() {
       const key = "Warehouse Cd.";
       const value = "C820_R";
       const index = Dashboard.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters_in[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters_in[key].push(value);
-      }
+      Dashboard.globalFilters_in[key] = value;
+      document.getElementById('plant_btn').textContent = "RECIFE";
+      document.querySelectorAll('[id^="C820_"]').forEach(button =>{
+        if (button.id !== value){
+          button.checked = false;
+        }
+      });
       Dashboard.update();
     });
     $("#C820_G").click(function() {
       const key = "Warehouse Cd.";
       const value = "C820_G";
       const index = Dashboard.globalFilters_in[key].indexOf(value);
-      if (index !== -1) {
-        Dashboard.globalFilters_in[key].splice(index, 1);
-      } else {
-        Dashboard.globalFilters_in[key].push(value);
-      }
+      Dashboard.globalFilters_in[key] = value;
+      document.getElementById('plant_btn').textContent = "GAR";
+      document.querySelectorAll('[id^="C820_"]').forEach(button =>{
+        if (button.id !== value){
+          button.checked = false;
+        }
+      });
       Dashboard.update();
     });
     $("#filtrarparadigma").click(function() {
@@ -843,7 +852,7 @@ const Dashboard = {
     // var lastupdateDescription = " Last Update: ";
 
     var capIcon = "<i class='tim-icons  icon-app text-info'></i>";
-    var capDescription = " Target: ";
+    var capDescription = " Capa: ";
 
     var inprocessDescription = "In process: "
 

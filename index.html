@@ -39,12 +39,7 @@
                         <p>Dashboard</p>
                         </a>
                     </li>
-                    <li>
-                        <a href="/aging.html">
-                        <i class="tim-icons icon-time-alarm"></i>
-                        <p>Aging</p>
-                        </a>
-                    </li>
+
                 </ul>
             </div>
         </div>
@@ -72,7 +67,7 @@
                     <div class="collapse navbar-collapse" id="navigation">
                         <ul class="navbar-nav">
                             <li class="dropdown nav-item ml-5"></li>
-                            <li class="dropdown nav-item card-title mb-0">
+                            <!-- <li class="dropdown nav-item card-title mb-0">
                                 <a class="nav-link card-title navbar-brand h4 mb-0 ml-0 p-0">
                                     <div class="form-check nav-item pt-1">
                                         <label class="form-check-label">
@@ -123,10 +118,10 @@
                                         </label>
                                     </div>
                                 </a>
-                            </li>
-                            <!-- <li class="dropdown nav-item card-title mb-0">
-                                <a href="javascript:void(0)" class="dropdown-toggle h3 navbar-brand ml-0" data-toggle="dropdown">
-                                    Plantas
+                            </li> -->
+                            <li class="dropdown nav-item card-title mb-0">
+                                <a href="javascript:void(0)" class="dropdown-toggle h3 navbar-brand ml-0" data-toggle="dropdown" id="plant_btn">
+                                    CAJ MX
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
                                     <li class="nav-link"><a>
@@ -136,45 +131,45 @@
                                                     <span class="form-check-sign">
                                                         <span class="check"></span>
                                                     </span>
-                                                    <span class="card-title navbar-brand">C820_L - CAJ MX</span>
+                                                    <span class="card-title navbar-brand">CAJ MX</span>
                                                 </label>
                                             </div>
                                     </a></li>
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="" id="C820_J">
+                                                <input class="form-check-input" type="checkbox" value=""  id="C820_J">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
                                                 </span>
-                                                <span class="card-title navbar-brand">C820_J - CAJ CE</span>
+                                                <span class="card-title navbar-brand">CAJ CE</span>
                                             </label>
                                         </div>
                                     </a></li>
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="" id="C820_R">
+                                                <input class="form-check-input" type="checkbox" value="" id="C820_R">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
                                                 </span>
-                                                <span class="card-title navbar-brand">C820_R - RECIFE</span>
+                                                <span class="card-title navbar-brand">RECIFE</span>
                                             </label>
                                         </div>
                                     </a></li>
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="" id="C820_G">
+                                                <input class="form-check-input" type="checkbox" value=""  id="C820_G">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
                                                 </span>
-                                                <span class="card-title navbar-brand">C820_G - GARUVA</span>
+                                                <span class="card-title navbar-brand">GARUVA</span>
                                             </label>
                                         </div>
                                     </a></li>
                                 </ul>
-                            </li> -->
+                            </li>
                         </ul>
                         <ul class="navbar-nav ml-auto">
                             <!-- <li class="dropdown nav-item card-title mb-0">
@@ -230,15 +225,7 @@
             <!-- End Navbar -->
             <div class="content">
                 <div class="row">
-                    <div class="col-lg-2 col-sm-12">
-                        <div class="card">
-                            <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-danger"></i> Backlog</h2></div>
-                            <div class="card-header btn btn-simple mb-xl-0" id="btn_backlog">
-                                <h4 class="text-muted">Pending <a class="h3"><i id="filter-clear-backlog" class="tim-icons text-muted"></i></a></h4>
-                                <h1 id="backlog"></i></h1>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="col-lg-5 col-sm-12">
                         <div class="card">
                             <div class="row">
@@ -271,7 +258,7 @@
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
-                                    <div class="card-header"><h2 class="mb-xl-0" id="Cap"><i class="tim-icons icon-app text-info"></i> Target:  </h2></div>
+                                    <div class="card-header"><h2 class="mb-xl-0" id="Cap"><i class="tim-icons icon-app text-info"></i> Capa:  </h2></div>
                                     <div class="card-header">
                                         <div class="mb-xl-1"></div>
                                         <div class="row">
@@ -289,6 +276,15 @@
                                 <div class="col-lg-5">
                                     <canvas id="CapPorcent"></canvas> 
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-sm-12">
+                        <div class="card">
+                            <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-danger"></i> Backlog</h2></div>
+                            <div class="card-header btn btn-simple mb-xl-0" id="btn_backlog">
+                                <h4 class="text-muted">Pending <a class="h3"><i id="filter-clear-backlog" class="tim-icons text-muted"></i></a></h4>
+                                <h1 id="backlog"></i></h1>
                             </div>
                         </div>
                     </div>
@@ -456,14 +452,14 @@
         $(document).ready(function() {
         $().ready(function() {
 
-            $('.dropdown-menu a').click(function(event) {
-                event.stopPropagation();
-            });
+            // $('.dropdown-menu a').click(function(event) {
+            //     event.stopPropagation();
+            // });
             
-            $('.dropdown-toggle').click(function(event) {
-                var isExpanded = $(this).attr('aria-expanded') === 'true';
-                $(this).attr('aria-expanded', !isExpanded);
-            });
+            // $('.dropdown-toggle').click(function(event) {
+            //     var isExpanded = $(this).attr('aria-expanded') === 'true';
+            //     $(this).attr('aria-expanded', !isExpanded);
+            // });
 
             $sidebar = $('.sidebar');
             $navbar = $('.navbar');
