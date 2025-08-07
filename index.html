@@ -1,4 +1,4 @@
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -15,7 +15,7 @@
     <link href="./assets/css/nucleo-icons.css" rel="stylesheet" />
     <!-- CSS Files -->
     <link href="./assets/css/black-dashboard.css?version=1" rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <!-- CSS Custom-->
     <link href="./assets/css/dashboard-page.css" rel="stylesheet" />
     <link href="./assets/css/dataTables.min.css" rel="stylesheet" />
     <link href="./assets/css/handsontable.min.css" rel="stylesheet" />
@@ -24,7 +24,56 @@
 </head>
 
 <body class="">
-    <div class="wrapper">
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <h2>
+                <i class="tim-icons tim-icons-is-spinning icon-refresh-01 text-info"></i> Carregando . . .  
+            </h2>
+        </div>
+    </div>
+    <div class="wrapper" id="tela_login">
+        <div class="container-fluid">
+            <div class="content">
+                <div class="container">
+                    <div class="row pt-5">
+                        <div class="col-md-6 mt-5 offset-md-3 pt-5 mt-5">
+                            <div class="card">
+                                <div class="card-header text-center py-4">
+                                    <h4 class="title">
+                                        Dashboard D2C
+                                    </h4>
+                                </div>
+                                <div class="card-body px-5 py-3">
+                                    <form id="Form_Login">
+                                        <div class="row">
+                                            <div class="col-md-12 px-md-1">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Username :
+                                                    </label>
+                                                    <input type="text" name="username" class="form-control" placeholder="Username" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="username">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>
+                                                        Password :
+                                                    </label>
+                                                    <input type="password" name="password" autocomplete="password" class="form-control" placeholder="Password" maxlength="50" required="" id="password">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 px-md-1">
+                                                <button class="btn btn-fill btn-info float-right" id="btn-login">Login</button> 
+                                            </div>                                
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper d-none" id="tela_dash">
         <div class="sidebar" data="blue">
             <div class="sidebar-wrapper">
                 <div class="logo">
@@ -119,7 +168,7 @@
                                     </div>
                                 </a>
                             </li> -->
-                            <li class="dropdown nav-item card-title mb-0">
+                            <li class="dropdown nav-item">
                                 <a href="javascript:void(0)" class="dropdown-toggle h3 navbar-brand ml-0" data-toggle="dropdown" id="plant_btn">
                                     CAJ MX
                                 </a>
@@ -204,19 +253,15 @@
                                     </li>
                                 </ul>
                             </li> -->
-
                             <li class="dropdown nav-item">
                                 <a href="javascript:void(0)" class="h3 m-0 p-0" >
                                     <i id="clear-all" class="tim-icons p-1 pr-2"></i>
                                 </a>
                             </li>
-                            
                             <li class="dropdown nav-item">
                                 <a class="card-title navbar-brand h3 mb-0 ml-0 p-0" id="lastupdate">
-                                    <i class="tim-icons tim-icons-is-spinning icon-refresh-01 text-info"></i> Carregando . . .
                                 </a>
                             </li>
-                            
                             <li class="separator d-lg-none"></li>
                         </ul>
                     </div>
@@ -226,7 +271,7 @@
             <div class="content">
                 <div class="row">
                     
-                    <div class="col-lg-5 col-sm-12">
+                    <div class="col-lg-6 col-sm-12">
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
@@ -247,28 +292,28 @@
                                 <div class="col-lg-5">
                                     <div class="mb-xl-4"></div>
                                     <div class="card-header text-center ">
-                                        <h4 class="text-muted">CURRENT</h4>
+                                        <h4 class="text-muted">TODAY</h4>
                                         <h1 class="bigg" id="GICurrent"></h1>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-sm-12">
+                    <div class="col-lg-6 col-sm-12">
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
-                                    <div class="card-header"><h2 class="mb-xl-0" id="Cap"><i class="tim-icons icon-app text-info"></i> Capa:  </h2></div>
+                                    <div class="card-header"><h2 class="mb-xl-0" ><i class="tim-icons icon-app text-info"></i> Performance</h2></div>
                                     <div class="card-header">
                                         <div class="mb-xl-1"></div>
                                         <div class="row">
                                             <div class="col-sm-6 text-center">
-                                                <h4 class="text-muted ">Pending</h4>
-                                                <h1 id="PendingCap"></h>                                   
+                                                <h4 class="text-muted">Capa</h4>
+                                                <h1 id="Cap"></h1>    
                                             </div>
                                             <div class="col-sm-6 text-center">
-                                                <h4 class="text-muted">GI Exp.</h4>
-                                                <h1 id="GIExpected"></h1>    
+                                                <h4 class="text-muted ">Pending</h4>
+                                                <h1 id="PendingCap"></h>                                   
                                             </div>
                                         </div>
                                     </div>
@@ -279,7 +324,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-sm-12">
+                    <div class="col-lg-2 col-sm-12 carousel-item">
                         <div class="card">
                             <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-danger"></i> Backlog</h2></div>
                             <div class="card-header btn btn-simple mb-xl-0" id="btn_backlog">
@@ -378,7 +423,7 @@
                                             </label>
                                             <label class="btn btn-sm btn-success btn-simple active" id="Current">
                                             <input type="radio" name="options" checked="">
-                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Current</span>
+                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Today</span>
                                             <span class="d-block d-sm-none">
                                                 Current
                                             </span>
@@ -414,7 +459,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
@@ -425,28 +470,28 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
+
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/jquery.min.js"></script>
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap.min.js"></script>
+
+    <!--   Plugins JS Files   -->
     <script src="./assets/js/plugins/handsontable.full.min.js"></script>
     <script src="./assets/js/plugins/chartjs.min.js"></script>
     <script src="./assets/js/plugins/chartjs-plugin-datalabels.js"></script>
-    <script src="./assets/js/core/jquery.min.js"></script>
     <script src="./assets/js/plugins/dataTables.min.js"></script>
-
-    <!--   Core JS Files   -->
-    <script src="./assets/js/core/popper.min.js"></script>
-    <script src="./assets/js/core/bootstrap.min.js"></script>
     <script src="./assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
-    <!--  Google Maps Plugin    -->
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <!-- Chart JS -->
-    
-    <!--  Notifications Plugin    -->
     <script src="./assets/js/plugins/bootstrap-notify.js"></script>
-    <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
-    <script src="./assets/js/black-dashboard.min.js"></script><!-- Black Dashboard DEMO methods, don't include it in your project! -->
+
+
+
+    <!-- Control Center -->
+    <script src="./assets/js/black-dashboard.min.js"></script>
     <script src="./assets/js/dashboard-page.js"></script>
     <script>
         $(document).ready(function() {
@@ -486,26 +531,26 @@
             });
 
             $('.fixed-plugin .background-color span').click(function() {
-            $(this).siblings().removeClass('active');
-            $(this).addClass('active');
+                $(this).siblings().removeClass('active');
+                $(this).addClass('active');
 
-            var new_color = $(this).data('color');
+                var new_color = $(this).data('color');
 
-            if ($sidebar.length != 0) {
-                $sidebar.attr('data', new_color);
-            }
+                if ($sidebar.length != 0) {
+                    $sidebar.attr('data', new_color);
+                }
 
-            if ($main_panel.length != 0) {
-                $main_panel.attr('data', new_color);
-            }
+                if ($main_panel.length != 0) {
+                    $main_panel.attr('data', new_color);
+                }
 
-            if ($full_page.length != 0) {
-                $full_page.attr('filter-color', new_color);
-            }
+                if ($full_page.length != 0) {
+                    $full_page.attr('filter-color', new_color);
+                }
 
-            if ($sidebar_responsive.length != 0) {
-                $sidebar_responsive.attr('data', new_color);
-            }
+                if ($sidebar_responsive.length != 0) {
+                    $sidebar_responsive.attr('data', new_color);
+                }
             });
 
             $('.switch-sidebar-mini input').on("switchChange.bootstrapSwitch", function() {
@@ -531,140 +576,37 @@
             });
 
             $('.switch-change-color input').on("switchChange.bootstrapSwitch", function() {
-            var $btn = $(this);
+                var $btn = $(this);
 
-            if (white_color == true) {
+                if (white_color == true) {
 
-                $('body').addClass('change-background');
-                setTimeout(function() {
-                $('body').removeClass('change-background');
-                $('body').removeClass('white-content');
-                }, 900);
-                white_color = false;
-            } else {
+                    $('body').addClass('change-background');
+                    setTimeout(function() {
+                    $('body').removeClass('change-background');
+                    $('body').removeClass('white-content');
+                    }, 900);
+                    white_color = false;
+                } else {
 
-                $('body').addClass('change-background');
-                setTimeout(function() {
-                $('body').removeClass('change-background');
-                $('body').addClass('white-content');
-                }, 900);
+                    $('body').addClass('change-background');
+                    setTimeout(function() {
+                    $('body').removeClass('change-background');
+                    $('body').addClass('white-content');
+                    }, 900);
 
-                white_color = true;
-            }
-
-
+                    white_color = true;
+                }
             });
 
             $('.light-badge').click(function() {
-            $('body').addClass('white-content');
+                $('body').addClass('white-content');
             });
 
             $('.dark-badge').click(function() {
-            $('body').removeClass('white-content');
+                $('body').removeClass('white-content');
             });
         });
         });
-    </script>
-    <script>
-
-    async function carregarDadosDeLinks(links) {
-        const combinado = {};
-
-        const respostas = await Promise.allSettled(
-            links.map(url =>
-            fetch(url)
-                .then(res => {
-                if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
-                return res.json();
-                })
-            )
-        );
-
-        respostas.forEach((res, i) => {
-            if (res.status === 'fulfilled') {
-                const json = res.value;
-                for (const chave in json) {
-                    if (!Array.isArray(json[chave])) continue; if (!combinado[chave]) combinado[chave] = [];combinado[chave].push(...json[chave]);
-                }
-            } else {
-                console.error(`❌ Erro ao processar ${links[i]}: ${res.reason}`);
-            }
-        });
-
-        return combinado;
-    }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await carregarDadosIniciais();
-            iniciarAtualizacaoAutomatica();
-        });
-
-        const links = [
-            'https://script.google.com/macros/s/AKfycbxVCy7EdLIT1w-LDQHJOPPG55qxieR6youUCgfLHoE21MVzJbunJwk9-sylNypCG9QG/exec',
-            'https://script.google.com/macros/s/AKfycbwIaIg_4ceVdT6-Z_811NDpnomnjGj2elflmnG-2brY8ia21NrAmoIu-GJxvIhuYTrj/exec',
-            'https://script.google.com/macros/s/AKfycbw_yoISx4-FO5KwzHSFgJVEaH0ClF4bMmsu4x5WXXpj3MGVPa0lVsonJfWE-1H4OUJh/exec',
-            'https://script.google.com/macros/s/AKfycbxP9IutCIYPaw5aUyGYGQ6kYzr-ywkBtJ4wz5JDZhYS8z_jmaMMr00UigqpNbn1Kiw8/exec',
-            'https://script.google.com/macros/s/AKfycbwPtszFPj8nPo--QKFaeEWFqVdDhKDikXfX8DA5TAU1XdacADxZK1OUtdBc9xPsQla7/exec'
-        ];
-
-        const intervalo = 5 * 60 * 1000;
-        let ultimaAtualizacao;
-        let proximaAtualizacao;
-        async function carregarDadosIniciais() {
-            try {
-                const dados = await carregarDadosDeLinks(links);
-                
-                Dashboard.Dashboard_start(dados);
-
-                ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
-                proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 30000);
-
-            } catch (error) {
-                console.error('Erro ao buscar dados iniciais:', error);
-            }
-        }
-
-        async function update() {
-
-            try {
-                const dados = await carregarDadosDeLinks(links);
-
-                ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
-                proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 30000);
-
-                const progamar = new Date();
-                const proximo = proximaAtualizacao - progamar;
-                setTimeout(update, proximo<0?intervalo:proximo);
-
-                console.log("Atualizando dados...");
-                
-                Dashboard.DOCreatedFilter = formatarData(Dashboard.DOCreatedBtn);
-                Dashboard.update(dados);
-                
-                
-            } catch (error) {
-                setTimeout(update, 30000);
-            }
-        }
-
-        function mostrarTempoRestante() {
-            const agora = new Date();
-            const tempoRestante = proximaAtualizacao - agora;
-
-            const minutosRestantes = Math.floor((tempoRestante / 1000) / 60);
-            const segundosRestantes = Math.floor((tempoRestante / 1000) % 60);
-
-            console.log(`Próxima atualização em: ${minutosRestantes} minutos e ${segundosRestantes} segundos.`);
-        }
-
-        function iniciarAtualizacaoAutomatica() {
-            setInterval(mostrarTempoRestante, 1000);
-
-            const progamar = new Date();
-            const proximo = proximaAtualizacao - progamar;
-
-            setTimeout(update, proximo<0?intervalo:proximo);
-        }
     </script>
 </body>
 </html>

@@ -1,3 +1,133 @@
+async function carregarDadosDeLinks(links) {
+  const combinado = {};
+  const respostas = await Promise.allSettled(
+      links.map(url =>
+      fetch(url)
+          .then(res => {
+          if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+          return res.json();
+          })
+      )
+  );
+  respostas.forEach((res, i) => {
+      if (res.status === 'fulfilled') {
+          const json = res.value;
+          for (const chave in json) {
+              if (!Array.isArray(json[chave])) continue; if (!combinado[chave]) combinado[chave] = [];combinado[chave].push(...json[chave]);
+          }
+      } else {
+          console.error(`❌ Erro ao processar ${links[i]}: ${res.reason}`);
+      }
+  });
+  return combinado;
+}
+
+async function carregarDadosIniciais() {
+    try {
+        const popup = document.getElementById("popup");
+              popup.style.display = "flex";
+
+        const dados = await carregarDadosDeLinks(links);
+        
+        Dashboard.Dashboard_start(dados);
+
+        popup.style.display = "none";
+        
+        ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
+        proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 30000);
+
+    } catch (error) {
+        console.error('Erro ao buscar dados iniciais:', error);
+    }
+}
+
+async function update() {
+    try {
+        const dados = await carregarDadosDeLinks(links);
+
+        ultimaAtualizacao = new Date(convertToUSFormat(dados.UltAtualizacao[0].Atualizacao,true));
+        proximaAtualizacao = new Date(ultimaAtualizacao.getTime() + intervalo + 30000);
+
+        const progamar = new Date();
+        const proximo = proximaAtualizacao - progamar;
+        setTimeout(update, proximo<0?intervalo:proximo);
+
+        console.log("Atualizando dados...");
+        
+        Dashboard.DOCreatedFilter = formatarData(Dashboard.DOCreatedBtn);
+        Dashboard.update(dados);
+        
+        
+    } catch (error) {
+        setTimeout(update, 30000);
+    }
+}
+
+function mostrarTempoRestante() {
+    const agora = new Date();
+    const tempoRestante = proximaAtualizacao - agora;
+
+    const minutosRestantes = Math.floor((tempoRestante / 1000) / 60);
+    const segundosRestantes = Math.floor((tempoRestante / 1000) % 60);
+
+    console.log(`Próxima atualização em: ${minutosRestantes} minutos e ${segundosRestantes} segundos.`);
+}
+
+function iniciarAtualizacaoAutomatica() {
+    setInterval(mostrarTempoRestante, 1000);
+
+    const progamar = new Date();
+    const proximo = proximaAtualizacao - progamar;
+
+    setTimeout(update, proximo<0?intervalo:proximo);
+}
+
+const usuariocerto = "admin";
+const senhacerta = "123";
+
+const intervalo = 5 * 60 * 1000;
+let ultimaAtualizacao;
+let proximaAtualizacao;
+
+const links = [
+  'https://script.google.com/macros/s/AKfycbxVCy7EdLIT1w-LDQHJOPPG55qxieR6youUCgfLHoE21MVzJbunJwk9-sylNypCG9QG/exec',
+  'https://script.google.com/macros/s/AKfycbwIaIg_4ceVdT6-Z_811NDpnomnjGj2elflmnG-2brY8ia21NrAmoIu-GJxvIhuYTrj/exec',
+  'https://script.google.com/macros/s/AKfycbw_yoISx4-FO5KwzHSFgJVEaH0ClF4bMmsu4x5WXXpj3MGVPa0lVsonJfWE-1H4OUJh/exec',
+  'https://script.google.com/macros/s/AKfycbxP9IutCIYPaw5aUyGYGQ6kYzr-ywkBtJ4wz5JDZhYS8z_jmaMMr00UigqpNbn1Kiw8/exec',
+  'https://script.google.com/macros/s/AKfycbwPtszFPj8nPo--QKFaeEWFqVdDhKDikXfX8DA5TAU1XdacADxZK1OUtdBc9xPsQla7/exec'
+];
+
+document.getElementById("Form_Login").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const usuario = document.getElementById("username").value;
+  const senha = document.getElementById("password").value;
+
+  if (usuario === usuariocerto && senha === senhacerta){
+      document.getElementById("tela_login").classList.add("d-none")
+      document.getElementById("tela_dash").classList.remove("d-none")
+  
+      await carregarDadosIniciais();
+      iniciarAtualizacaoAutomatica();
+  } else {
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+
+      $.notify({
+        message: '<strong>Error!</strong> User or password incorrect.'
+      }, {
+        type: 'danger',
+        placement: {
+          from: "top",
+          align: "center"
+        },
+        delay: 3000, // Notification disappears after 3 seconds
+        template: '<div data-notify="container" class="col-xs-11 col-sm-4 alert alert-{0}" role="alert" style="min-width: 80%; max-width: 80%; font-size: 1rem;">' +
+                    '<span data-notify="message">{2}</span>' +
+                  '</div>'
+      });
+  }
+})
+
 class ChartManager {
   constructor(chartId, type, data = {}, options = {},gradientColor,tela) {
     this.chartId = chartId;
@@ -96,7 +226,7 @@ class ChartManager {
         }
       }
       
-      tela.update_tables();
+      // tela.update_tables();
     }
   }
 };
@@ -161,7 +291,7 @@ const Dashboard = {
     d2cdata = data.RelatorioD2C;
 
     this.initialize_charts();
-    this.initialize_table();
+    // this.initialize_table();
     this.initialize_buttons();
     this.initialize_redim();
 
@@ -689,7 +819,7 @@ const Dashboard = {
       const value = "C820_G";
       const index = Dashboard.globalFilters_in[key].indexOf(value);
       Dashboard.globalFilters_in[key] = value;
-      document.getElementById('plant_btn').textContent = "GAR";
+      document.getElementById('plant_btn').textContent = "GARUVA";
       document.querySelectorAll('[id^="C820_"]').forEach(button =>{
         if (button.id !== value){
           button.checked = false;
@@ -788,7 +918,7 @@ const Dashboard = {
 
     this.update_heads();
     this.update_charts();
-    this.update_tables();
+    // this.update_tables();
   },
   update_heads(){
 
@@ -861,9 +991,9 @@ const Dashboard = {
     document.getElementById("GID2").innerHTML = GI_DMenos2.toLocaleString('pt-BR');
     document.getElementById("GID1").innerHTML = GI_DMenos1.toLocaleString('pt-BR');
     document.getElementById("GICurrent").innerHTML = (GI_Current.toLocaleString('pt-BR'))
-    document.getElementById("Cap").innerHTML = (capIcon + capDescription + Capacidade.toLocaleString('pt-BR'));
+    document.getElementById("Cap").innerHTML = (Capacidade.toLocaleString('pt-BR'));
     document.getElementById("PendingCap").innerHTML = PendingCap.toLocaleString('pt-BR');
-    document.getElementById("GIExpected").innerHTML = GI_Exp.toLocaleString('pt-BR');
+    // document.getElementById("GIExpected").innerHTML = GI_Exp.toLocaleString('pt-BR');
     document.getElementById("inprocess").innerHTML = inprocessDescription + inprocess.toLocaleString('pt-BR') + "  ";
     
     this.myChartCap.chart.data.datasets[0].data = [porcentagemmeta, 100-porcentagemmeta];
