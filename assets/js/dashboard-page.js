@@ -106,11 +106,13 @@ document.getElementById("Form_Login").addEventListener("submit", async function(
       document.getElementById("tela_login").classList.add("d-none")
       document.getElementById("tela_dash").classList.remove("d-none")
   
-      await carregarDadosIniciais();
-      iniciarAtualizacaoAutomatica();
+      // await carregarDadosIniciais();
+      // iniciarAtualizacaoAutomatica();
   } else {
       document.getElementById("username").value = "";
       document.getElementById("password").value = "";
+
+      document.getElementById("username").focus();
 
       $.notify({
         message: '<strong>Error!</strong> User or password incorrect.'

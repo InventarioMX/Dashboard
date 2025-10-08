@@ -1,84 +1,42 @@
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/favicon.png">
-    <link rel="icon" type="image/png" href="./assets/img/favicon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
     <title>
         Dashboard Operation's
     </title>
     <!--     Fonts and icons     -->
-    <link href="./assets/css/Poppins.css" rel="stylesheet" />
-    <link href="./assets/css/fontawesome.css" rel="stylesheet">
+    <link href="../assets/css/Poppins.css" rel="stylesheet" />
+    <link href="../assets/css/fontawesome.css" rel="stylesheet">
     <!-- Nucleo Icons -->
-    <link href="./assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
     <!-- CSS Files -->
-    <link href="./assets/css/black-dashboard.css?version=1" rel="stylesheet" />
-    <!-- CSS Custom-->
-    <link href="./assets/css/dashboard-page.css" rel="stylesheet" />
-    <link href="./assets/css/dataTables.min.css" rel="stylesheet" />
-    <link href="./assets/css/handsontable.min.css" rel="stylesheet" />
-    <link href="./assets/css/ht-theme-main.min.css" rel="stylesheet" />
+    <link href="../assets/css/black-dashboard.css" rel="stylesheet" />
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link href="../assets/css/dashboard-page.css" rel="stylesheet" />
+    <link href="../assets/css/dataTables.min.css" rel="stylesheet" />
+    <link href="../assets/css/handsontable.min.css" rel="stylesheet" />
+    <link href="../assets/css/ht-theme-main.min.css" rel="stylesheet" />
 
 </head>
 
 <body class="">
-    <div id="popup" class="popup d-none">
+    <div id="popup" class="popup">
         <div class="popup-content">
             <h2>
                 <i class="tim-icons tim-icons-is-spinning icon-refresh-01 text-info"></i> Carregando . . .  
             </h2>
         </div>
     </div>
-    <div class="wrapper" id="tela_login">
-        <div class="container-fluid">
-            <div class="content">
-                <div class="container">
-                    <div class="row pt-5">
-                        <div class="col-md-6 mt-5 offset-md-3 pt-5 mt-5">
-                            <div class="card">
-                                <div class="card-header text-center py-4">
-                                    <h4 class="title">
-                                        Dashboard D2C
-                                    </h4>
-                                </div>
-                                <div class="card-body px-5 py-3">
-                                    <form id="Form_Login">
-                                        <div class="row">
-                                            <div class="col-md-12 px-md-1">
-                                                <div class="form-group">
-                                                    <label>
-                                                        Username :
-                                                    </label>
-                                                    <input type="text" name="username" class="form-control" placeholder="Username" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="username">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>
-                                                        Password :
-                                                    </label>
-                                                    <input type="password" name="password" autocomplete="password" class="form-control" placeholder="Password" maxlength="50" required="" id="password">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 px-md-1">
-                                                <button class="btn btn-fill btn-info float-right" id="btn-login">Login</button> 
-                                            </div>                                
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="wrapper d-none" id="tela_dash">
+    <div class="wrapper">
         <div class="sidebar" data="blue">
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <div class="photo">
-                        <img src="./assets/img/logo-azul.avif" alt="Profile Photo">
+                        <img src="../assets/img/logo-azul.avif" alt="Profile Photo">
                     </div>
                 </div>
                 <ul class="nav">
@@ -86,6 +44,12 @@
                         <a href="#">
                         <i class="tim-icons icon-chart-pie-36"></i>
                         <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/aging">
+                        <i class="tim-icons icon-time-alarm"></i>
+                        <p>Aging</p>
                         </a>
                     </li>
                 </ul>
@@ -115,7 +79,7 @@
                     <div class="collapse navbar-collapse" id="navigation">
                         <ul class="navbar-nav">
                             <li class="dropdown nav-item ml-5"></li>
-                            <li class="dropdown nav-item">
+                            <li class="dropdown nav-item mb-1">
                                 <a href="javascript:void(0)" class="dropdown-toggle h3 navbar-brand ml-0" data-toggle="dropdown" id="plant_btn">
                                     CAJ MX
                                 </a>
@@ -145,6 +109,17 @@
                                     <li class="nav-link"><a>
                                         <div class="form-check nav-item dropdown-item">
                                             <label class="form-check-label">
+                                                <input class="form-check-input" type="checkbox" value="" id="C820_R">
+                                                <span class="form-check-sign">
+                                                    <span class="check"></span>
+                                                </span>
+                                                <span class="card-title navbar-brand">RECIFE</span>
+                                            </label>
+                                        </div>
+                                    </a></li>
+                                    <li class="nav-link"><a>
+                                        <div class="form-check nav-item dropdown-item">
+                                            <label class="form-check-label">
                                                 <input class="form-check-input" type="checkbox" value=""  id="C820_G">
                                                 <span class="form-check-sign">
                                                     <span class="check"></span>
@@ -168,13 +143,14 @@
                                     <i class="tim-icons tim-icons-is-spinning icon-refresh-01 text-info"></i> Carregando . . .
                                 </a>
                             </li>
-
-                            <li class="dropdown nav-item">
-                                <a href="javascript:void(0)" class="h3 m-0 p-0" >
-                                    <i id="sair" class="tim-icons p-2 icon-button-power btn btn-danger" style="display: block;"></i>
-                                </a>
-                            </li>
                             
+                            <!-- <li class="dropdown nav-item">
+                                <a href="javascript:void(0)" class="h3 m-0 p-0" id="Download">
+                                    <i class="tim-icons p-1 icon-cloud-download-93 btn btn-success"></i>
+                                </a>
+                            </li> -->
+                            
+                            <li class="separator d-lg-none"></li>
                         </ul>
                     </div>
                 </div>
@@ -182,7 +158,16 @@
             <!-- End Navbar -->
             <div class="content">
                 <div class="row">
-                    <div class="col-lg-6 col-sm-12">
+                    <div class="col-lg-2 col-sm-12">
+                        <div class="card">
+                            <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons  icon-app text-danger"></i> Backlog</h2></div>
+                            <div class="card-header text-center mb-xl-0" id="btn_backlog">
+                                <h4 class="text-muted">Pending <a class="h3"><i id="filter-clear-backlog" class="tim-icons text-muted"></i></a></h4>
+                                <h1 id="backlog">0</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-sm-12">
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
@@ -191,11 +176,11 @@
                                         <div class="row">
                                             <div class="col-sm-6 text-center">
                                                 <h4 class="text-muted">D-2</h4>
-                                                <h1 id="gi_d_menos_2"></i></h1>
+                                                <h1 id="gi_d_menos_2">0</h1>
                                             </div>
                                             <div class="col-sm-6 text-center">
                                                 <h4 class="text-muted">D-1</h4>
-                                                <h1 id="gi_d_menos_1"></h1>
+                                                <h1 id="gi_d_menos_1">0</h1>
                                             </div>
                                         </div>
                                     </div>
@@ -204,27 +189,27 @@
                                     <div class="mb-xl-4"></div>
                                     <div class="card-header text-center ">
                                         <h4 class="text-muted">TODAY</h4>
-                                        <h1 class="bigg" id="gi_hoje"></h1>
+                                        <h1 class="bigg" id="gi_hoje">0</h1>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-sm-12">
+                    <div class="col-lg-5 col-sm-12">
                         <div class="card">
                             <div class="row">
                                 <div class="col-lg-7">
-                                    <div class="card-header"><h2 class="mb-xl-0" ><i class="tim-icons icon-app text-info"></i> Performance</h2></div>
+                                    <div class="card-header"><h2 class="mb-xl-0"><i class="tim-icons icon-app text-info"></i> Capa: <span id="cap">0</span> </h2></div>
                                     <div class="card-header">
                                         <div class="mb-xl-1"></div>
                                         <div class="row">
                                             <div class="col-sm-6 text-center">
-                                                <h4 class="text-muted">Capa</h4>
-                                                <h1 id="cap"></h1>    
+                                                <h4 class="text-muted ">Pending</h4>
+                                                <h1 id="gi_pending">0</h>                                   
                                             </div>
                                             <div class="col-sm-6 text-center">
-                                                <h4 class="text-muted ">Pending</h4>
-                                                <h1 id="gi_pending"></h>                                   
+                                                <h4 class="text-muted">GI Exp.</h4>
+                                                <h1 id="gi_expected">0</h1>    
                                             </div>
                                         </div>
                                     </div>
@@ -408,7 +393,11 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title"> DO's Detalhado</h4>
+                                <h4 class="card-title"> DO's Detalhado
+                                    <a href="javascript:void(0)" class="float-right btn btn-default" id="Download">
+                                        <i class="tim-icons pr-2 icon-cloud-download-93"></i> Download
+                                    </a>
+                                </h4>
                             </div>
                             <div class="card-body">
                                 <div id="excelTable" class="ht-theme-main-dark"></div>
@@ -419,38 +408,44 @@
             </div>
         </div>
     </div>
+    <script src="../assets/js/plugins/handsontable.full.min.js"></script>
+    <script src="../assets/js/plugins/chartjs.min.js"></script>
+    <script src="../assets/js/plugins/chartjs-plugin-datalabels.js"></script>
+    <script src="../assets/js/core/jquery.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.min.js"></script>
 
     <!--   Core JS Files   -->
-    <script src="./assets/js/core/jquery.min.js"></script>
-    <script src="./assets/js/core/popper.min.js"></script>
-    <script src="./assets/js/core/bootstrap.min.js"></script>
-
-    <!--   Plugins JS Files   -->
-    <script src="./assets/js/plugins/handsontable.full.min.js"></script>
-    <script src="./assets/js/plugins/chartjs.min.js"></script>
-    <script src="./assets/js/plugins/chartjs-plugin-datalabels.js"></script>
-    <script src="./assets/js/plugins/dataTables.min.js"></script>
-    <script src="./assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
-    <script src="./assets/js/plugins/bootstrap-notify.js"></script>
-
-    <!--   Managers JS Files   -->
-    <script src="./assets/js/managers/ChartManager.js"></script>
-    <script src="./assets/js/managers/DashboardManager.js"></script>
-    <script src="./assets/js/managers/AuthManager.js"></script>
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
     
-    <!-- <script src="../assets/js/managers/DownloadManager.js"></script> -->
+    <!--  Notifications Plugin    -->
+    <script src="../assets/js/plugins/bootstrap-notify.js"></script>
+    <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../assets/js/black-dashboard.min.js"></script>
+    <!-- <script src="../assets/js/dashboard-page.js"></script> -->
 
-    <!--   Utils JS Files   -->
+    <script src="../assets/js/managers/ChartManager.js"></script>
+    <script src="../assets/js/managers/DashboardManager.js"></script>
+    <script src="../assets/js/managers/DownloadManager.js"></script>
     <script src="../assets/js/utils/chartUtils.js"></script>
 
-    <!-- Control Center -->
-    <script src="./assets/js/black-dashboard.min.js"></script>
-    <script src="./assets/js/main.js"></script>
-    <script src="./assets/js/dashboard.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
+
 
     <script>
         $(document).ready(function() {
         $().ready(function() {
+
+            // $('.dropdown-menu a').click(function(event) {
+            //     event.stopPropagation();
+            // });
+            
+            // $('.dropdown-toggle').click(function(event) {
+            //     var isExpanded = $(this).attr('aria-expanded') === 'true';
+            //     $(this).attr('aria-expanded', !isExpanded);
+            // });
 
             $sidebar = $('.sidebar');
             $navbar = $('.navbar');
@@ -477,26 +472,26 @@
             });
 
             $('.fixed-plugin .background-color span').click(function() {
-                $(this).siblings().removeClass('active');
-                $(this).addClass('active');
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
 
-                var new_color = $(this).data('color');
+            var new_color = $(this).data('color');
 
-                if ($sidebar.length != 0) {
-                    $sidebar.attr('data', new_color);
-                }
+            if ($sidebar.length != 0) {
+                $sidebar.attr('data', new_color);
+            }
 
-                if ($main_panel.length != 0) {
-                    $main_panel.attr('data', new_color);
-                }
+            if ($main_panel.length != 0) {
+                $main_panel.attr('data', new_color);
+            }
 
-                if ($full_page.length != 0) {
-                    $full_page.attr('filter-color', new_color);
-                }
+            if ($full_page.length != 0) {
+                $full_page.attr('filter-color', new_color);
+            }
 
-                if ($sidebar_responsive.length != 0) {
-                    $sidebar_responsive.attr('data', new_color);
-                }
+            if ($sidebar_responsive.length != 0) {
+                $sidebar_responsive.attr('data', new_color);
+            }
             });
 
             $('.switch-sidebar-mini input').on("switchChange.bootstrapSwitch", function() {
@@ -522,38 +517,41 @@
             });
 
             $('.switch-change-color input').on("switchChange.bootstrapSwitch", function() {
-                var $btn = $(this);
+            var $btn = $(this);
 
-                if (white_color == true) {
+            if (white_color == true) {
 
-                    $('body').addClass('change-background');
-                    setTimeout(function() {
-                    $('body').removeClass('change-background');
-                    $('body').removeClass('white-content');
-                    }, 900);
-                    white_color = false;
-                } else {
+                $('body').addClass('change-background');
+                setTimeout(function() {
+                $('body').removeClass('change-background');
+                $('body').removeClass('white-content');
+                }, 900);
+                white_color = false;
+            } else {
 
-                    $('body').addClass('change-background');
-                    setTimeout(function() {
-                    $('body').removeClass('change-background');
-                    $('body').addClass('white-content');
-                    }, 900);
+                $('body').addClass('change-background');
+                setTimeout(function() {
+                $('body').removeClass('change-background');
+                $('body').addClass('white-content');
+                }, 900);
 
-                    white_color = true;
-                }
+                white_color = true;
+            }
+
             });
 
             $('.light-badge').click(function() {
-                $('body').addClass('white-content');
+            $('body').addClass('white-content');
             });
 
             $('.dark-badge').click(function() {
-                $('body').removeClass('white-content');
+            $('body').removeClass('white-content');
             });
         });
         });
     </script>
+
+
 
 </body>
 </html>
